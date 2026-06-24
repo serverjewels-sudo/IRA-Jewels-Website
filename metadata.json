@@ -1,0 +1,6 @@
+{
+  "name": "LuxeLoom Jewels",
+  "description": "Exquisite luxury jewelry e-commerce atelier, offering masterfully crafted rings, necklaces, diamonds, and gemstones with custom design services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

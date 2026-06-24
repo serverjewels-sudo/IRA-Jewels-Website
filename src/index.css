@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Custom fine luxury fading animations & scroll bars */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base resets to match the beautiful Editorial Aesthetic completely */
+body {
+  background-color: #f5f0eb;
+  color: #0a0a0a;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Elegant sleek scrollbars on cream surfaces */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f0eb;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a6b5c/30;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1a6b5c;
+}
+
+/* Product image wrapper rules */
+.product-image-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Base product image */
+.product-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+/* Hover effects */
+.product-image-wrapper:hover img {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Image fallback styling */
+.image-fallback {
+  background: linear-gradient(135deg, #1a6b5c, #f5f0eb);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+@media (min-width: 769px) {
+  .mobile-stats {
+    display: none !important;
+  }
+}
+

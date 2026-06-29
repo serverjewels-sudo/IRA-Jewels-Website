@@ -18,12 +18,14 @@ export const CartProvider = ({ children }) => {
 
   // Load cart from localStorage once on mount (client-side only to avoid hydration mismatch)
   useEffect(() => {
-    const storedCart = localStorage.getItem("ira_jewels_cart");
-    if (storedCart) {
-      try {
-        setItems(JSON.parse(storedCart));
-      } catch (error) {
-        console.error("Failed to parse cart data from localStorage:", error);
+    if (typeof window !== 'undefined') {
+      const storedCart = localStorage.getItem("ira_jewels_cart");
+      if (storedCart) {
+        try {
+          setItems(JSON.parse(storedCart));
+        } catch (error) {
+          console.error("Failed to parse cart data from localStorage:", error);
+        }
       }
     }
     setIsLoaded(true);
@@ -31,7 +33,7 @@ export const CartProvider = ({ children }) => {
 
   // Save cart to localStorage whenever items change, after the initial load has completed
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && typeof window !== 'undefined') {
       localStorage.setItem("ira_jewels_cart", JSON.stringify(items));
     }
   }, [items, isLoaded]);

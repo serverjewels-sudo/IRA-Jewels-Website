@@ -18,12 +18,14 @@ export default function ProductCard({ product }) {
 
     const checkWishlist = () => {
       try {
-        const stored = localStorage.getItem("ira-wishlist");
-        if (stored) {
-          const list = JSON.parse(stored);
-          if (Array.isArray(list)) {
-            setIsWishlisted(list.some((id) => String(id) === String(product.id)));
-            return;
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem("ira-wishlist");
+          if (stored) {
+            const list = JSON.parse(stored);
+            if (Array.isArray(list)) {
+              setIsWishlisted(list.some((id) => String(id) === String(product.id)));
+              return;
+            }
           }
         }
         setIsWishlisted(false);
@@ -35,11 +37,15 @@ export default function ProductCard({ product }) {
 
     checkWishlist();
 
-    window.addEventListener("wishlist-updated", checkWishlist);
+    if (typeof window !== 'undefined') {
+      window.addEventListener("wishlist-updated", checkWishlist);
+    }
     return () => {
-      window.removeEventListener("wishlist-updated", checkWishlist);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("wishlist-updated", checkWishlist);
+      }
     };
-  }, [product?.id]);
+  }, [product]);
 
   const toggleWishlist = (e) => {
     e.preventDefault();
@@ -47,24 +53,26 @@ export default function ProductCard({ product }) {
     if (!product) return;
 
     try {
-      const stored = localStorage.getItem("ira-wishlist");
-      let list = stored ? JSON.parse(stored) : [];
-      if (!Array.isArray(list)) list = [];
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem("ira-wishlist");
+        let list = stored ? JSON.parse(stored) : [];
+        if (!Array.isArray(list)) list = [];
 
-      const productIdStr = String(product.id);
-      const isCurrentlyWishlisted = list.some((id) => String(id) === productIdStr);
+        const productIdStr = String(product.id);
+        const isCurrentlyWishlisted = list.some((id) => String(id) === productIdStr);
 
-      if (isCurrentlyWishlisted) {
-        list = list.filter((id) => String(id) !== productIdStr);
-      } else {
-        list.push(product.id);
+        if (isCurrentlyWishlisted) {
+          list = list.filter((id) => String(id) !== productIdStr);
+        } else {
+          list.push(product.id);
+        }
+
+        localStorage.setItem("ira-wishlist", JSON.stringify(list));
+        setIsWishlisted(!isCurrentlyWishlisted);
+
+        // Dispatch custom event to notify all listeners
+        window.dispatchEvent(new Event("wishlist-updated"));
       }
-
-      localStorage.setItem("ira-wishlist", JSON.stringify(list));
-      setIsWishlisted(!isCurrentlyWishlisted);
-
-      // Dispatch custom event to notify all listeners
-      window.dispatchEvent(new Event("wishlist-updated"));
     } catch (err) {
       console.error("Error saving wishlist to localStorage:", err);
     }

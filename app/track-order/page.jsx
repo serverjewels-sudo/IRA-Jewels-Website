@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { supabase } from "@/lib/supabase";
+
+export const dynamic = 'force-dynamic';
 import { Package, Check, Phone } from "lucide-react";
 
 export default function TrackOrderPage() {

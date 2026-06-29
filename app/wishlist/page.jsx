@@ -36,11 +36,13 @@ export default function WishlistPage() {
 
   // Set SEO metadata and load wishlist on mount
   useEffect(() => {
-    document.title = "My Wishlist | IRA Jewels";
+    if (typeof window !== 'undefined') {
+      document.title = "My Wishlist | IRA Jewels";
+    }
 
     const loadWishlist = async () => {
       try {
-        const stored = localStorage.getItem("ira-wishlist");
+        const stored = typeof window !== 'undefined' ? localStorage.getItem("ira-wishlist") : null;
         const ids = stored ? JSON.parse(stored) : [];
         setWishlistIds(ids);
 
@@ -78,7 +80,7 @@ export default function WishlistPage() {
   useEffect(() => {
     const handleWishlistUpdate = () => {
       try {
-        const stored = localStorage.getItem("ira-wishlist");
+        const stored = typeof window !== 'undefined' ? localStorage.getItem("ira-wishlist") : null;
         const ids = stored ? JSON.parse(stored) : [];
         const stringIds = ids.map(String);
 
@@ -105,15 +107,17 @@ export default function WishlistPage() {
       e.stopPropagation();
     }
     try {
-      const stored = localStorage.getItem("ira-wishlist");
-      let list = stored ? JSON.parse(stored) : [];
-      if (Array.isArray(list)) {
-        const productIdStr = String(productId);
-        list = list.filter((id) => String(id) !== productIdStr);
-        localStorage.setItem("ira-wishlist", JSON.stringify(list));
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem("ira-wishlist");
+        let list = stored ? JSON.parse(stored) : [];
+        if (Array.isArray(list)) {
+          const productIdStr = String(productId);
+          list = list.filter((id) => String(id) !== productIdStr);
+          localStorage.setItem("ira-wishlist", JSON.stringify(list));
 
-        // Dispatch update event
-        window.dispatchEvent(new Event("wishlist-updated"));
+          // Dispatch update event
+          window.dispatchEvent(new Event("wishlist-updated"));
+        }
       }
     } catch (err) {
       console.error("Error removing item from wishlist:", err);

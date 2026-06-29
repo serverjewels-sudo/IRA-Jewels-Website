@@ -5,6 +5,8 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 import Testimonials from "@/components/home/Testimonials";
 import Footer from "@/components/layout/Footer";
 
+export const dynamic = 'force-dynamic';
+
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">

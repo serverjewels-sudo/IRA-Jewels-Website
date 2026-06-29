@@ -6,6 +6,8 @@ import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/shop/ProductCard";
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
 
+export const dynamic = 'force-dynamic';
+
 export default function OffersPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);

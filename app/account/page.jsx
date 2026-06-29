@@ -7,6 +7,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = 'force-dynamic';
+
 export default function AccountPage() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);

@@ -1,5 +1,7 @@
 import ProductForm from "@/components/admin/ProductForm";
 
+export const dynamic = 'force-dynamic';
+
 export default function EditProductPage({ params }) {
   const { id } = params;
 

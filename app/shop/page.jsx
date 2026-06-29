@@ -8,6 +8,8 @@ import { SlidersHorizontal, X, ChevronDown, RotateCcw } from "lucide-react";
 
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
 
+export const dynamic = 'force-dynamic';
+
 
 const categories = [
   "All", "Rings", "Necklaces", "Bangles", "Earrings", "Bracelets", 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
 import { useCart } from "@/lib/CartContext";
 import { supabase } from "@/lib/supabase";
 
@@ -41,17 +41,48 @@ export default function Navbar() {
           >
             Shop
           </Link>
+          
+          {/* Collections Dropdown */}
+          <div className="relative group py-2">
+            <button className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase flex items-center gap-1">
+              Collections
+              <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" />
+            </button>
+            <div className="absolute left-0 mt-2 w-48 bg-white border border-[#F3F1EC] shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+              <div className="py-2">
+                <Link href="/shop?category=rings" className="block px-4 py-2.5 text-[11px] font-medium tracking-widest text-[#2E3135] hover:bg-[#F9F8F6] hover:text-[#CDB38B] transition-colors duration-200 uppercase">
+                  Rings
+                </Link>
+                <Link href="/shop?category=necklaces" className="block px-4 py-2.5 text-[11px] font-medium tracking-widest text-[#2E3135] hover:bg-[#F9F8F6] hover:text-[#CDB38B] transition-colors duration-200 uppercase">
+                  Necklaces
+                </Link>
+                <Link href="/shop?category=earrings" className="block px-4 py-2.5 text-[11px] font-medium tracking-widest text-[#2E3135] hover:bg-[#F9F8F6] hover:text-[#CDB38B] transition-colors duration-200 uppercase">
+                  Earrings
+                </Link>
+                <Link href="/shop?category=bangles" className="block px-4 py-2.5 text-[11px] font-medium tracking-widest text-[#2E3135] hover:bg-[#F9F8F6] hover:text-[#CDB38B] transition-colors duration-200 uppercase">
+                  Bangles
+                </Link>
+                <Link href="/shop?category=bracelets" className="block px-4 py-2.5 text-[11px] font-medium tracking-widest text-[#2E3135] hover:bg-[#F9F8F6] hover:text-[#CDB38B] transition-colors duration-200 uppercase">
+                  Bracelets
+                </Link>
+                <Link href="/shop" className="block px-4 py-2.5 text-[11px] font-semibold tracking-widest text-[#2E3135] hover:bg-[#F9F8F6] hover:text-[#CDB38B] transition-colors duration-200 uppercase border-t border-[#F3F1EC]">
+                  All Jewellery
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <Link 
-            href="/about" 
+            href="/offers" 
             className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
           >
-            Our Story
+            Offers
           </Link>
           <Link 
-            href="/contact" 
+            href="/blog" 
             className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
           >
-            Contact
+            Blog
           </Link>
         </div>
 
@@ -75,8 +106,24 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Right Side: Search, Account, Cart */}
+        {/* Right Side: Search, Account, Cart + Our Story, Contact */}
         <div className="flex items-center space-x-3 sm:space-x-5">
+          {/* Navigation Links for Desktop on Right Side */}
+          <div className="hidden md:flex items-center space-x-8 mr-4 lg:mr-6">
+            <Link 
+              href="/about" 
+              className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+            >
+              Our Story
+            </Link>
+            <Link 
+              href="/contact" 
+              className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+            >
+              Contact
+            </Link>
+          </div>
+
           <button 
             className="p-2 text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300"
             aria-label="Search"
@@ -125,32 +172,101 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <div className="flex flex-col space-y-6">
+              <div className="flex flex-col space-y-5 overflow-y-auto max-h-[calc(100vh-180px)] pr-2">
                 <Link 
                   href="/shop" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[14px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
                 >
                   Shop
                 </Link>
+                
+                <div className="space-y-2">
+                  <span className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase block">
+                    Collections
+                  </span>
+                  <div className="pl-3 flex flex-col space-y-2.5 border-l border-[#F3F1EC]">
+                    <Link 
+                      href="/shop?category=rings" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                    >
+                      Rings
+                    </Link>
+                    <Link 
+                      href="/shop?category=necklaces" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                    >
+                      Necklaces
+                    </Link>
+                    <Link 
+                      href="/shop?category=earrings" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                    >
+                      Earrings
+                    </Link>
+                    <Link 
+                      href="/shop?category=bangles" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                    >
+                      Bangles
+                    </Link>
+                    <Link 
+                      href="/shop?category=bracelets" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                    >
+                      Bracelets
+                    </Link>
+                    <Link 
+                      href="/shop" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-[12px] font-semibold tracking-widest text-[#CDB38B] uppercase"
+                    >
+                      All Jewellery
+                    </Link>
+                  </div>
+                </div>
+
+                <Link 
+                  href="/offers" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                >
+                  Offers
+                </Link>
+                
+                <Link 
+                  href="/blog" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                >
+                  Blog
+                </Link>
+                
                 <Link 
                   href="/about" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[14px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
                 >
                   Our Story
                 </Link>
+                
                 <Link 
                   href="/contact" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[14px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
                 >
                   Contact
                 </Link>
+
                 <Link 
                   href={accountLink} 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[14px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase border-t border-[#F3F1EC] pt-4"
                 >
                   Account
                 </Link>

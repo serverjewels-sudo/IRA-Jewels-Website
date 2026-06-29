@@ -144,3 +144,15 @@ USING (
 -- Verification Check: Confirm RLS states
 -- ---------------------------------------------------------------------
 -- SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public';
+
+
+-- ---------------------------------------------------------------------
+-- 5. PUBLIC TRACK ORDER POLICY
+-- ---------------------------------------------------------------------
+
+-- POLICY: Allow public/anonymous search of orders by order number
+CREATE POLICY select_order_by_number ON orders
+  FOR SELECT
+  TO public
+  USING (true);
+

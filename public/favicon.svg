@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Luxury dark emerald background -->
-  <rect width="512" height="512" rx="128" fill="#1a6b5c"/>
-  <!-- Elegant gold border -->
-  <circle cx="256" cy="256" r="216" fill="none" stroke="#d4af37" stroke-width="12" opacity="0.85"/>
-  <!-- Serif "LL" monogram lettering representing LuxeLoom -->
-  <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="'Times New Roman', 'Playfair Display', 'Didot', 'Georgia', serif" font-size="210" font-weight="700" fill="#d4af37" letter-spacing="-8">LL</text>
-</svg>

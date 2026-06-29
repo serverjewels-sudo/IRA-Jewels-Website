@@ -1,110 +1,34 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, AlertTriangle, ArrowRight, ShoppingBag } from "lucide-react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { supabase } from "@/lib/supabase";
+import { supabaseServer } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 
-export default function OrderConfirmedDetailPage() {
-  const { id } = useParams();
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!id) return;
-
-    async function fetchOrder() {
-      try {
-        const { data, error } = await supabase
-          .from("orders")
-          .select("*")
-          .eq("id", id)
-          .single();
-
-        if (error || !data) {
-          console.error("Error fetching order:", error);
-          setOrder(null);
-        } else {
-          setOrder(data);
-        }
-      } catch (err) {
-        console.error("Unexpected error fetching order:", err);
-        setOrder(null);
-      } finally {
-        setLoading(false);
-      }
+export default async function OrderConfirmedPage({ params }) {
+  const { id } = params;
+  
+  try {
+    const { data: order, error } = await supabaseServer
+      .from('orders')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error || !order) {
+      return <OrderNotFound />;
     }
-
-    fetchOrder();
-  }, [id]);
-
-  const formatPrice = (amount) => {
-    return "₹" + Number(amount).toLocaleString("en-IN");
-  };
-
-  const getPaymentMethodLabel = (method) => {
-    switch (String(method).toLowerCase()) {
-      case "cod":
-        return "Cash on Delivery (COD)";
-      case "upi":
-        return "UPI (GPay/PhonePe)";
-      case "card":
-        return "Credit/Debit Card";
-      case "netbanking":
-        return "Net Banking";
-      default:
-        return method ? method.toUpperCase() : "Demo Payment";
-    }
-  };
-
-  const getStatusLabel = (status) => {
-    switch (String(status).toLowerCase()) {
-      case "placed":
-        return "Placed";
-      case "confirmed":
-        return "Confirmed";
-      case "shipped":
-        return "Shipped";
-      case "delivered":
-        return "Delivered";
-      case "cancelled":
-        return "Cancelled";
-      default:
-        return status ? status.toUpperCase() : "Placed";
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
-        <Navbar />
-        <main className="flex-grow py-16 px-4 max-w-7xl mx-auto w-full flex flex-col items-center justify-center">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-8 h-8 rounded-full border-2 border-t-[#CDB38B] border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-            <p className="text-[14px] font-inter font-light text-[#888888] tracking-wider uppercase">Loading Order Details...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    
+    return <OrderConfirmedUI order={order} />;
+    
+  } catch (err) {
+    console.error('[OrderConfirmed] Error:', err);
+    return <OrderNotFound />;
   }
+}
 
-  if (!order) {
-    return (
-      <div style={{textAlign:'center', padding:'80px 20px', fontFamily:'Inter'}}>
-        <h2 style={{fontFamily:'Cormorant Garamond', fontSize:'36px', color:'#2E3135', marginBottom:'12px'}}>Order Not Found</h2>
-        <p style={{color:'#888', fontSize:'15px'}}>We could not find your order details.</p>
-        <a href="/" style={{display:'inline-block', marginTop:'28px', background:'#2E3135', color:'#fff', padding:'14px 36px', fontSize:'12px', letterSpacing:'2px', textDecoration:'none'}}>BACK TO HOME</a>
-      </div>
-    );
-  }
-
+function OrderConfirmedUI({ order }) {
   const itemsList = Array.isArray(order.items) ? order.items : [];
   const orderDate = order.created_at
     ? new Date(order.created_at).toLocaleDateString("en-IN", {
@@ -256,3 +180,49 @@ export default function OrderConfirmedDetailPage() {
     </div>
   );
 }
+
+function OrderNotFound() {
+  return (
+    <div style={{minHeight:'60vh', display:'flex', flexDirection:'column', alignItems:'center', justifyItems:'center', justifyContent:'center', fontFamily:'Inter'}}>
+      <h2 style={{fontFamily:'Cormorant Garamond', fontSize:'36px', color:'#2E3135', marginBottom:'12px'}}>Order Not Found</h2>
+      <p style={{color:'#888', fontSize:'15px', marginBottom:'28px'}}>We could not find your order details.</p>
+      <a href="/" style={{background:'#2E3135', color:'#fff', padding:'14px 36px', fontSize:'12px', letterSpacing:'2px', textDecoration:'none', fontFamily:'Inter'}}>BACK TO HOME</a>
+    </div>
+  );
+}
+
+const formatPrice = (amount) => {
+  return "₹" + Number(amount).toLocaleString("en-IN");
+};
+
+const getPaymentMethodLabel = (method) => {
+  switch (String(method).toLowerCase()) {
+    case "cod":
+      return "Cash on Delivery (COD)";
+    case "upi":
+      return "UPI (GPay/PhonePe)";
+    case "card":
+      return "Credit/Debit Card";
+    case "netbanking":
+      return "Net Banking";
+    default:
+      return method ? method.toUpperCase() : "Demo Payment";
+  }
+};
+
+const getStatusLabel = (status) => {
+  switch (String(status).toLowerCase()) {
+    case "placed":
+      return "Placed";
+    case "confirmed":
+      return "Confirmed";
+    case "shipped":
+      return "Shipped";
+    case "delivered":
+      return "Delivered";
+    case "cancelled":
+      return "Cancelled";
+    default:
+      return status ? status.toUpperCase() : "Placed";
+  }
+};

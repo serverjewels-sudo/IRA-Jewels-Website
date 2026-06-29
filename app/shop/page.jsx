@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/shop/ProductCard";
@@ -41,7 +42,10 @@ function SkeletonCard() {
   );
 }
 
-export default function ShopPage() {
+function ShopInner() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
   const [products, setProducts] = useState([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
@@ -53,6 +57,18 @@ export default function ShopPage() {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const isFirstMount = useRef(true);
+
+  // Sync category query parameter if it exists
+  useEffect(() => {
+    if (categoryParam) {
+      const matched = categories.find(
+        (c) => c.toLowerCase() === categoryParam.toLowerCase()
+      );
+      if (matched) {
+        setSelectedCategory(matched);
+      }
+    }
+  }, [categoryParam]);
 
   // Fetch products from Supabase on mount
   useEffect(() => {
@@ -402,5 +418,13 @@ export default function ShopPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopInner />
+    </Suspense>
   );
 }

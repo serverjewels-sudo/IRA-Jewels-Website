@@ -8,18 +8,26 @@ import Footer from "@/components/layout/Footer";
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
 import { useCart } from "@/lib/CartContext";
 
-export default function ProductDetailClient({ slug }) {
+export default function ProductDetailClient({ product: initialProduct, slug }) {
   const { addToCart } = useCart();
 
-  const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [product, setProduct] = useState(initialProduct);
+  const [isLoading, setIsLoading] = useState(!initialProduct);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColour, setSelectedColour] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(initialProduct?.size_options?.[0] || null);
+  const [selectedColour, setSelectedColour] = useState(initialProduct?.colour_options?.[0] || null);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [cartStatus, setCartStatus] = useState("ADD TO CART");
 
   useEffect(() => {
+    if (initialProduct) {
+      setProduct(initialProduct);
+      setSelectedSize(initialProduct.size_options?.[0] || null);
+      setSelectedColour(initialProduct.colour_options?.[0] || null);
+      setIsLoading(false);
+      return;
+    }
+
     async function loadProduct() {
       try {
         const { data, error } = await supabase
@@ -43,7 +51,7 @@ export default function ProductDetailClient({ slug }) {
       }
     }
     loadProduct();
-  }, [slug]);
+  }, [slug, initialProduct]);
 
   if (isLoading) {
     return (

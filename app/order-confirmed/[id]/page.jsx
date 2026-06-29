@@ -8,6 +8,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = 'force-dynamic';
+
 export default function OrderConfirmedDetailPage() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -95,35 +97,10 @@ export default function OrderConfirmedDetailPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
-        <Navbar />
-        <main className="flex-grow flex items-center justify-center py-16 md:py-24 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md w-full text-center space-y-8">
-            <div className="flex justify-center">
-              <div className="rounded-full bg-[#FFF5F5] p-5 flex items-center justify-center">
-                <AlertTriangle className="w-16 h-16 text-[#E53E3E] stroke-[1.25]" />
-              </div>
-            </div>
-            <div className="space-y-3">
-              <h1 className="font-cormorant font-normal text-[36px] text-[#2E3135] leading-tight">
-                Order Not Found
-              </h1>
-              <p className="font-inter font-light text-[15px] text-[#888888] max-w-sm mx-auto">
-                We couldn&apos;t retrieve the details for this order. It might not exist or there was a system error.
-              </p>
-            </div>
-            <div className="pt-4">
-              <Link
-                href="/shop"
-                className="w-full h-14 bg-[#2E3135] text-white font-inter font-medium text-[12px] tracking-[2px] uppercase flex items-center justify-center hover:bg-[#CDB38B] transition-all duration-300 shadow-sm gap-2"
-              >
-                <span>RETURN TO SHOP</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </main>
-        <Footer />
+      <div style={{textAlign:'center', padding:'80px 20px', fontFamily:'Inter'}}>
+        <h2 style={{fontFamily:'Cormorant Garamond', fontSize:'36px', color:'#2E3135', marginBottom:'12px'}}>Order Not Found</h2>
+        <p style={{color:'#888', fontSize:'15px'}}>We could not find your order details.</p>
+        <a href="/" style={{display:'inline-block', marginTop:'28px', background:'#2E3135', color:'#fff', padding:'14px 36px', fontSize:'12px', letterSpacing:'2px', textDecoration:'none'}}>BACK TO HOME</a>
       </div>
     );
   }

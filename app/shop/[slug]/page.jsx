@@ -9,6 +9,7 @@ import Footer from '@/components/layout/Footer'
 import { useCart } from '@/lib/CartContext'
 import { createClient, mapSupabaseProduct } from '@/lib/supabase'
 import { sampleProducts } from '@/lib/products'
+import ReviewSection from '@/components/product/ReviewSection'
 
 export default function ProductDetailPage() {
   const { slug } = useParams()
@@ -27,6 +28,7 @@ export default function ProductDetailPage() {
   // Wishlist state
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [cartStatus, setCartStatus] = useState("ADD TO CART")
+  const [reviewsStats, setReviewsStats] = useState({ count: 0, average: 0 })
   
   // Fetch product from Supabase (or local fallback)
   useEffect(() => {
@@ -79,6 +81,34 @@ export default function ProductDetailPage() {
 
     fetchProduct()
   }, [slug])
+
+  // Fetch reviews count and average rating
+  useEffect(() => {
+    if (!product?.id) return
+
+    async function fetchReviewStats() {
+      try {
+        const supabase = createClient()
+        const { data, error } = await supabase
+          .from('reviews')
+          .select('rating')
+          .eq('product_id', product.id)
+          .eq('is_approved', true)
+        
+        if (!error && data) {
+          const count = data.length
+          const average = count > 0 
+            ? data.reduce((sum, r) => sum + r.rating, 0) / count 
+            : 0
+          setReviewsStats({ count, average })
+        }
+      } catch (err) {
+        console.error('[ProductDetail] fetch stats error:', err)
+      }
+    }
+
+    fetchReviewStats()
+  }, [product?.id])
 
   // Sync wishlist status
   useEffect(() => {
@@ -286,14 +316,25 @@ export default function ProductDetailPage() {
                   <span className="text-[#CDB38B] font-inter font-medium text-[11px] tracking-[2.5px] uppercase">
                     {product.category || 'Fine Jewellery'}
                   </span>
-                  <div className="flex items-center gap-1">
-                    <div className="flex text-[#CDB38B]">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-current stroke-current" />
-                      ))}
+                  {reviewsStats.count > 0 && (
+                    <div className="flex items-center gap-1">
+                      <div className="flex text-[#CDB38B]">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`w-3.5 h-3.5 ${
+                              i < Math.round(reviewsStats.average) 
+                                ? 'fill-current stroke-current' 
+                                : 'fill-none stroke-current'
+                            }`} 
+                          />
+                        ))}
+                      </div>
+                      <span className="text-gray-400 font-inter text-[11px] ml-1">
+                        ({reviewsStats.count} Review{reviewsStats.count !== 1 ? 's' : ''})
+                      </span>
                     </div>
-                    <span className="text-gray-400 font-inter text-[11px] ml-1">(18 Reviews)</span>
-                  </div>
+                  )}
                 </div>
 
                 {/* Product Name */}
@@ -478,6 +519,7 @@ export default function ProductDetailPage() {
 
           </div>
         </div>
+        {product && <ReviewSection productId={product.id} />}
       </main>
 
       <Footer />

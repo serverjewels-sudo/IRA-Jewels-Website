@@ -5,11 +5,34 @@ import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/CartContext";
+import { supabase } from '@/lib/supabase'
 
 export default function ProductCard({ product }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const router = useRouter();
   const { addToCart } = useCart();
+
+  const [rating, setRating] = useState({ avg: 0, count: 0 })
+
+  useEffect(() => {
+    if (!product?.id) return
+    async function fetchRating() {
+      try {
+        const { data, error } = await supabase
+          .from('reviews')
+          .select('rating')
+          .eq('product_id', product.id)
+          .eq('is_approved', true)
+        if (!error && data && data.length > 0) {
+          const avg = data.reduce((sum, r) => sum + r.rating, 0) / data.length
+          setRating({ avg: avg.toFixed(1), count: data.length })
+        }
+      } catch (err) {
+        console.error('[ProductCard] rating fetch error:', err)
+      }
+    }
+    fetchRating()
+  }, [product?.id])
 
   const isOnSale = product?.comparePriceVal && product?.comparePriceVal > product?.priceVal;
 
@@ -148,6 +171,15 @@ export default function ProductCard({ product }) {
             {product.name}
           </Link>
         </h3>
+
+        {rating.count > 0 && (
+          <div style={{display:'flex', alignItems:'center', gap:'4px', marginBottom:'6px'}}>
+            <span style={{color:'#CDB38B', fontSize:'12px', letterSpacing:'1px'}}>
+              {'★'.repeat(Math.round(rating.avg))}{'☆'.repeat(5 - Math.round(rating.avg))}
+            </span>
+            <span style={{fontSize:'11px', color:'#888'}}>({rating.count})</span>
+          </div>
+        )}
 
         {/* Price & Metal type */}
         <div className="mt-auto space-y-1">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 export default function ReviewSection({ productId }) {
   const [reviews, setReviews] = useState([])
@@ -21,14 +21,12 @@ export default function ReviewSection({ productId }) {
   }, [productId])
 
   async function checkUser() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
+    const { data: { session } } = await supabase.auth.getSession()
+    setUser(session?.user || null)
   }
 
   async function fetchReviews() {
     try {
-      const supabase = createClient()
       const { data, error } = await supabase
         .from('reviews')
         .select('*')
@@ -48,7 +46,6 @@ export default function ReviewSection({ productId }) {
     if (!user || rating === 0) return
     setSubmitting(true)
     try {
-      const supabase = createClient()
       const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
       const { error } = await supabase.from('reviews').insert({
         product_id: productId,
@@ -92,7 +89,12 @@ export default function ReviewSection({ productId }) {
         {!user ? (
           <div style={{textAlign:'center'}}>
             <p style={{fontSize:'14px', color:'#2E3135', marginBottom:'12px'}}>Login to share your experience</p>
-            <a href="/account/login" style={{display:'inline-block', background:'#2E3135', color:'#fff', padding:'12px 28px', fontSize:'12px', letterSpacing:'1.5px', textDecoration:'none'}}>LOGIN TO REVIEW</a>
+            <a 
+              href={typeof window !== 'undefined' ? `/account/login?redirect=${encodeURIComponent(window.location.pathname)}` : '/account/login'} 
+              style={{display:'inline-block', background:'#2E3135', color:'#fff', padding:'12px 28px', fontSize:'12px', letterSpacing:'1.5px', textDecoration:'none'}}
+            >
+              LOGIN TO REVIEW
+            </a>
           </div>
         ) : submitSuccess ? (
           <p style={{textAlign:'center', color:'#2E3135', fontSize:'14px'}}>Thank you! Your review has been posted.</p>

@@ -108,6 +108,12 @@ export default function OrderConfirmedPage() {
             </div>
           )}
 
+          <div style={{marginBottom:'32px'}}>
+            <p style={{fontFamily:'Inter', fontWeight:300, fontSize:'12px', color:'#888'}}>
+              IRA Jewels | GSTIN: 24AAHCI5512M1ZH
+            </p>
+          </div>
+
           <a href="/shop" style={{display:'inline-block', background:'#2E3135', color:'#fff', padding:'16px 40px', fontSize:'12px', letterSpacing:'2px', textDecoration:'none'}}>CONTINUE SHOPPING</a>
         </div>
       </main>

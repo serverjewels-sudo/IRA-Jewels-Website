@@ -126,8 +126,13 @@ export default function Footer() {
 
         {/* Bottom: Copyright & Fine Print */}
         <div className="border-t border-[#F3F1EC] pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="text-[11px] font-medium tracking-widest text-[#2E3135]/60 uppercase">
-            &copy; {new Date().getFullYear()} IRA Jewels. Handcrafted Everyday Luxury. All rights reserved.
+          <div className="flex flex-col space-y-2 items-center md:items-start">
+            <div className="text-[11px] font-medium tracking-widest text-[#2E3135]/60 uppercase">
+              &copy; {new Date().getFullYear()} IRA Jewels. Handcrafted Everyday Luxury. All rights reserved.
+            </div>
+            <div className="text-[12px] font-inter font-light text-[#2E3135]">
+              GSTIN: 24AAHCI5512M1ZH
+            </div>
           </div>
         </div>
       </div>

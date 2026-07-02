@@ -467,12 +467,16 @@ export default function ProductDetailPage() {
                   {/* Wishlist Button */}
                   <button
                     onClick={toggleWishlist}
-                    className="w-[52px] h-[52px] border border-[#E5E5E5] flex items-center justify-center transition-all duration-300 hover:bg-[#FBFBFA]"
+                    className={`w-[52px] h-[52px] border flex items-center justify-center transition-all duration-300 ${
+                      isWishlisted
+                        ? "bg-[#CDB38B] border-[#CDB38B] hover:bg-[#CDB38B]/90"
+                        : "bg-white border-[#E5E5E5] hover:bg-[#FBFBFA]"
+                    }`}
                     aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                   >
                     <Heart
                       className={`w-5 h-5 transition-colors duration-300 ${
-                        isWishlisted ? "fill-[#CDB38B] stroke-[#CDB38B]" : "stroke-[#2E3135] fill-none"
+                        isWishlisted ? "fill-[#2E3135] stroke-[#2E3135]" : "stroke-[#2E3135] fill-none"
                       }`}
                     />
                   </button>

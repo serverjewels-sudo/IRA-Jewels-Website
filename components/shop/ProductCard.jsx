@@ -140,13 +140,17 @@ export default function ProductCard({ product }) {
         {/* Wishlist Heart Icon (Top right corner of image) */}
         <button
           onClick={toggleWishlist}
-          className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 hover:bg-white"
+          className={`absolute top-4 right-4 z-10 p-2.5 rounded-full shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 ${
+            isWishlisted
+              ? "bg-[#CDB38B] hover:bg-[#CDB38B]/90 text-[#2E3135]"
+              : "bg-white/90 backdrop-blur-sm hover:bg-white text-[#2E3135]"
+          }`}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
             className={`w-[18px] h-[18px] transition-colors duration-300 ${
               isWishlisted
-                ? "fill-[#CDB38B] stroke-[#CDB38B]"
+                ? "fill-[#2E3135] stroke-[#2E3135]"
                 : "stroke-[#2E3135] fill-none"
             }`}
           />

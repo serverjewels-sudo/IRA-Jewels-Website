@@ -88,11 +88,15 @@ export default function AddToCartButton({ product }) {
         {/* Add to Wishlist Button */}
         <button
           onClick={toggleWishlist}
-          className="w-full h-[52px] bg-white border border-[#2E3135] text-[#2E3135] font-inter font-medium text-[13px] tracking-[2px] uppercase transition-all duration-300 hover:bg-[#F3F1EC]/30 active:scale-[0.99] flex items-center justify-center gap-2"
+          className={`w-full h-[52px] border font-inter font-medium text-[13px] tracking-[2px] uppercase transition-all duration-300 active:scale-[0.99] flex items-center justify-center gap-2 ${
+            isWishlisted
+              ? "bg-[#CDB38B] border-[#CDB38B] text-[#2E3135] hover:bg-[#CDB38B]/90"
+              : "bg-white border-[#2E3135] text-[#2E3135] hover:bg-[#F3F1EC]/30"
+          }`}
         >
           <Heart
             className={`w-[16px] h-[16px] transition-colors duration-300 ${
-              isWishlisted ? "fill-[#CDB38B] stroke-[#CDB38B]" : "stroke-[#2E3135] fill-none"
+              isWishlisted ? "fill-[#2E3135] stroke-[#2E3135]" : "stroke-[#2E3135] fill-none"
             }`}
           />
           {isWishlisted ? "WISHLISTED" : "ADD TO WISHLIST"}

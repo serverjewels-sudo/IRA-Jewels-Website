@@ -4,12 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Sidebar from "@/components/admin/Sidebar";
+import { Menu } from "lucide-react";
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     // If it's the login page, bypass authentication check in layout
@@ -70,12 +76,27 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex bg-[#F3F1EC] text-[#2E3135]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F3F1EC] text-[#2E3135]">
+      {/* Mobile Header Top Bar */}
+      <header className="bg-white border-b border-[#2E3135]/10 h-16 flex items-center justify-between px-6 md:hidden sticky top-0 z-20 w-full shrink-0">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="text-[#2E3135] p-2 -ml-2 focus:outline-none"
+          aria-label="Open sidebar"
+        >
+          <Menu className="w-5 h-5 stroke-[1.5]" />
+        </button>
+        <span className="font-serif text-[16px] tracking-[0.15em] text-[#2E3135] uppercase">
+          Admin Panel
+        </span>
+        <div className="w-9"></div> {/* spacer for centering */}
+      </header>
+
       {/* Admin Sidebar */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       
       {/* Main Content Pane */}
-      <main className="flex-grow p-8 md:p-12 overflow-y-auto max-w-7xl mx-auto w-full">
+      <main className="flex-grow p-4 md:p-12 overflow-y-auto max-w-7xl mx-auto w-full">
         {children}
       </main>
     </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
 import { Lock, CreditCard, Landmark, Banknote, Smartphone, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -67,7 +68,7 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState({});
   const [deliveryPref, setDeliveryPref] = useState("standard"); // "standard" or "express"
-  const [paymentMethod, setPaymentMethod] = useState("upi"); // "upi", "card", "netbanking", "cod"
+  const [paymentMethod, setPaymentMethod] = useState("razorpay"); // "razorpay", "cod"
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -158,6 +159,8 @@ export default function CheckoutPage() {
       const orderNumber = `IRA-${year}-${datePart}`;
 
       const subtotal = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
+      const shippingCost = deliveryPref === "express" ? 199 : 0;
+      const finalTotal = subtotal + shippingCost;
 
       const orderItems = items.map((item) => ({
         product_id: item.id,
@@ -174,42 +177,131 @@ export default function CheckoutPage() {
         pincode: formData.pinCode,
       };
 
-      const { data: newOrder, error } = await supabase
-        .from("orders")
-        .insert([
-          {
-            order_number: orderNumber,
-            customer_id: customerId,
-            customer_name: formData.fullName,
-            customer_email: formData.email,
-            customer_phone: formData.phone,
-            items: orderItems,
-            subtotal: subtotal,
-            shipping: 0,
-            total: subtotal,
-            payment_method: paymentMethod,
-            payment_status: paymentMethod === "cod" ? "cod_pending" : "pending",
-            shipping_address: shippingAddress,
-            status: "placed",
+      if (paymentMethod === "cod") {
+        const { data: newOrder, error } = await supabase
+          .from("orders")
+          .insert([
+            {
+              order_number: orderNumber,
+              customer_id: customerId,
+              customer_name: formData.fullName,
+              customer_email: formData.email,
+              customer_phone: formData.phone,
+              items: orderItems,
+              subtotal: subtotal,
+              shipping: shippingCost,
+              total: finalTotal,
+              payment_method: "cod",
+              payment_status: "cod_pending",
+              shipping_address: shippingAddress,
+              status: "placed",
+            },
+          ])
+          .select();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!newOrder || newOrder.length === 0) {
+          throw new Error("No order data returned from Supabase");
+        }
+
+        // On success: clear cart and redirect
+        setIsSuccess(true);
+        clearCart();
+        router.push(`/order-confirmed/${newOrder[0].id}`);
+      } else {
+        // Razorpay Flow
+        const createOrderRes = await fetch("/api/razorpay/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: finalTotal }),
+        });
+        const orderData = await createOrderRes.json();
+
+        if (!createOrderRes.ok) {
+          throw new Error(orderData.error || "Failed to create Razorpay order");
+        }
+
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: finalTotal * 100,
+          currency: "INR",
+          name: "IRA Jewels",
+          description: "Jewelry Purchase",
+          order_id: orderData.orderId,
+          handler: async function (response) {
+            try {
+              const verifyRes = await fetch("/api/razorpay/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  orderData: {
+                    order_number: orderNumber,
+                    customer_id: customerId,
+                    customer_name: formData.fullName,
+                    customer_email: formData.email,
+                    customer_phone: formData.phone,
+                    items: orderItems,
+                    subtotal: subtotal,
+                    shipping: shippingCost,
+                    total: finalTotal,
+                    payment_method: "razorpay",
+                    payment_status: "paid",
+                    shipping_address: shippingAddress,
+                    status: "placed",
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                  },
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (!verifyRes.ok) {
+                throw new Error(verifyData.error || "Payment verification failed");
+              }
+
+              setIsSuccess(true);
+              clearCart();
+              router.push(`/order-confirmed/${verifyData.order.id}`);
+            } catch (err) {
+              console.error("Verification error:", err);
+              setSubmitError("Payment verification failed. Please contact support if amount was deducted.");
+              setIsPlacingOrder(false);
+            }
           },
-        ])
-        .select();
+          prefill: {
+            name: formData.fullName,
+            email: formData.email,
+            contact: formData.phone,
+          },
+          theme: {
+            color: "#2E3135",
+          },
+          modal: {
+            ondismiss: function () {
+              setSubmitError("Payment cancelled.");
+              setIsPlacingOrder(false);
+            },
+          },
+        };
 
-      if (error) {
-        throw error;
+        const rzp = new window.Razorpay(options);
+        rzp.on("payment.failed", function (response) {
+          console.error("Payment Failed:", response.error);
+          setSubmitError(response.error.description || "Payment failed. Please try again.");
+          setIsPlacingOrder(false);
+        });
+        rzp.open();
       }
-
-      if (!newOrder || newOrder.length === 0) {
-        throw new Error("No order data returned from Supabase");
-      }
-
-      // On success: clear cart and redirect
-      setIsSuccess(true);
-      clearCart();
-      router.push(`/order-confirmed/${newOrder[0].id}`);
     } catch (err) {
       console.error("Error creating order:", err);
-      setSubmitError("Something went wrong. Please try again.");
+      setSubmitError(err.message || "Something went wrong. Please try again.");
       setIsPlacingOrder(false);
     }
   };
@@ -235,6 +327,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <Navbar />
 
       <main className="flex-grow py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -505,57 +598,21 @@ export default function CheckoutPage() {
                 PAYMENT METHOD
               </h2>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                {/* UPI */}
+                {/* Pay Online */}
                 <div
-                  onClick={() => setPaymentMethod("upi")}
+                  onClick={() => setPaymentMethod("razorpay")}
                   className={`cursor-pointer rounded-lg p-4 transition-all duration-300 flex flex-col items-center justify-center text-center ${
-                    paymentMethod === "upi"
-                      ? "border-2 border-[#2E3135] bg-[#F3F1EC]"
-                      : "border border-[#E0E0E0] bg-white hover:border-[#2E3135]/50"
-                  }`}
-                >
-                  <Smartphone className="w-6 h-6 text-[#2E3135] mb-2 stroke-[1.5]" />
-                  <span className="block font-inter font-medium text-[13px] text-[#2E3135]">
-                    UPI
-                  </span>
-                  <span className="block font-inter font-light text-[11px] text-[#888888]">
-                    GPay / PhonePe
-                  </span>
-                </div>
-
-                {/* Card */}
-                <div
-                  onClick={() => setPaymentMethod("card")}
-                  className={`cursor-pointer rounded-lg p-4 transition-all duration-300 flex flex-col items-center justify-center text-center ${
-                    paymentMethod === "card"
+                    paymentMethod === "razorpay"
                       ? "border-2 border-[#2E3135] bg-[#F3F1EC]"
                       : "border border-[#E0E0E0] bg-white hover:border-[#2E3135]/50"
                   }`}
                 >
                   <CreditCard className="w-6 h-6 text-[#2E3135] mb-2 stroke-[1.5]" />
                   <span className="block font-inter font-medium text-[13px] text-[#2E3135]">
-                    Credit / Debit Card
+                    Pay Online
                   </span>
                   <span className="block font-inter font-light text-[11px] text-[#888888]">
-                    Visa / Mastercard
-                  </span>
-                </div>
-
-                {/* Net Banking */}
-                <div
-                  onClick={() => setPaymentMethod("netbanking")}
-                  className={`cursor-pointer rounded-lg p-4 transition-all duration-300 flex flex-col items-center justify-center text-center ${
-                    paymentMethod === "netbanking"
-                      ? "border-2 border-[#2E3135] bg-[#F3F1EC]"
-                      : "border border-[#E0E0E0] bg-white hover:border-[#2E3135]/50"
-                  }`}
-                >
-                  <Landmark className="w-6 h-6 text-[#2E3135] mb-2 stroke-[1.5]" />
-                  <span className="block font-inter font-medium text-[13px] text-[#2E3135]">
-                    Net Banking
-                  </span>
-                  <span className="block font-inter font-light text-[11px] text-[#888888]">
-                    All Indian Banks
+                    UPI, Cards, Net Banking
                   </span>
                 </div>
 

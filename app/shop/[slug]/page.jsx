@@ -343,7 +343,7 @@ export default function ProductDetailPage() {
                 </h1>
 
                 {/* Price Display */}
-                <div className="flex items-baseline gap-4 mb-6">
+                <div className="flex items-baseline gap-4 mb-2">
                   <span className="font-serif text-2xl lg:text-3xl text-[#2E3135]">
                     {product.price}
                   </span>
@@ -353,6 +353,19 @@ export default function ProductDetailPage() {
                     </span>
                   )}
                 </div>
+
+                {/* Stock Messaging */}
+                {(product.stock_quantity ?? product.stock ?? 0) === 0 ? (
+                  <div className="mb-6 font-inter font-medium text-[13px] text-[#DC2626]">
+                    Out of Stock
+                  </div>
+                ) : (product.stock_quantity ?? product.stock ?? 0) >= 1 && (product.stock_quantity ?? product.stock ?? 0) <= 5 ? (
+                  <div className="mb-6 font-inter font-medium text-[13px] text-[#D97706]">
+                    Only {product.stock_quantity ?? product.stock ?? 0} left in stock — order soon
+                  </div>
+                ) : (
+                  <div className="mb-6"></div>
+                )}
 
                 <div className="w-full h-[1px] bg-[#2E3135]/10 my-6" />
 
@@ -440,11 +453,15 @@ export default function ProductDetailPage() {
                   {/* Add to Cart */}
                   <button
                     onClick={handleAddToCart}
-                    disabled={cartStatus.startsWith("ADDED")}
-                    className="flex-grow h-[52px] bg-[#2E3135] text-white font-inter font-medium text-[12px] tracking-[2px] uppercase transition-all duration-300 hover:opacity-95 active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-100"
+                    disabled={cartStatus.startsWith("ADDED") || (product.stock_quantity ?? product.stock ?? 0) === 0}
+                    className={`flex-grow h-[52px] font-inter font-medium text-[12px] tracking-[2px] uppercase transition-all duration-300 flex items-center justify-center gap-2 ${
+                      (product.stock_quantity ?? product.stock ?? 0) === 0
+                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                        : "bg-[#2E3135] text-white hover:opacity-95 active:scale-[0.99] disabled:opacity-100"
+                    }`}
                   >
                     <ShoppingBag className="w-4 h-4" />
-                    {cartStatus}
+                    {(product.stock_quantity ?? product.stock ?? 0) === 0 ? "Out of Stock" : cartStatus}
                   </button>
 
                   {/* Wishlist Button */}

@@ -35,6 +35,7 @@ export default function ProductCard({ product }) {
   }, [product?.id])
 
   const isOnSale = product?.comparePriceVal && product?.comparePriceVal > product?.priceVal;
+  const isOutOfStock = (product?.stock_quantity ?? product?.stock ?? 0) === 0;
 
   useEffect(() => {
     if (!product) return;
@@ -125,12 +126,16 @@ export default function ProductCard({ product }) {
       {/* Image Container (1:1 square ratio) */}
       <div className="aspect-square w-full overflow-hidden relative bg-[#F9F9F9]">
         
-        {/* SALE Badge (Top left corner of image) */}
-        {isOnSale && (
+        {/* Badges (Top left corner of image) */}
+        {isOutOfStock ? (
+          <div className="absolute top-4 left-4 z-10 bg-[#2E3135] text-[#FFFFFF] px-2.5 py-1 text-[10px] font-inter font-medium tracking-[1.5px] uppercase">
+            OUT OF STOCK
+          </div>
+        ) : isOnSale ? (
           <div className="absolute top-4 left-4 z-10 bg-[#2E3135] text-[#FFFFFF] px-2.5 py-1 text-[10px] font-inter font-medium tracking-[1.5px] uppercase">
             SALE
           </div>
-        )}
+        ) : null}
 
         {/* Wishlist Heart Icon (Top right corner of image) */}
         <button
@@ -210,10 +215,15 @@ export default function ProductCard({ product }) {
         {/* "Add to Cart" button (full width of card, slides in on hover) */}
         <div className="absolute bottom-0 left-0 w-full overflow-hidden transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 h-[48px]">
           <button
-            onClick={handleAddToCart}
-            className="w-full h-full bg-[#2E3135] text-[#FFFFFF] font-inter font-medium text-[12px] tracking-[1.5px] uppercase transition-colors duration-300 hover:bg-[#CDB38B]"
+            onClick={isOutOfStock ? (e) => { e.preventDefault(); e.stopPropagation(); } : handleAddToCart}
+            disabled={isOutOfStock}
+            className={`w-full h-full font-inter font-medium text-[12px] tracking-[1.5px] uppercase transition-colors duration-300 ${
+              isOutOfStock
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-[#2E3135] text-[#FFFFFF] hover:bg-[#CDB38B]"
+            }`}
           >
-            Add to Cart
+            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
           </button>
         </div>
       </div>

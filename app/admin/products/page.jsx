@@ -181,7 +181,18 @@ export default function AdminProductsPage() {
 
                       {/* Stock */}
                       <td className="p-5 text-center font-mono text-[13px]">
-                        {product.stock_quantity ?? product.stock ?? 0}
+                        <div className="flex items-center justify-center gap-2">
+                          <span>{product.stock_quantity ?? product.stock ?? 0}</span>
+                          {(product.stock_quantity ?? product.stock ?? 0) === 0 ? (
+                            <span className="bg-[#DC2626] text-white font-inter font-medium text-[10px] tracking-[1px] uppercase px-2 py-0.5 rounded-full whitespace-nowrap">
+                              Out of Stock
+                            </span>
+                          ) : (product.stock_quantity ?? product.stock ?? 0) >= 1 && (product.stock_quantity ?? product.stock ?? 0) <= 5 ? (
+                            <span className="bg-[#D97706] text-white font-inter font-medium text-[10px] tracking-[1px] uppercase px-2 py-0.5 rounded-full whitespace-nowrap">
+                              Low Stock
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
 
                       {/* Status */}

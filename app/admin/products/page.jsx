@@ -122,6 +122,8 @@ export default function AdminProductsPage() {
                 <tr className="border-b border-[#2E3135]/10 bg-[#F3F1EC]/30">
                   <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Image</th>
                   <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Name</th>
+                  <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">SKU</th>
+                  <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Style Number</th>
                   <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Category</th>
                   <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase text-right">Price</th>
                   <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase text-center">Stock</th>
@@ -162,6 +164,16 @@ export default function AdminProductsPage() {
                         <div className="text-[11px] text-gray-400 font-mono mt-0.5 truncate max-w-[180px]">
                           {product.slug}
                         </div>
+                      </td>
+
+                      {/* SKU */}
+                      <td className="p-5 font-mono text-[12px] text-[#2E3135] whitespace-nowrap">
+                        {product.sku || "-"}
+                      </td>
+
+                      {/* Style Number */}
+                      <td className="p-5 font-mono text-[12px] text-[#2E3135]/80 whitespace-nowrap">
+                        {product.style_number || "-"}
                       </td>
 
                       {/* Category */}

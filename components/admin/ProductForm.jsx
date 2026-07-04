@@ -20,6 +20,26 @@ const categories = [
 
 const karats = ["14K", "18K", "22K"];
 
+const categoryPrefixMap = {
+  "rings": "RIN",
+  "necklaces": "NEC",
+  "bangles": "BNG",
+  "earrings": "EAR",
+  "bracelets": "BRA",
+  "pendants": "PEN",
+  "chains": "CHN",
+  "mangalsutra": "MNG",
+  "sets": "SET",
+  "anklets": "ANK",
+  "nose pins": "NSP"
+};
+
+function getSkuPrefix(categoryName) {
+  if (!categoryName) return "GEN";
+  const clean = categoryName.toLowerCase().trim();
+  return categoryPrefixMap[clean] || "GEN";
+}
+
 function ImageUploadBox({ label, index, currentUrl, setImages, isRequired }) {
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -124,6 +144,8 @@ export default function ProductForm({ productId }) {
   // Form State
   const [name, setName] = useState("");
   const [category, setCategory] = useState("rings");
+  const [sku, setSku] = useState("");
+  const [styleNumber, setStyleNumber] = useState("");
   const [price, setPrice] = useState("");
   const [comparePrice, setComparePrice] = useState("");
   const [karat, setKarat] = useState("14K");
@@ -137,6 +159,47 @@ export default function ProductForm({ productId }) {
   const [images, setImages] = useState(["", "", "", ""]);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
+
+  // Helper to query and generate SKU
+  const generateSkuForCategory = async (cat) => {
+    try {
+      const prefix = getSkuPrefix(cat);
+      const { count, error } = await supabase
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .ilike("sku", `${prefix}-%`);
+
+      if (error) {
+        console.error("Error fetching SKU count:", error);
+        return `${prefix}-0001`;
+      }
+
+      const nextNum = (count || 0) + 1;
+      const formattedNum = String(nextNum).padStart(4, "0");
+      return `${prefix}-${formattedNum}`;
+    } catch (err) {
+      console.error("Error generating SKU:", err);
+      const prefix = getSkuPrefix(cat);
+      return `${prefix}-0001`;
+    }
+  };
+
+  // Auto-generate SKU when category changes (only on Add Product mode)
+  useEffect(() => {
+    if (productId) return; // do NOT regenerate on edit page
+    
+    let isMounted = true;
+    async function updateSku() {
+      const generated = await generateSkuForCategory(category);
+      if (isMounted) {
+        setSku(generated);
+      }
+    }
+    updateSku();
+    return () => {
+      isMounted = false;
+    };
+  }, [category, productId]);
 
   // New Gold Rate Pricing Fields State
   const [netGoldWeight, setNetGoldWeight] = useState("");
@@ -202,6 +265,8 @@ export default function ProductForm({ productId }) {
           const p = await response.json();
           setName(p.name || "");
           setCategory(p.category || "rings");
+          setSku(p.sku || "");
+          setStyleNumber(p.style_number || "");
           setPrice(p.price !== undefined ? String(p.price) : "");
           setComparePrice(p.compare_price !== undefined && p.compare_price !== null ? String(p.compare_price) : "");
           setKarat(p.karat || "14K");
@@ -277,6 +342,8 @@ export default function ProductForm({ productId }) {
     const payload = {
       name,
       category,
+      sku,
+      style_number: styleNumber || null,
       price: parseFloat(price),
       compare_price: comparePrice ? parseFloat(comparePrice) : null,
       karat,
@@ -322,6 +389,15 @@ export default function ProductForm({ productId }) {
       } else {
         const errData = await response.json();
         setErrorMsg(errData.error || "Failed to save product.");
+        
+        // Handle SKU collision
+        if (errData.error && (errData.error.toLowerCase().includes("sku") || errData.error.toLowerCase().includes("duplicate key"))) {
+          if (!productId) {
+            const freshSku = await generateSkuForCategory(category);
+            setSku(freshSku);
+            setErrorMsg("SKU collision detected. A new SKU has been generated. Please review and try saving again.");
+          }
+        }
       }
     } catch (err) {
       console.error("Error saving product:", err);
@@ -364,6 +440,11 @@ export default function ProductForm({ productId }) {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-6xl space-y-6">
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md font-inter text-[13px]">
+          {errorMsg}
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* Left Column: Form Fields */}
@@ -383,6 +464,34 @@ export default function ProductForm({ productId }) {
                 className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
                   validated && !name ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
                 }`}
+              />
+            </div>
+
+            {/* SKU (Auto-Generated) */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                SKU (Auto-Generated)
+              </label>
+              <input
+                type="text"
+                readOnly
+                value={sku}
+                placeholder="Auto-generating..."
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-[#FBFBFA] rounded-md font-inter text-[13px] text-gray-500 focus:outline-none cursor-not-allowed"
+              />
+            </div>
+
+            {/* Style Number */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Style Number
+              </label>
+              <input
+                type="text"
+                value={styleNumber}
+                onChange={(e) => setStyleNumber(e.target.value)}
+                placeholder="e.g. your internal style/reference number"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
               />
             </div>
 

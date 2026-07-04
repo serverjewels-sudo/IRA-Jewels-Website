@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { Package, PlusCircle, ShoppingBag, LogOut, X } from "lucide-react";
+import { Package, PlusCircle, ShoppingBag, Coins, LogOut, X } from "lucide-react";
 
 export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
@@ -25,6 +25,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const isAddProductActive = pathname === "/admin/products/new";
   const isOrdersActive = pathname === "/admin/orders";
+  const isGoldRateActive = pathname === "/admin/gold-rate";
 
   return (
     <>
@@ -107,6 +108,20 @@ export default function Sidebar({ isOpen, onClose }) {
             >
               <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
               Orders
+            </Link>
+
+            {/* Gold Rate Link */}
+            <Link
+              href="/admin/gold-rate"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 py-3 px-6 text-[12px] font-medium tracking-[1.5px] uppercase font-inter transition-all duration-200 hover:text-[#CDB38B] ${
+                isGoldRateActive
+                  ? "border-l-[3px] border-[#CDB38B] text-[#CDB38B] pl-[21px]"
+                  : "border-l-[3px] border-transparent text-white/70"
+              }`}
+            >
+              <Coins className="w-4 h-4 stroke-[1.5]" />
+              Gold Rate
             </Link>
           </nav>
         </div>

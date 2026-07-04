@@ -110,7 +110,7 @@ export default function OrderConfirmedPage() {
 
           <div style={{marginBottom:'32px'}}>
             <p style={{fontFamily:'Inter', fontWeight:300, fontSize:'12px', color:'#888'}}>
-              IRA Jewels | GSTIN: 24AAHCI5512M1ZH
+              TATVAAN | GSTIN: 24AAHCI5512M1ZH
             </p>
           </div>
 

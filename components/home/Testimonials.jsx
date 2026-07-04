@@ -8,13 +8,13 @@ export default function Testimonials() {
     },
     {
       stars: "★★★★★",
-      text: '"The quality is exceptional for the price. I was skeptical about lab-grown diamonds at first, but after seeing this necklace I am completely convinced. IRA Jewels has a customer for life."',
+      text: '"The quality is exceptional for the price. I was skeptical about lab-grown diamonds at first, but after seeing this necklace I am completely convinced. TATVAAN has a customer for life."',
       name: "Ananya Patel",
       location: "Ahmedabad",
     },
     {
       stars: "★★★★★",
-      text: '"Fast delivery, beautiful packaging, and the earrings are stunning. I\'ve bought from many jewellery brands but IRA Jewels feels truly premium. Worth every rupee."',
+      text: '"Fast delivery, beautiful packaging, and the earrings are stunning. I\'ve bought from many jewellery brands but TATVAAN feels truly premium. Worth every rupee."',
       name: "Meera Iyer",
       location: "Bangalore",
     },

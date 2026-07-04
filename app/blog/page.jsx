@@ -3,7 +3,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Stories & Insights | IRA Jewels",
+  title: "Stories & Insights | TATVAAN",
   description: "Jewellery care, diamond education, and style inspiration. Learn how to care for your pieces, understand the 4Cs, and get style inspiration.",
 };
 
@@ -43,7 +43,7 @@ const articles = [
   {
     id: 5,
     category: "BEHIND THE SCENES",
-    title: "How Every IRA Jewels Piece Is Made",
+    title: "How Every TATVAAN Piece Is Made",
     excerpt: "From raw lab-grown diamond to finished jewellery — a look at our crafting process and quality standards.",
     date: "May 20, 2026",
     image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&auto=format&fit=crop"

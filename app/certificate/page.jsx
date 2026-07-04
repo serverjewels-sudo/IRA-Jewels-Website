@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "Certification | IRA Jewels",
+  title: "Certification | TATVAAN",
   description: "Every diamond comes with a certificate of authenticity. Learn about IGI certification, the 4Cs, and how to verify your lab-grown diamond certificate online.",
 };
 
@@ -33,7 +33,7 @@ export default function CertificatePage() {
             <div className="w-[60px] h-[1px] bg-[#CDB38B] mx-auto mt-4 mb-8"></div>
 
             <p className="font-inter text-[16px] text-[#555] leading-[1.8] font-light max-w-3xl mx-auto">
-              A diamond grading certificate is an independent assessment of your diamond&apos;s quality, issued by a certified gemological laboratory. At IRA Jewels, every lab-grown diamond comes with an IGI (International Gemological Institute) certificate &mdash; the world&apos;s leading authority on lab-grown diamond grading.
+              A diamond grading certificate is an independent assessment of your diamond&apos;s quality, issued by a certified gemological laboratory. At TATVAAN, every lab-grown diamond comes with an IGI (International Gemological Institute) certificate &mdash; the world&apos;s leading authority on lab-grown diamond grading.
             </p>
           </div>
         </section>
@@ -130,7 +130,7 @@ export default function CertificatePage() {
             <div className="w-[60px] h-[1px] bg-[#CDB38B] mx-auto mt-4 mb-8"></div>
 
             <p className="font-inter text-[16px] text-[#555] leading-[1.8] font-light text-center mb-8">
-              Every IRA Jewels diamond comes with a unique IGI report number. You can verify your certificate anytime at{" "}
+              Every TATVAAN diamond comes with a unique IGI report number. You can verify your certificate anytime at{" "}
               <a 
                 href="https://www.igi.org" 
                 target="_blank" 

@@ -102,7 +102,7 @@ export default function Navbar() {
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link href="/" className="group flex flex-col items-center">
               <span className="font-serif text-[14px] min-[400px]:text-[22px] sm:text-[26px] font-normal tracking-[0.12em] min-[400px]:tracking-[0.25em] text-[#2E3135] uppercase transition-colors duration-300 group-hover:text-[#CDB38B]">
-                IRA Jewels
+                TATVAAN
               </span>
             </Link>
           </div>
@@ -169,7 +169,7 @@ export default function Navbar() {
             <div>
               <div className="flex justify-between items-center mb-10">
                 <span className="font-serif text-[18px] tracking-[0.2em] text-[#2E3135] uppercase">
-                  IRA
+                  TATVAAN
                 </span>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -283,7 +283,7 @@ export default function Navbar() {
 
             <div className="border-t border-[#F3F1EC] pt-6 text-center">
               <p className="text-[10px] tracking-wider text-[#2E3135]/50 uppercase">
-                © IRA Jewels 2026
+                © TATVAAN 2026
               </p>
             </div>
           </div>

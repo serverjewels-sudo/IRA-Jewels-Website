@@ -16,7 +16,7 @@ export default function TrackOrderPage() {
 
   // Set document title on mount
   useEffect(() => {
-    document.title = "Track Your Order | IRA Jewels";
+    document.title = "Track Your Order | TATVAAN";
   }, []);
 
   const handleSearch = async (e) => {
@@ -44,7 +44,7 @@ export default function TrackOrderPage() {
       } else {
         // Fallback for the test order number IRA-2026-441262
         // Since remote RLS policy might block anonymous reads, we provide the test row
-        if (trimmedInput.toUpperCase() === "IRA-2026-441262") {
+        if (trimmedInput.toUpperCase() === "IRA-2026-441262" || trimmedInput.toUpperCase() === "TATVAAN-2026-441262") {
           const mockOrder = {
             id: "33b56eac-fdaf-41c7-9785-eaedf5369f67",
             order_number: "IRA-2026-441262",
@@ -153,7 +153,7 @@ export default function TrackOrderPage() {
                   type="text"
                   value={orderNumber}
                   onChange={(e) => setOrderNumber(e.target.value)}
-                  placeholder="e.g. IRA-2026-441262"
+                  placeholder="e.g. TATVAAN-2026-441262"
                   className="w-full bg-white border border-[#2E3135] focus:border-[#CDB38B] outline-none font-inter text-[15px] px-[18px] py-[14px] transition-all rounded-[4px]"
                   required
                 />

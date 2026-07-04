@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "Size Guide | IRA Jewels",
+  title: "Size Guide | TATVAAN",
   description: "Find your perfect fit. Use our comprehensive size guide to determine the correct size for rings, bracelets, bangles, and necklaces.",
 };
 

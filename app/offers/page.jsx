@@ -17,7 +17,7 @@ export default function OffersPage() {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
-    document.title = "Limited Time Offers | IRA Jewels";
+    document.title = "Limited Time Offers | TATVAAN";
 
     async function fetchOffersAndRate() {
       try {

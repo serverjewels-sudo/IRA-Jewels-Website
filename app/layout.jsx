@@ -2,7 +2,7 @@ import './globals.css';
 import { CartProvider } from '@/lib/CartContext';
 
 export const metadata = {
-  title: "IRA Jewels — Fine Lab-Grown Diamond Jewellery",
+  title: "TATVAAN — Fine Lab-Grown Diamond Jewellery",
   description: "Everyday luxury lab-grown diamond jewellery. Starting from ₹8,000. Free delivery all India.",
 };
 

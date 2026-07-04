@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "Care Instructions | IRA Jewels",
+  title: "Care Instructions | TATVAAN",
   description: "Keep your jewellery looking its best. Discover our daily care tips, home cleaning steps, storage advice, and professional servicing recommendations.",
 };
 
@@ -150,7 +150,7 @@ export default function CarePage() {
                 </li>
                 <li className="flex items-start">
                   <span className="text-[#CDB38B] mr-3 font-semibold text-lg leading-none">&bull;</span>
-                  <span>Keep your IRA Jewels box &mdash; it&apos;s designed to protect your pieces long-term.</span>
+                  <span>Keep your TATVAAN box &mdash; it&apos;s designed to protect your pieces long-term.</span>
                 </li>
               </ul>
             </div>

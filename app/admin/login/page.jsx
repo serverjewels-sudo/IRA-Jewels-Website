@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
       <div className="bg-white rounded-lg shadow-xl p-10 max-w-md w-full border border-[#2E3135]/5 flex flex-col items-center">
         {/* Logo and Titles */}
         <h1 className="font-serif font-normal text-[32px] tracking-wide text-[#2E3135] text-center uppercase leading-none">
-          IRA JEWELS
+          TATVAAN
         </h1>
         <p className="font-inter text-[13px] text-[#CDB38B] tracking-[2px] font-semibold uppercase mt-2.5 mb-8 text-center">
           Admin Panel

@@ -200,7 +200,7 @@ export default function CheckoutPage() {
 
       const year = new Date().getFullYear();
       const datePart = String(Date.now()).slice(-6);
-      const orderNumber = `IRA-${year}-${datePart}`;
+      const orderNumber = `TATVAAN-${year}-${datePart}`;
 
       const orderItems = items.map((item) => {
         const calculated = calculateProductPrice(item, freshRate);
@@ -275,7 +275,7 @@ export default function CheckoutPage() {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
           amount: finalTotal * 100,
           currency: "INR",
-          name: "IRA Jewels",
+          name: "TATVAAN",
           description: "Jewelry Purchase",
           order_id: orderData.orderId,
           handler: async function (response) {

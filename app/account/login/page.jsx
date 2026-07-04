@@ -58,7 +58,7 @@ function LoginForm() {
     <div className="max-w-md w-full bg-[#FFFFFF] p-8 sm:p-10 border border-[#2E3135]/10 shadow-sm rounded-none">
       <div className="text-center mb-8">
         <h1 className="font-serif text-[28px] font-normal tracking-[0.2em] text-[#2E3135] uppercase mb-2">
-          IRA JEWELS
+          TATVAAN
         </h1>
         <p className="font-inter text-sm text-[#2E3135]/70">
           Sign in to your account

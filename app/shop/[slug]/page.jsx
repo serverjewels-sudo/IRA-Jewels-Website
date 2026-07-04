@@ -170,7 +170,7 @@ export default function ProductDetailPage() {
   // Dynamic SEO Page Title
   useEffect(() => {
     if (product && typeof window !== 'undefined') {
-      document.title = `${product.name} | IRA Jewels`
+      document.title = `${product.name} | TATVAAN`
     }
   }, [product])
 

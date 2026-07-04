@@ -49,7 +49,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <div className="p-6 border-b border-white/5 flex items-center justify-between">
             <div>
               <h1 className="font-serif font-normal text-[20px] tracking-wide text-white leading-tight uppercase">
-                IRA JEWELS
+                TATVAAN
               </h1>
               <p className="font-inter text-[11px] text-[#CDB38B] tracking-wider mt-1 font-medium uppercase">
                 Admin Panel

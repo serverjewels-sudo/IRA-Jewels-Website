@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "Connect With Us | IRA Jewels",
+  title: "Connect With Us | TATVAAN",
   description: "Follow our journey on social media. See our daily drops, crafting process, styling ideas and custom diamond designs.",
 };
 
@@ -128,7 +128,7 @@ export default function ConnectPage() {
               Tag us in your photos
             </h2>
             <p className="font-inter text-[15px] text-ira-gold tracking-wide font-normal">
-              Use #IRAJewels and get featured on our page.
+              Use #TATVAAN and get featured on our page.
             </p>
           </div>
         </section>

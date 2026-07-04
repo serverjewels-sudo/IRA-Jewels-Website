@@ -26,7 +26,7 @@ export default function CustomOrderPage() {
   const [successPhone, setSuccessPhone] = useState("");
 
   useEffect(() => {
-    document.title = "Custom Order | IRA Jewels";
+    document.title = "Custom Order | TATVAAN";
   }, []);
 
   const handleInputChange = (e) => {

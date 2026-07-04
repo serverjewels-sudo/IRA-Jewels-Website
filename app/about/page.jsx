@@ -3,7 +3,7 @@ import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Our Story | IRA Jewels",
+  title: "Our Story | TATVAAN",
   description: "Born in Surat. Built for the modern woman. Discover our journey, our lab-grown diamonds, and our commitment to ethical, everyday luxury.",
 };
 
@@ -45,7 +45,7 @@ export default function AboutPage() {
                 Fine Jewellery for Everyday Life
               </h2>
               <p className="font-inter text-[15px] sm:text-[16px] text-[#555] leading-[1.8] font-light">
-                IRA Jewels was founded with one belief &mdash; that fine jewellery should not wait for special occasions. Every woman deserves to wear something beautiful every day. We create lab-grown diamond jewellery that is ethical, affordable, and crafted for real life.
+                TATVAAN was founded with one belief &mdash; that fine jewellery should not wait for special occasions. Every woman deserves to wear something beautiful every day. We create lab-grown diamond jewellery that is ethical, affordable, and crafted for real life.
               </p>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function AboutPage() {
         <section className="bg-[#F3F1EC] py-[80px] px-6 sm:px-8 lg:px-12" id="our-values">
           <div className="max-w-7xl mx-auto">
             <h2 className="font-cormorant text-[36px] sm:text-[40px] text-[#2E3135] text-center mb-12 font-normal">
-              Why IRA Jewels?
+              Why TATVAAN?
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -150,7 +150,7 @@ export default function AboutPage() {
             </span>
             <span className="text-[#CDB38B] text-4xl font-serif leading-none mb-2" aria-hidden="true">&ldquo;</span>
             <blockquote className="font-cormorant italic text-[24px] sm:text-[28px] text-[#2E3135] leading-relaxed mb-6 font-normal">
-              We started IRA Jewels because we believed every woman deserves to feel luxurious &mdash; not just on her wedding day, but every single day.
+              We started TATVAAN because we believed every woman deserves to feel luxurious &mdash; not just on her wedding day, but every single day.
             </blockquote>
             <cite className="font-inter text-[14px] text-[#888] font-normal not-italic">
               &mdash; Pavasiya Lakshya, Founder

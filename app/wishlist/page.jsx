@@ -38,7 +38,7 @@ export default function WishlistPage() {
   // Set SEO metadata and load wishlist on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      document.title = "My Wishlist | IRA Jewels";
+      document.title = "My Wishlist | TATVAAN";
     }
 
     const loadWishlist = async () => {

@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Column 0: Logo & Bio */}
           <div className="flex flex-col space-y-4">
             <div className="font-serif text-[20px] tracking-[0.2em] text-[#2E3135] uppercase">
-              IRA Jewels
+              TATVAAN
             </div>
             <p className="text-[12px] font-light font-inter text-[#2E3135]/70 leading-relaxed max-w-xs">
               Handcrafted everyday luxury made with ethical, stunning lab-grown diamonds.
@@ -128,7 +128,7 @@ export default function Footer() {
         <div className="border-t border-[#F3F1EC] pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="flex flex-col space-y-2 items-center md:items-start">
             <div className="text-[11px] font-medium tracking-widest text-[#2E3135]/60 uppercase">
-              &copy; {new Date().getFullYear()} IRA Jewels. Handcrafted Everyday Luxury. All rights reserved.
+              &copy; {new Date().getFullYear()} TATVAAN. Handcrafted Everyday Luxury. All rights reserved.
             </div>
             <div className="text-[12px] font-inter font-light text-[#2E3135]">
               GSTIN: 24AAHCI5512M1ZH

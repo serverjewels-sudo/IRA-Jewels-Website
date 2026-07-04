@@ -1,6 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import { supabase } from "./supabase";
+import { calculateProductPrice } from "./priceUtils";
 
 const CartContext = createContext();
 
@@ -15,6 +17,43 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [goldRate, setGoldRate] = useState(null);
+  const fetchPromiseRef = useRef(null);
+  const lastFetchTimeRef = useRef(0);
+
+  // Helper to fetch latest gold rate with caching and promise-sharing to avoid concurrent duplicate requests
+  const fetchLatestRate = async () => {
+    const now = Date.now();
+    if (goldRate && now - lastFetchTimeRef.current < 5000) {
+      return goldRate;
+    }
+    if (fetchPromiseRef.current) {
+      return fetchPromiseRef.current;
+    }
+
+    fetchPromiseRef.current = (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+        if (!error && data) {
+          const rate = data.rate_999;
+          setGoldRate(rate);
+          lastFetchTimeRef.current = Date.now();
+          return rate;
+        }
+      } catch (err) {
+        console.error("Failed to fetch gold rate in CartProvider:", err);
+      } finally {
+        fetchPromiseRef.current = null;
+      }
+      return goldRate;
+    })();
+
+    return fetchPromiseRef.current;
+  };
 
   // Load cart from localStorage once on mount (client-side only to avoid hydration mismatch)
   useEffect(() => {
@@ -29,6 +68,8 @@ export const CartProvider = ({ children }) => {
       }
     }
     setIsLoaded(true);
+    fetchLatestRate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Save cart to localStorage whenever items change, after the initial load has completed
@@ -40,41 +81,46 @@ export const CartProvider = ({ children }) => {
 
   // Add to cart function
   const addToCart = (product, selectedSize = null, selectedColour = null) => {
+    // Construct a unique composite key for item variation
+    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}`;
+    
     setItems((prevItems) => {
-      // Construct a unique composite key for item variation
-      const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}`;
-      
       const existingIndex = prevItems.findIndex((item) => item.productId === cartItemId);
-
       if (existingIndex > -1) {
-        // If product already in cart with same size/color, increment quantity
         const updatedItems = [...prevItems];
         updatedItems[existingIndex] = {
           ...updatedItems[existingIndex],
           quantity: updatedItems[existingIndex].quantity + 1,
         };
         return updatedItems;
-      } else {
-        // Otherwise, add a new item to cart
-        const priceVal = product.priceVal || parseInt(product.price.replace(/[^\d]/g, ""), 10);
-        const image = product.images?.[0] || product.image;
-
-        return [
-          ...prevItems,
-          {
-            productId: cartItemId,
-            id: product.id,
-            slug: product.slug,
-            name: product.name,
-            price: product.price,
-            priceVal: priceVal,
-            image: image,
-            selectedSize: selectedSize,
-            selectedColour: selectedColour,
-            quantity: 1,
-          },
-        ];
       }
+
+      const image = product.images?.[0] || product.image;
+      return [
+        ...prevItems,
+        {
+          productId: cartItemId,
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          image: image,
+          selectedSize: selectedSize,
+          selectedColour: selectedColour,
+          quantity: 1,
+          
+          // Raw pricing component fields:
+          net_gold_weight: product.net_gold_weight,
+          diamond_net_amount: product.diamond_net_amount,
+          making_net_amount: product.making_net_amount,
+          other_net_amount: product.other_net_amount,
+          gst_percentage: product.gst_percentage,
+          karat: product.karat,
+          
+          // Legacy / fallback fields:
+          price: product.price,
+          priceVal: product.priceVal,
+        },
+      ];
     });
   };
 
@@ -100,7 +146,10 @@ export const CartProvider = ({ children }) => {
 
   // Derive total quantity and total price
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => {
+    const calculated = calculateProductPrice(item, goldRate);
+    return sum + calculated.priceVal * item.quantity;
+  }, 0);
 
   return (
     <CartContext.Provider

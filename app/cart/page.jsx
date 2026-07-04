@@ -6,14 +6,45 @@ import { X, Plus, Minus, ShieldCheck, Truck } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/lib/CartContext";
+import { supabase } from "@/lib/supabase";
+import { calculateProductPrice } from "@/lib/priceUtils";
 
 export default function CartPage() {
-  const { items, totalCount, totalPrice, updateQuantity, removeFromCart } = useCart();
+  const { items, totalCount, updateQuantity, removeFromCart } = useCart();
   const [mounted, setMounted] = useState(false);
+  const [rate999, setRate999] = useState(null);
 
   useEffect(() => {
     setMounted(true);
+
+    async function fetchGoldRate() {
+      try {
+        const { data, error } = await supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+        if (!error && data) {
+          setRate999(data.rate_999);
+        }
+      } catch (err) {
+        console.error("Failed to fetch gold rate in CartPage:", err);
+      }
+    }
+    fetchGoldRate();
   }, []);
+
+  // Live-calculate product prices based on current gold rate
+  const cartItemsWithPrice = items.map((item) => {
+    const calculated = calculateProductPrice(item, rate999);
+    return {
+      ...item,
+      livePriceVal: calculated.priceVal,
+      livePriceStr: calculated.price,
+    };
+  });
+
+  const subtotal = cartItemsWithPrice.reduce((sum, item) => sum + item.livePriceVal * item.quantity, 0);
 
   // Format currency in Indian Style (INR)
   const formatPrice = (amount) => {
@@ -66,7 +97,7 @@ export default function CartPage() {
             {/* Left Column: Items List (65% width) */}
             <div className="w-full lg:w-[65%] space-y-6">
               <div className="border-t border-[#F3F1EC]">
-                {items.map((item) => {
+                {cartItemsWithPrice.map((item) => {
                   const variationText = [
                     item.selectedSize ? `Size: ${item.selectedSize}` : null,
                     item.selectedColour ? `Colour: ${item.selectedColour}` : null
@@ -109,7 +140,7 @@ export default function CartPage() {
                         {/* Price and Quantity Control Row */}
                         <div className="flex items-center justify-between mt-2">
                           <span className="font-inter font-medium text-[15px] text-[#2E3135]">
-                            {formatPrice(item.priceVal * item.quantity)}
+                            {formatPrice(item.livePriceVal * item.quantity)}
                           </span>
 
                           {/* Quantity control */}
@@ -160,7 +191,7 @@ export default function CartPage() {
               <div className="flex justify-between items-center py-3 border-b border-[#2E3135]/5">
                 <span className="font-inter font-light text-[14px] text-[#2E3135]">Subtotal</span>
                 <span className="font-inter font-medium text-[15px] text-[#2E3135]">
-                  {formatPrice(totalPrice)}
+                  {formatPrice(subtotal)}
                 </span>
               </div>
 
@@ -174,7 +205,7 @@ export default function CartPage() {
               <div className="flex justify-between items-baseline pt-4 pb-1">
                 <span className="font-inter font-medium text-[16px] text-[#2E3135]">Total</span>
                 <span className="font-inter font-bold text-[20px] text-[#2E3135]">
-                  {formatPrice(totalPrice)}
+                  {formatPrice(subtotal)}
                 </span>
               </div>
               <p className="font-inter font-light text-[11px] text-[#888888] text-right mb-6">

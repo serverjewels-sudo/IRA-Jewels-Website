@@ -9,6 +9,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/lib/CartContext";
 import { supabase } from "@/lib/supabase";
+import { calculateProductPrice } from "@/lib/priceUtils";
 
 const INDIAN_STATES = [
   "Andhra Pradesh",
@@ -50,9 +51,10 @@ const INDIAN_STATES = [
 ];
 
 export default function CheckoutPage() {
-  const { items, totalPrice, isLoaded, clearCart } = useCart();
+  const { items, isLoaded, clearCart } = useCart();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [rate999, setRate999] = useState(null);
 
   // Form Field States
   const [formData, setFormData] = useState({
@@ -75,6 +77,21 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true);
+    async function fetchRate() {
+      try {
+        const { data, error } = await supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+        if (!error && data) {
+          setRate999(data.rate_999);
+        }
+      } catch (err) {
+        console.error("Failed to fetch gold rate on checkout:", err);
+      }
+    }
+    fetchRate();
   }, []);
 
   // Empty cart protection: redirect to cart if empty
@@ -83,6 +100,18 @@ export default function CheckoutPage() {
       router.push("/cart");
     }
   }, [mounted, isLoaded, items, router, isSuccess]);
+
+  // Live-calculate product prices based on current gold rate
+  const cartItemsWithPrice = items.map((item) => {
+    const calculated = calculateProductPrice(item, rate999);
+    return {
+      ...item,
+      livePriceVal: calculated.priceVal,
+      livePriceStr: calculated.price,
+    };
+  });
+
+  const subtotal = cartItemsWithPrice.reduce((sum, item) => sum + item.livePriceVal * item.quantity, 0);
 
 
   const formatPrice = (amount) => {
@@ -151,6 +180,21 @@ export default function CheckoutPage() {
     setIsPlacingOrder(true);
 
     try {
+      // Fetch fresh gold rate at the exact moment order is placed
+      let freshRate = rate999;
+      try {
+        const { data: rateData, error: rateError } = await supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+        if (!rateError && rateData) {
+          freshRate = rateData.rate_999;
+        }
+      } catch (rateErr) {
+        console.error("Error fetching fresh gold rate during submit:", rateErr);
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       const customerId = session?.user?.id || null;
 
@@ -158,17 +202,20 @@ export default function CheckoutPage() {
       const datePart = String(Date.now()).slice(-6);
       const orderNumber = `IRA-${year}-${datePart}`;
 
-      const subtotal = items.reduce((sum, item) => sum + item.priceVal * item.quantity, 0);
+      const orderItems = items.map((item) => {
+        const calculated = calculateProductPrice(item, freshRate);
+        return {
+          product_id: item.id,
+          name: item.name,
+          price: calculated.priceVal, // freshly calculated price
+          quantity: item.quantity,
+          image: item.image,
+        };
+      });
+
+      const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const shippingCost = deliveryPref === "express" ? 199 : 0;
       const finalTotal = subtotal + shippingCost;
-
-      const orderItems = items.map((item) => ({
-        product_id: item.id,
-        name: item.name,
-        price: item.priceVal,
-        quantity: item.quantity,
-        image: item.image,
-      }));
 
       const shippingAddress = {
         address: formData.address1 + (formData.address2 ? ", " + formData.address2 : ""),
@@ -323,7 +370,7 @@ export default function CheckoutPage() {
   }
 
   const shippingCost = deliveryPref === "express" ? 199 : 0;
-  const finalTotal = totalPrice + shippingCost;
+  const finalTotal = subtotal + shippingCost;
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
@@ -671,7 +718,7 @@ export default function CheckoutPage() {
 
             {/* Items List */}
             <div className="divide-y divide-[#E8E6E1] border-b border-[#E8E6E1] mb-6 max-h-[300px] overflow-y-auto pr-2">
-              {items.map((item) => {
+              {cartItemsWithPrice.map((item) => {
                 const variationDetails = [
                   item.selectedSize ? `Size: ${item.selectedSize}` : null,
                   item.selectedColour ? `Colour: ${item.selectedColour}` : null
@@ -707,7 +754,7 @@ export default function CheckoutPage() {
                     </div>
                     {/* Price */}
                     <span className="font-inter font-medium text-[14px] text-[#2E3135] text-right">
-                      {formatPrice(item.priceVal * item.quantity)}
+                      {formatPrice(item.livePriceVal * item.quantity)}
                     </span>
                   </div>
                 );
@@ -719,7 +766,7 @@ export default function CheckoutPage() {
               {/* Subtotal */}
               <div className="flex justify-between items-center text-[15px] text-[#2E3135]">
                 <span className="font-light">Subtotal</span>
-                <span className="font-medium">{formatPrice(totalPrice)}</span>
+                <span className="font-medium">{formatPrice(subtotal)}</span>
               </div>
 
               {/* Delivery */}

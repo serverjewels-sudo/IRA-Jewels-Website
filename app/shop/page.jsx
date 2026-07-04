@@ -8,6 +8,7 @@ import ProductCard from "@/components/shop/ProductCard";
 import { SlidersHorizontal, X, ChevronDown, RotateCcw } from "lucide-react";
 
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
+import { calculateProductPrice } from "@/lib/priceUtils";
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +48,7 @@ function ShopInner() {
   const categoryParam = searchParams.get("category");
 
   const [products, setProducts] = useState([]);
+  const [rate999, setRate999] = useState(null);
   const [dbLoading, setDbLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -70,19 +72,33 @@ function ShopInner() {
     }
   }, [categoryParam]);
 
-  // Fetch products from Supabase on mount
+  // Fetch products and gold rate from Supabase on mount
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchData() {
       try {
-        const { data, error } = await supabase
+        const productsPromise = supabase
           .from("products")
           .select("*")
           .eq("is_active", true);
 
-        if (error) {
-          console.error("Error fetching products from Supabase:", error);
-        } else if (data) {
-          setProducts(data.map(mapSupabaseProduct));
+        const ratePromise = supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+
+        const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
+
+        if (rateRes.error) {
+          console.error("Error fetching gold rate:", rateRes.error);
+        } else if (rateRes.data) {
+          setRate999(rateRes.data.rate_999);
+        }
+
+        if (productsRes.error) {
+          console.error("Error fetching products from Supabase:", productsRes.error);
+        } else if (productsRes.data) {
+          setProducts(productsRes.data.map(mapSupabaseProduct));
         }
       } catch (err) {
         console.error("Unexpected error loading products:", err);
@@ -90,7 +106,7 @@ function ShopInner() {
         setDbLoading(false);
       }
     }
-    fetchProducts();
+    fetchData();
   }, []);
 
   // Trigger loading skeleton state on filter/sorting changes
@@ -120,7 +136,16 @@ function ShopInner() {
 
   // Filtered and sorted products memoized
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    // Apply live pricing to products before filtering and sorting
+    let result = products.map((p) => {
+      const { priceVal, price, hasLivePrice } = calculateProductPrice(p, rate999);
+      return {
+        ...p,
+        priceVal,
+        price,
+        hasLivePrice,
+      };
+    });
 
     // Filter by Category
     if (selectedCategory !== "All") {
@@ -155,7 +180,7 @@ function ShopInner() {
     }
 
     return result;
-  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, sortBy]);
+  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, sortBy, rate999]);
 
   // Content for filters to share between desktop sidebar and mobile drawer
   const renderFilters = () => (
@@ -338,7 +363,7 @@ function ShopInner() {
             ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} rate_999={rate999} />
                 ))}
               </div>
             ) : (

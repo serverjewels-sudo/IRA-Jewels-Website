@@ -31,6 +31,7 @@ function SkeletonCard() {
 
 export default function WishlistPage() {
   const [products, setProducts] = useState([]);
+  const [rate999, setRate999] = useState(null);
   const [wishlistIds, setWishlistIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,17 +52,31 @@ export default function WishlistPage() {
           const numericIds = ids.map((id) => Number(id)).filter((id) => !isNaN(id));
           const queryIds = numericIds.length > 0 ? numericIds : ids;
 
-          const { data, error } = await supabase
+          const productsPromise = supabase
             .from("products")
             .select("*")
             .in("id", queryIds)
             .eq("is_active", true);
 
-          if (error) {
-            console.error("Error loading products from Supabase:", error);
-          } else if (data) {
+          const ratePromise = supabase
+            .from("gold_rates")
+            .select("rate_999")
+            .eq("id", 1)
+            .maybeSingle();
+
+          const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
+
+          if (rateRes.error) {
+            console.error("Error fetching gold rate:", rateRes.error);
+          } else if (rateRes.data) {
+            setRate999(rateRes.data.rate_999);
+          }
+
+          if (productsRes.error) {
+            console.error("Error loading products from Supabase:", productsRes.error);
+          } else if (productsRes.data) {
             // Map products to the frontend format
-            setProducts(data.map(mapSupabaseProduct));
+            setProducts(productsRes.data.map(mapSupabaseProduct));
           }
         } else {
           setProducts([]);
@@ -162,7 +177,7 @@ export default function WishlistPage() {
                   {products.map((product) => (
                     <div key={product.id} className="flex flex-col">
                       <div className="flex-grow">
-                        <ProductCard product={product} />
+                        <ProductCard product={product} rate_999={rate999} />
                       </div>
                       <button
                         onClick={(e) => handleRemoveFromWishlist(product.id, e)}

@@ -5,9 +5,10 @@ import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/CartContext";
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase';
+import { calculateProductPrice } from "@/lib/priceUtils";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, rate_999 }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const router = useRouter();
   const { addToCart } = useCart();
@@ -34,7 +35,11 @@ export default function ProductCard({ product }) {
     fetchRating()
   }, [product?.id])
 
-  const isOnSale = product?.comparePriceVal && product?.comparePriceVal > product?.priceVal;
+  const { priceVal: calculatedPriceVal, price: calculatedPrice, hasLivePrice } = calculateProductPrice(product, rate_999);
+  const displayPriceVal = calculatedPriceVal;
+  const displayPrice = calculatedPrice;
+
+  const isOnSale = product?.comparePriceVal && product?.comparePriceVal > displayPriceVal;
   const isOutOfStock = (product?.stock_quantity ?? product?.stock ?? 0) === 0;
 
   useEffect(() => {
@@ -196,20 +201,32 @@ export default function ProductCard({ product }) {
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-inter font-medium text-[16px] text-[#2E3135]">
-                  {product.price}
+                  {displayPrice}
                 </span>
                 <span className="font-inter line-through text-[14px] text-[#888888]">
                   {product.compare_price}
                 </span>
               </div>
+              {hasLivePrice && (
+                <p className="text-[11px] text-[#888888] font-light -mt-1">
+                  Incl. GST
+                </p>
+              )}
               <p className="font-inter font-normal text-[13px] text-[#CDB38B]">
-                You save ₹{(product.comparePriceVal - product.priceVal).toLocaleString("en-IN")}
+                You save ₹{(product.comparePriceVal - displayPriceVal).toLocaleString("en-IN")}
               </p>
             </div>
           ) : (
-            <p className="font-inter font-medium text-[16px] text-[#2E3135]">
-              {product.price}
-            </p>
+            <div className="space-y-1">
+              <p className="font-inter font-medium text-[16px] text-[#2E3135]">
+                {displayPrice}
+              </p>
+              {hasLivePrice && (
+                <p className="text-[11px] text-[#888888] font-light">
+                  Incl. GST
+                </p>
+              )}
+            </div>
           )}
           <p className="font-inter font-light text-[13px] text-[#888888]">
             {product.metal}

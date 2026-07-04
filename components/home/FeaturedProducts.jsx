@@ -22,21 +22,36 @@ function SkeletonCard() {
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState([]);
+  const [rate999, setRate999] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchFeatured() {
+    async function fetchFeaturedAndRate() {
       try {
-        const { data, error } = await supabase
+        const productsPromise = supabase
           .from("products")
           .select("*")
           .eq("is_featured", true)
           .limit(6);
 
-        if (error) {
-          console.error("Error fetching featured products from Supabase:", error);
-        } else if (data) {
-          setProducts(data.map(mapSupabaseProduct));
+        const ratePromise = supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+
+        const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
+
+        if (rateRes.error) {
+          console.error("Error fetching gold rate:", rateRes.error);
+        } else if (rateRes.data) {
+          setRate999(rateRes.data.rate_999);
+        }
+
+        if (productsRes.error) {
+          console.error("Error fetching featured products from Supabase:", productsRes.error);
+        } else if (productsRes.data) {
+          setProducts(productsRes.data.map(mapSupabaseProduct));
         }
       } catch (err) {
         console.error("Unexpected error fetching featured products:", err);
@@ -44,7 +59,7 @@ export default function FeaturedProducts() {
         setIsLoading(false);
       }
     }
-    fetchFeatured();
+    fetchFeaturedAndRate();
   }, []);
 
   return (
@@ -75,7 +90,7 @@ export default function FeaturedProducts() {
         ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} rate_999={rate999} />
             ))}
           </div>
         ) : (

@@ -5,11 +5,13 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/shop/ProductCard";
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
+import { calculateProductPrice } from "@/lib/priceUtils";
 
 export const dynamic = 'force-dynamic';
 
 export default function OffersPage() {
   const [products, setProducts] = useState([]);
+  const [rate999, setRate999] = useState(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -17,22 +19,41 @@ export default function OffersPage() {
   useEffect(() => {
     document.title = "Limited Time Offers | IRA Jewels";
 
-    async function fetchOffers() {
+    async function fetchOffersAndRate() {
       try {
-        const { data: products, error } = await supabase
+        const productsPromise = supabase
           .from('products')
           .select('*')
           .not('compare_price', 'is', null)
           .eq('is_active', true)
           .order('created_at', { ascending: false });
 
-        if (error) {
-          console.error("Error fetching offers from Supabase:", error);
-        } else {
-          const saleProducts = (products || []).filter(
-            (p) => p.compare_price && p.compare_price > p.price
-          );
-          setProducts(saleProducts.map(mapSupabaseProduct));
+        const ratePromise = supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+
+        const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
+
+        let fetchedRate = null;
+        if (rateRes.error) {
+          console.error("Error fetching gold rate:", rateRes.error);
+        } else if (rateRes.data) {
+          fetchedRate = rateRes.data.rate_999;
+          setRate999(fetchedRate);
+        }
+
+        if (productsRes.error) {
+          console.error("Error fetching offers from Supabase:", productsRes.error);
+        } else if (productsRes.data) {
+          const mapped = productsRes.data.map(mapSupabaseProduct);
+          // Filter products based on live price calculation compared to comparePriceVal
+          const saleProducts = mapped.filter((p) => {
+            const { priceVal } = calculateProductPrice(p, fetchedRate);
+            return p.comparePriceVal && p.comparePriceVal > priceVal;
+          });
+          setProducts(saleProducts);
         }
       } catch (err) {
         console.error("Unexpected error fetching offers:", err);
@@ -40,7 +61,7 @@ export default function OffersPage() {
         setLoading(false);
       }
     }
-    fetchOffers();
+    fetchOffersAndRate();
   }, []);
 
   const handleNotifySubmit = (e) => {
@@ -88,7 +109,7 @@ export default function OffersPage() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard key={product.id} product={product} rate_999={rate999} />
                   ))}
                 </div>
               </>

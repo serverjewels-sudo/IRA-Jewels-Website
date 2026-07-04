@@ -32,6 +32,7 @@ export default function FeaturedProducts() {
           .from("products")
           .select("*")
           .eq("is_featured", true)
+          .eq("is_active", true)
           .limit(6);
 
         const ratePromise = supabase

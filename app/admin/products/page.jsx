@@ -5,12 +5,14 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
-import { Plus, Edit3, Trash2 } from "lucide-react";
+import { Plus, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -70,6 +72,43 @@ export default function AdminProductsPage() {
       alert("Failed to delete product. Please try again.");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleToggleActive = async (id, currentIsActive, name) => {
+    setTogglingId(id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const response = await fetch(`/api/admin/products`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id,
+          is_active: !currentIsActive,
+        }),
+      });
+
+      if (response.ok) {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, is_active: !currentIsActive } : p))
+        );
+        const actionText = currentIsActive ? "Product delisted" : "Product listed";
+        setToast({ message: actionText });
+        setTimeout(() => setToast(null), 3000);
+      } else {
+        const errData = await response.json();
+        alert(`Error updating product status: ${errData.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error("Error updating product status:", err);
+      alert("Failed to update product status. Please try again.");
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -216,7 +255,7 @@ export default function AdminProductsPage() {
                               : "bg-gray-100 text-gray-600 border border-gray-200"
                           }`}
                         >
-                          {product.is_active ? "Active" : "Inactive"}
+                          {product.is_active ? "Active" : "Delisted"}
                         </span>
                       </td>
 
@@ -230,6 +269,20 @@ export default function AdminProductsPage() {
                           >
                             <Edit3 className="w-4 h-4 stroke-[1.5]" />
                           </Link>
+                          <button
+                            onClick={() => handleToggleActive(product.id, product.is_active, product.name)}
+                            disabled={togglingId === product.id}
+                            className="p-2 hover:bg-[#F3F1EC] text-gray-600 hover:text-[#CDB38B] rounded transition-all disabled:opacity-50"
+                            title={product.is_active ? "Delist Product" : "List Product"}
+                          >
+                            {togglingId === product.id ? (
+                              <div className="w-4 h-4 border-2 border-[#CDB38B] border-t-transparent rounded-full animate-spin"></div>
+                            ) : product.is_active ? (
+                              <Eye className="w-4 h-4 stroke-[1.5]" />
+                            ) : (
+                              <EyeOff className="w-4 h-4 stroke-[1.5]" />
+                            )}
+                          </button>
                           <button
                             onClick={() => handleDelete(product.id, product.name)}
                             disabled={deletingId === product.id}
@@ -268,6 +321,29 @@ export default function AdminProductsPage() {
           </div>
         )}
       </div>
+      {toast && (
+        <>
+          <style>{`
+            @keyframes slideInUp {
+              from {
+                transform: translateY(100%) scale(0.9);
+                opacity: 0;
+              }
+              to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+              }
+            }
+            .animate-toast {
+              animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+          `}</style>
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#2E3135] text-white px-5 py-3.5 rounded shadow-xl border border-[#CDB38B]/40 font-inter text-[13px] tracking-wide animate-toast">
+            <div className="w-2 h-2 rounded-full bg-[#CDB38B] animate-pulse"></div>
+            <span>{toast.message}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

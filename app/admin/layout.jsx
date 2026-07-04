@@ -29,9 +29,23 @@ export default function AdminLayout({ children }) {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           router.replace("/admin/login");
-        } else {
+          return;
+        }
+
+        // Query the admin verification endpoint
+        const response = await fetch("/api/admin/verify", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (response.ok) {
           setAuthenticated(true);
           setLoading(false);
+        } else {
+          console.warn("Access denied: User is not a registered administrator");
+          await supabase.auth.signOut();
+          router.replace("/admin/login?error=unauthorized");
         }
       } catch (err) {
         console.error("Auth check error:", err);

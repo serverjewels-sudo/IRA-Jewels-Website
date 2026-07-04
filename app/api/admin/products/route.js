@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin, isAdminUser } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 
 // Helper to authenticate requests using client's JWT
@@ -22,6 +22,11 @@ export async function GET(req) {
   const user = await getAdminUser(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const check = await isAdminUser(user.email);
+  if (!check) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
   }
 
   const { searchParams } = new URL(req.url);
@@ -57,6 +62,11 @@ export async function POST(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const check = await isAdminUser(user.email);
+  if (!check) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     
@@ -89,6 +99,11 @@ export async function PUT(req) {
   const user = await getAdminUser(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const check = await isAdminUser(user.email);
+  if (!check) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
   }
 
   try {
@@ -128,6 +143,11 @@ export async function DELETE(req) {
   const user = await getAdminUser(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const check = await isAdminUser(user.email);
+  if (!check) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
   }
 
   const { searchParams } = new URL(req.url);

@@ -43,8 +43,50 @@ export default function ProductForm({ productId }) {
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
+  // New Gold Rate Pricing Fields State
+  const [netGoldWeight, setNetGoldWeight] = useState("");
+  const [diamondNetAmount, setDiamondNetAmount] = useState("0");
+  const [makingNetAmount, setMakingNetAmount] = useState("0");
+  const [otherNetAmount, setOtherNetAmount] = useState("0");
+  const [gstPercentage, setGstPercentage] = useState("");
+
+  // Reference rates fetched from DB
+  const [rate999, setRate999] = useState(0);
+
   // Validation States
   const [validated, setValidated] = useState(false);
+
+  // Fetch reference gold rates and default GST on load
+  useEffect(() => {
+    async function fetchGoldRates() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        if (!token) return;
+
+        const response = await fetch("/api/admin/gold-rate", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setRate999(data.rate_999 || 0);
+          
+          // Pre-fill GST% on load for ADD mode only
+          if (!productId && data.gst_default !== undefined && data.gst_default !== null) {
+            setGstPercentage(String(data.gst_default));
+          }
+        }
+      } catch (err) {
+        console.error("Error loading reference gold rates:", err);
+      }
+    }
+
+    fetchGoldRates();
+  }, [productId]);
 
   // Fetch product data if editing
   useEffect(() => {
@@ -73,6 +115,13 @@ export default function ProductForm({ productId }) {
           setWeight(p.weight_grams !== undefined && p.weight_grams !== null ? String(p.weight_grams) : "");
           setStock(p.stock_quantity !== undefined ? String(p.stock_quantity) : "0");
           setDescription(p.description || "");
+          
+          // Load new fields
+          setNetGoldWeight(p.net_gold_weight !== undefined && p.net_gold_weight !== null ? String(p.net_gold_weight) : "");
+          setDiamondNetAmount(p.diamond_net_amount !== undefined && p.diamond_net_amount !== null ? String(p.diamond_net_amount) : "0");
+          setMakingNetAmount(p.making_net_amount !== undefined && p.making_net_amount !== null ? String(p.making_net_amount) : "0");
+          setOtherNetAmount(p.other_net_amount !== undefined && p.other_net_amount !== null ? String(p.other_net_amount) : "0");
+          setGstPercentage(p.gst_percentage !== undefined && p.gst_percentage !== null ? String(p.gst_percentage) : "");
           
           if (Array.isArray(p.size_options)) {
             setSizesStr(p.size_options.join(", "));
@@ -139,6 +188,11 @@ export default function ProductForm({ productId }) {
       images,
       is_featured: isFeatured,
       is_active: isActive,
+      net_gold_weight: netGoldWeight ? parseFloat(netGoldWeight) : null,
+      diamond_net_amount: diamondNetAmount ? parseFloat(diamondNetAmount) : 0,
+      making_net_amount: makingNetAmount ? parseFloat(makingNetAmount) : 0,
+      other_net_amount: otherNetAmount ? parseFloat(otherNetAmount) : 0,
+      gst_percentage: gstPercentage ? parseFloat(gstPercentage) : null,
     };
 
     if (productId) {
@@ -190,268 +244,471 @@ export default function ProductForm({ productId }) {
     );
   }
 
+  // Calculations for Live Preview
+  const karatMultiplier = karat === "22K" ? 22 : karat === "18K" ? 18 : 14;
+  const karatRate = rate999 ? (rate999 / 24) * karatMultiplier : 0;
+  
+  const weightVal = parseFloat(netGoldWeight) || 0;
+  const goldAmount = weightVal * karatRate;
+  
+  const diamondVal = parseFloat(diamondNetAmount) || 0;
+  const makingVal = parseFloat(makingNetAmount) || 0;
+  const otherVal = parseFloat(otherNetAmount) || 0;
+  const gstPctVal = parseFloat(gstPercentage) || 0;
+  
+  const subtotal = goldAmount + diamondVal + makingVal + otherVal;
+  const gstAmount = subtotal * (gstPctVal / 100);
+  const finalPrice = subtotal + gstAmount;
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-[#2E3135]/5 p-8 max-w-4xl">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {errorMsg && (
-          <div className="text-red-600 text-[13px] font-inter py-3 px-4 bg-red-50 rounded border border-red-100">
-            {errorMsg}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Product Name */}
-          <div className="flex flex-col space-y-1.5 md:col-span-2">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Solitaire Diamond Ring"
-              className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
-                validated && !name ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
-              }`}
-            />
-          </div>
-
-          {/* Category */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Category <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-white rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all cursor-pointer capitalize"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Karat */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Karat
-            </label>
-            <select
-              value={karat}
-              onChange={(e) => setKarat(e.target.value)}
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-white rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all cursor-pointer"
-            >
-              {karats.map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Price */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Price (₹) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              required
-              min="0"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g. 18500"
-              className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
-                validated && !price ? "border-red-400" : "border-[#E5E5E5]"
-              }`}
-            />
-          </div>
-
-          {/* Compare Price */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Compare Price (Original Crossed-out, ₹)
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={comparePrice}
-              onChange={(e) => setComparePrice(e.target.value)}
-              placeholder="e.g. 22000"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Metal Type */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Metal Type
-            </label>
-            <input
-              type="text"
-              value={metalType}
-              onChange={(e) => setMetalType(e.target.value)}
-              placeholder="e.g. white gold"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Stone Type */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Stone Type
-            </label>
-            <input
-              type="text"
-              value={stoneType}
-              onChange={(e) => setStoneType(e.target.value)}
-              placeholder="e.g. lab diamond"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Weight */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Weight in grams
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="e.g. 2.3"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Stock */}
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Stock Quantity
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              placeholder="e.g. 50"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Size Options */}
-          <div className="flex flex-col space-y-1.5 md:col-span-2">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Size Options (comma separated)
-            </label>
-            <input
-              type="text"
-              value={sizesStr}
-              onChange={(e) => setSizesStr(e.target.value)}
-              placeholder="e.g. 5, 6, 7, 8"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Colour Options */}
-          <div className="flex flex-col space-y-1.5 md:col-span-2">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Colour Options (comma separated)
-            </label>
-            <input
-              type="text"
-              value={coloursStr}
-              onChange={(e) => setColoursStr(e.target.value)}
-              placeholder="e.g. White Gold, Yellow Gold, Rose Gold"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Image URLs */}
-          <div className="flex flex-col space-y-1.5 md:col-span-2">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Image URLs (comma separated)
-            </label>
-            <input
-              type="text"
-              value={imagesStr}
-              onChange={(e) => setImagesStr(e.target.value)}
-              placeholder="e.g. https://domain.com/img1.jpg, https://domain.com/img2.jpg"
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="flex flex-col space-y-1.5 md:col-span-2">
-            <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-              Description
-            </label>
-            <textarea
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide a detailed description of the jewellery item..."
-              className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all resize-none"
-            />
-          </div>
-
-          {/* Toggles */}
-          <div className="flex items-center space-x-6 md:col-span-2 py-2">
-            <label className="flex items-center space-x-3 cursor-pointer">
+    <form onSubmit={handleSubmit} className="max-w-6xl space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        {/* Left Column: Form Fields */}
+        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-[#2E3135]/5 p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Product Name */}
+            <div className="flex flex-col space-y-1.5 md:col-span-2">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Product Name <span className="text-red-500">*</span>
+              </label>
               <input
-                type="checkbox"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                className="w-4.5 h-4.5 rounded border-[#E5E5E5] text-[#CDB38B] focus:ring-[#CDB38B] cursor-pointer"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Solitaire Diamond Ring"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !name ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
-              <span className="font-inter text-[12px] font-semibold text-[#2E3135]/80 uppercase tracking-wide">
-                Is Featured Product
-              </span>
-            </label>
+            </div>
 
-            <label className="flex items-center space-x-3 cursor-pointer">
+            {/* Category */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-white rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all cursor-pointer capitalize"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Karat */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Karat
+              </label>
+              <select
+                value={karat}
+                onChange={(e) => setKarat(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-white rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all cursor-pointer"
+              >
+                {karats.map((k) => (
+                  <option key={k} value={k}>
+                    {k}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Price (Legacy/Manual) (₹) <span className="text-red-500">*</span>
+              </label>
               <input
-                type="checkbox"
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-                className="w-4.5 h-4.5 rounded border-[#E5E5E5] text-[#CDB38B] focus:ring-[#CDB38B] cursor-pointer"
+                type="number"
+                required
+                min="0"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="e.g. 18500"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !price ? "border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
-              <span className="font-inter text-[12px] font-semibold text-[#2E3135]/80 uppercase tracking-wide">
-                Is Active (Visible in Shop)
-              </span>
-            </label>
+            </div>
+
+            {/* Compare Price */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Compare Price (Original Crossed-out, ₹)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={comparePrice}
+                onChange={(e) => setComparePrice(e.target.value)}
+                placeholder="e.g. 22000"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Metal Type */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Metal Type
+              </label>
+              <input
+                type="text"
+                value={metalType}
+                onChange={(e) => setMetalType(e.target.value)}
+                placeholder="e.g. white gold"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Stone Type */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Stone Type
+              </label>
+              <input
+                type="text"
+                value={stoneType}
+                onChange={(e) => setStoneType(e.target.value)}
+                placeholder="e.g. lab diamond"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Weight */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Weight in grams
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="e.g. 2.3"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Stock */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Stock Quantity
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                placeholder="e.g. 50"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Section Divider */}
+            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+              <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                Gold Rate Pricing Settings
+              </h3>
+              <p className="font-inter text-[12px] text-[#888888] mb-4 font-light">
+                Configure weights and individual component costs. The final calculated price is displayed in the live preview panel on the right.
+              </p>
+            </div>
+
+            {/* Net Gold Weight (grams) */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Net Gold Weight (grams)
+              </label>
+              <input
+                type="number"
+                step="0.001"
+                min="0"
+                value={netGoldWeight}
+                onChange={(e) => setNetGoldWeight(e.target.value)}
+                placeholder="e.g. 5.25"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Diamond Net Amount */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Diamond Net Amount (₹)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={diamondNetAmount}
+                onChange={(e) => setDiamondNetAmount(e.target.value)}
+                placeholder="e.g. 0"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Making Net Amount */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Making Net Amount (₹)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={makingNetAmount}
+                onChange={(e) => setMakingNetAmount(e.target.value)}
+                placeholder="e.g. 0"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Other Net Amount */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Other Net Amount (₹)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={otherNetAmount}
+                onChange={(e) => setOtherNetAmount(e.target.value)}
+                placeholder="e.g. 0"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* GST % */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                GST %
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={gstPercentage}
+                onChange={(e) => setGstPercentage(e.target.value)}
+                placeholder="e.g. 3"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Section Divider for Attributes */}
+            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+              <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                Product Attributes & Details
+              </h3>
+            </div>
+
+            {/* Size Options */}
+            <div className="flex flex-col space-y-1.5 md:col-span-2">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Size Options (comma separated)
+              </label>
+              <input
+                type="text"
+                value={sizesStr}
+                onChange={(e) => setSizesStr(e.target.value)}
+                placeholder="e.g. 5, 6, 7, 8"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Colour Options */}
+            <div className="flex flex-col space-y-1.5 md:col-span-2">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Colour Options (comma separated)
+              </label>
+              <input
+                type="text"
+                value={coloursStr}
+                onChange={(e) => setColoursStr(e.target.value)}
+                placeholder="e.g. White Gold, Yellow Gold, Rose Gold"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Image URLs */}
+            <div className="flex flex-col space-y-1.5 md:col-span-2">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Image URLs (comma separated)
+              </label>
+              <input
+                type="text"
+                value={imagesStr}
+                onChange={(e) => setImagesStr(e.target.value)}
+                placeholder="e.g. https://domain.com/img1.jpg, https://domain.com/img2.jpg"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="flex flex-col space-y-1.5 md:col-span-2">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Description
+              </label>
+              <textarea
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Provide a detailed description of the jewellery item..."
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all resize-none"
+              />
+            </div>
+
+            {/* Toggles */}
+            <div className="flex items-center space-x-6 md:col-span-2 py-2">
+              <label className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                  className="w-4.5 h-4.5 rounded border-[#E5E5E5] text-[#CDB38B] focus:ring-[#CDB38B] cursor-pointer"
+                />
+                <span className="font-inter text-[12px] font-semibold text-[#2E3135]/80 uppercase tracking-wide">
+                  Is Featured Product
+                </span>
+              </label>
+
+              <label className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                  className="w-4.5 h-4.5 rounded border-[#E5E5E5] text-[#CDB38B] focus:ring-[#CDB38B] cursor-pointer"
+                />
+                <span className="font-inter text-[12px] font-semibold text-[#2E3135]/80 uppercase tracking-wide">
+                  Is Active (Visible in Shop)
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Form Action Buttons */}
+          <div className="flex items-center gap-4 pt-4 border-t border-[#2E3135]/10">
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-3.5 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300 flex items-center justify-center min-w-[120px] disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                "Save Product"
+              )}
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => router.push("/admin/products")}
+              className="px-6 py-3.5 bg-white border border-[#2E3135] text-[#2E3135] hover:bg-[#F3F1EC] font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300"
+            >
+              Cancel
+            </button>
           </div>
         </div>
 
-        {/* Form Action Buttons */}
-        <div className="flex items-center gap-4 pt-4 border-t border-[#2E3135]/10">
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-3.5 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300 flex items-center justify-center min-w-[120px] disabled:opacity-50"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              "Save Product"
-            )}
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => router.push("/admin/products")}
-            className="px-6 py-3.5 bg-white border border-[#2E3135] text-[#2E3135] hover:bg-[#F3F1EC] font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300"
-          >
-            Cancel
-          </button>
+        {/* Right Column: Live Price Preview (Sticky) */}
+        <div className="lg:col-span-1 lg:sticky lg:top-6 space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-[#2E3135]/5 p-6 space-y-6">
+            <h3 className="font-serif font-normal text-[20px] tracking-wide text-[#2E3135] uppercase pb-3 border-b border-[#2E3135]/10">
+              Live Price Preview
+            </h3>
+            
+            <div className="space-y-4 font-inter text-[13px]">
+              {/* Reference rates info */}
+              <div className="flex justify-between items-center text-[#888888] font-light">
+                <span>Ref Gold Rate (999):</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{(rate999 || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/g
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center text-[#888888] font-light">
+                <span>Ref Karat Rate ({karat}):</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{karatRate.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/g
+                </span>
+              </div>
+              
+              <hr className="border-[#2E3135]/5" />
+
+              {/* Gold Amount Breakdown */}
+              <div className="flex justify-between items-center">
+                <span className="text-[#2E3135]/70">Gold Amount:</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{goldAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="text-[11px] text-[#888888] font-light -mt-2">
+                ({weightVal} g × ₹{karatRate.toFixed(2)}/g)
+              </div>
+
+              {/* Diamond Amount */}
+              <div className="flex justify-between items-center">
+                <span className="text-[#2E3135]/70">Diamond Net Amount:</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{diamondVal.toLocaleString("en-IN")}
+                </span>
+              </div>
+
+              {/* Making Amount */}
+              <div className="flex justify-between items-center">
+                <span className="text-[#2E3135]/70">Making Net Amount:</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{makingVal.toLocaleString("en-IN")}
+                </span>
+              </div>
+
+              {/* Other Amount */}
+              <div className="flex justify-between items-center">
+                <span className="text-[#2E3135]/70">Other Net Amount:</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{otherVal.toLocaleString("en-IN")}
+                </span>
+              </div>
+
+              <hr className="border-[#2E3135]/5" />
+
+              {/* Subtotal */}
+              <div className="flex justify-between items-center font-medium">
+                <span className="text-[#2E3135]">Subtotal:</span>
+                <span className="text-[#2E3135]">
+                  ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              {/* GST Amount */}
+              <div className="flex justify-between items-center text-[#888888] font-light">
+                <span>GST Amount ({gstPctVal}%):</span>
+                <span className="font-medium text-[#2E3135]">
+                  ₹{gstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="border-t border-[#2E3135]/10 pt-4 mt-2">
+                <div className="flex flex-col space-y-1">
+                  <span className="font-serif text-[12px] font-normal text-[#2E3135]/60 uppercase tracking-wider">Final Calculated Price:</span>
+                  <span className="font-serif text-[28px] font-semibold text-[#2E3135] leading-none">
+                    ₹{finalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#888888] font-light mt-4 italic">
+                  Note: This preview updates live and shows calculations for verification. Save the product to persist changes.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </form>
-    </div>
+
+      </div>
+    </form>
   );
 }

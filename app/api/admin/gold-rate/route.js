@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin, isAdminUser } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 
 // Helper to authenticate requests using client's JWT
@@ -24,6 +24,11 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const check = await isAdminUser(user.email);
+  if (!check) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+  }
+
   try {
     const { data, error } = await supabaseAdmin
       .from("gold_rates")
@@ -44,6 +49,11 @@ export async function PUT(req) {
   const user = await getAdminUser(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const check = await isAdminUser(user.email);
+  if (!check) {
+    return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
   }
 
   try {

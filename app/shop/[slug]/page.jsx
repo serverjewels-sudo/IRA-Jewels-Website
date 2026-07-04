@@ -267,6 +267,8 @@ export default function ProductDetailPage() {
     ? Math.round(((product.comparePriceVal - displayPriceVal) / product.comparePriceVal) * 100) 
     : 0
 
+  const validImages = product.images ? product.images.filter(img => img && img.trim() !== "") : [];
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
       <Navbar />
@@ -274,7 +276,7 @@ export default function ProductDetailPage() {
       <main className="flex-grow">
         {/* Breadcrumbs */}
         <div className="bg-[#FBFBFA] border-b border-[#F3F1EC]">
-          <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center gap-2 font-inter text-[11px] text-[#888] tracking-wider uppercase">
+          <div className="max-w-[1280px] mx-auto px-6 py-4 flex items-center gap-2 font-inter text-[11px] text-[#888] tracking-wider uppercase">
             <Link href="/" className="hover:text-[#CDB38B] transition-colors">Home</Link>
             <ChevronRight className="w-3 h-3 text-[#E5E5E5]" />
             <Link href="/shop" className="hover:text-[#CDB38B] transition-colors">Shop</Link>
@@ -284,22 +286,22 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product Details Section */}
-        <div className="max-w-[1400px] mx-auto px-6 py-12 lg:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+        <div className="max-w-[1280px] mx-auto px-6 py-12 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12">
             
             {/* Left Column: Image Gallery */}
-            <div className="lg:col-span-7 flex flex-col">
-              <div className="aspect-square w-full bg-[#FAF9F6] border border-[#F3F1EC] overflow-hidden relative group">
+            <div className="lg:col-span-6 flex flex-col">
+              <div className="w-full lg:max-w-[540px] aspect-square bg-white border border-[#F3F1EC] overflow-hidden relative group">
                 {isOnSale && (
                   <span className="absolute top-4 left-4 z-10 bg-[#CDB38B] text-white font-inter font-semibold text-[10px] tracking-wider uppercase px-3 py-1.5 shadow-sm">
                     {discountPercent}% OFF
                   </span>
                 )}
-                {product.images && product.images.length > 0 ? (
+                {validImages.length > 0 ? (
                   <img
-                    src={product.images[activeImageIndex]}
+                    src={validImages[activeImageIndex] || validImages[0]}
                     alt={`${product.name} main view`}
-                    className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105"
+                    className="w-full h-full object-contain transition-all duration-700 ease-out group-hover:scale-105"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-[#F3F1EC]">
@@ -309,9 +311,9 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Thumbnails */}
-              {product.images && product.images.length > 1 && (
+              {validImages.length > 1 && (
                 <div className="flex gap-4 mt-4 overflow-x-auto pb-2 scrollbar-thin">
-                  {product.images.map((img, idx) => (
+                  {validImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImageIndex(idx)}
@@ -325,7 +327,7 @@ export default function ProductDetailPage() {
                       <img
                         src={img}
                         alt={`${product.name} thumbnail ${idx + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </button>
                   ))}
@@ -334,7 +336,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Right Column: Product Info & Actions */}
-            <div className="lg:col-span-5 flex flex-col justify-between">
+            <div className="lg:col-span-6 flex flex-col">
               <div>
                 {/* Category & Rating */}
                 <div className="flex justify-between items-center mb-4">
@@ -576,7 +578,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Trust Services Badges */}
-                <div className="grid grid-cols-3 gap-4 border-t border-b border-[#2E3135]/10 py-6 mb-8 text-center bg-[#FBFBFA]">
+                <div className="grid grid-cols-3 gap-4 border-t border-b border-[#2E3135]/10 py-6 mb-2 text-center bg-[#FBFBFA]">
                   <div className="flex flex-col items-center p-2">
                     <Truck className="w-5 h-5 text-[#CDB38B] mb-2" />
                     <span className="font-inter font-medium text-[10px] tracking-wider uppercase text-[#2E3135]">Free Insured Shipping</span>
@@ -593,7 +595,7 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Specifications Table */}
-              <div className="mt-4">
+              <div className="mt-6">
                 <h3 className="font-inter font-medium text-[12px] tracking-[1.5px] uppercase text-[#2E3135] mb-4">
                   Specifications
                 </h3>

@@ -20,6 +20,101 @@ const categories = [
 
 const karats = ["14K", "18K", "22K"];
 
+function ImageUploadBox({ label, index, currentUrl, setImages, isRequired }) {
+  const [uploading, setUploading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setErrorMsg("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const response = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setImages((prev) => {
+          const newImages = [...prev];
+          newImages[index] = data.url;
+          return newImages;
+        });
+      } else {
+        const errData = await response.json();
+        setErrorMsg(errData.error || "Upload failed");
+        alert(errData.error || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setErrorMsg("Network error");
+      alert("Network error");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = (e) => {
+    e.preventDefault();
+    setImages((prev) => {
+      const newImages = [...prev];
+      newImages[index] = "";
+      return newImages;
+    });
+  };
+
+  return (
+    <div className="flex flex-col space-y-2">
+      <label className="font-inter text-[10px] font-semibold tracking-wider text-[#2E3135]/60 uppercase text-center min-h-[30px] flex items-center justify-center">
+        {label} {isRequired && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      
+      <div className="relative aspect-square border-2 border-dashed border-[#E5E5E5] rounded-md flex flex-col items-center justify-center bg-[#FBFBFA] overflow-hidden group hover:border-[#CDB38B] transition-colors">
+        {uploading ? (
+          <div className="flex flex-col items-center space-y-2">
+            <div className="w-5 h-5 border-2 border-[#CDB38B]/20 border-t-[#CDB38B] rounded-full animate-spin"></div>
+            <span className="font-inter text-[10px] text-[#888] uppercase tracking-widest">Uploading...</span>
+          </div>
+        ) : currentUrl ? (
+          <>
+            <img src={currentUrl} alt={label} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <label className="cursor-pointer px-4 py-2 bg-white text-[#2E3135] font-inter text-[11px] uppercase tracking-wider font-semibold hover:bg-[#F3F1EC] transition-colors mb-2">
+                Change
+                <input type="file" className="hidden" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />
+              </label>
+              <button onClick={handleRemove} className="text-white font-inter text-[11px] uppercase tracking-wider hover:text-red-400 transition-colors">
+                Remove
+              </button>
+            </div>
+          </>
+        ) : (
+          <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center text-[#888] hover:text-[#CDB38B] transition-colors">
+            <svg className="w-6 h-6 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+            </svg>
+            <span className="font-inter text-[10px] uppercase tracking-widest">Select File</span>
+            <input type="file" className="hidden" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />
+          </label>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProductForm({ productId }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -39,7 +134,7 @@ export default function ProductForm({ productId }) {
   const [description, setDescription] = useState("");
   const [sizesStr, setSizesStr] = useState("");
   const [coloursStr, setColoursStr] = useState("");
-  const [imagesStr, setImagesStr] = useState("");
+  const [images, setImages] = useState(["", "", "", ""]);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
@@ -130,7 +225,14 @@ export default function ProductForm({ productId }) {
             setColoursStr(p.colour_options.join(", "));
           }
           if (Array.isArray(p.images)) {
-            setImagesStr(p.images.join(", "));
+            setImages([
+              p.images[0] || "",
+              p.images[1] || "",
+              p.images[2] || "",
+              p.images[3] || ""
+            ]);
+          } else {
+            setImages(["", "", "", ""]);
           }
 
           setIsFeatured(!!p.is_featured);
@@ -168,9 +270,9 @@ export default function ProductForm({ productId }) {
     const colours = coloursStr
       ? coloursStr.split(",").map((c) => c.trim()).filter(Boolean)
       : [];
-    const images = imagesStr
-      ? imagesStr.split(",").map((i) => i.trim()).filter(Boolean)
-      : [];
+    
+    // Keep empty strings to preserve image positions
+    const imagesPayload = images.map(img => img ? img.trim() : "");
 
     const payload = {
       name,
@@ -185,7 +287,7 @@ export default function ProductForm({ productId }) {
       description,
       size_options: sizes,
       colour_options: colours,
-      images,
+      images: imagesPayload,
       is_featured: isFeatured,
       is_active: isActive,
       net_gold_weight: netGoldWeight ? parseFloat(netGoldWeight) : null,
@@ -535,18 +637,45 @@ export default function ProductForm({ productId }) {
               />
             </div>
 
-            {/* Image URLs */}
-            <div className="flex flex-col space-y-1.5 md:col-span-2">
-              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Image URLs (comma separated)
-              </label>
-              <input
-                type="text"
-                value={imagesStr}
-                onChange={(e) => setImagesStr(e.target.value)}
-                placeholder="e.g. https://domain.com/img1.jpg, https://domain.com/img2.jpg"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-              />
+            {/* Product Images (4 Slots) */}
+            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+              <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                Product Images
+              </h3>
+              <p className="font-inter text-[12px] text-[#888888] mb-4 font-light">
+                Upload up to 4 images for this product. The main image is required.
+              </p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <ImageUploadBox 
+                  label="Main Image (Front View)"
+                  index={0}
+                  currentUrl={images[0]}
+                  setImages={setImages}
+                  isRequired={true}
+                />
+                <ImageUploadBox 
+                  label="Close-Up / Detail Shot"
+                  index={1}
+                  currentUrl={images[1]}
+                  setImages={setImages}
+                  isRequired={false}
+                />
+                <ImageUploadBox 
+                  label="Side View"
+                  index={2}
+                  currentUrl={images[2]}
+                  setImages={setImages}
+                  isRequired={false}
+                />
+                <ImageUploadBox 
+                  label="Worn / Lifestyle Shot"
+                  index={3}
+                  currentUrl={images[3]}
+                  setImages={setImages}
+                  isRequired={false}
+                />
+              </div>
             </div>
 
             {/* Description */}

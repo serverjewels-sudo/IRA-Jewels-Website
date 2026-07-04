@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Heart, ShoppingBag, Truck, ShieldCheck, RefreshCw, Star, ChevronRight, Minus, Plus } from 'lucide-react'
+import { Heart, ShoppingBag, Truck, ShieldCheck, RefreshCw, Star, ChevronRight, ChevronDown, Minus, Plus } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useCart } from '@/lib/CartContext'
 import { createClient, mapSupabaseProduct } from '@/lib/supabase'
 import { sampleProducts } from '@/lib/products'
 import ReviewSection from '@/components/product/ReviewSection'
+import { calculateProductPrice } from '@/lib/priceUtils'
 
 export default function ProductDetailPage() {
   const { slug } = useParams()
@@ -19,6 +20,8 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [rate999, setRate999] = useState(null)
+  const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
@@ -34,16 +37,35 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!slug) return
 
-    async function fetchProduct() {
+    async function fetchProductAndGoldRate() {
       try {
         setLoading(true)
         const supabase = createClient()
-        const { data, error } = await supabase
+
+        // Fetch gold rate
+        const ratePromise = supabase
+          .from("gold_rates")
+          .select("rate_999")
+          .eq("id", 1)
+          .maybeSingle();
+
+        // Fetch product
+        const productPromise = supabase
           .from('products')
           .select('*')
           .eq('slug', slug)
           .eq('is_active', true)
           .single()
+
+        const [productRes, rateRes] = await Promise.all([productPromise, ratePromise]);
+
+        if (rateRes.error) {
+          console.error("Error fetching gold rate:", rateRes.error);
+        } else if (rateRes.data) {
+          setRate999(rateRes.data.rate_999);
+        }
+
+        const { data, error } = productRes;
         
         if (error || !data) {
           console.log('[ProductDetail] Supabase fetch error or no data. Checking fallback sample products...')
@@ -79,7 +101,7 @@ export default function ProductDetailPage() {
       }
     }
 
-    fetchProduct()
+    fetchProductAndGoldRate()
   }, [slug])
 
   // Fetch reviews count and average rating
@@ -237,9 +259,12 @@ export default function ProductDetailPage() {
     )
   }
 
-  const isOnSale = product.comparePriceVal && product.comparePriceVal > product.priceVal
+  const priceResult = calculateProductPrice(product, rate999);
+  const { hasLivePrice, priceVal: displayPriceVal, price: displayPrice } = priceResult;
+
+  const isOnSale = product.comparePriceVal && product.comparePriceVal > displayPriceVal
   const discountPercent = isOnSale 
-    ? Math.round(((product.comparePriceVal - product.priceVal) / product.comparePriceVal) * 100) 
+    ? Math.round(((product.comparePriceVal - displayPriceVal) / product.comparePriceVal) * 100) 
     : 0
 
   return (
@@ -345,7 +370,7 @@ export default function ProductDetailPage() {
                 {/* Price Display */}
                 <div className="flex items-baseline gap-4 mb-2">
                   <span className="font-serif text-2xl lg:text-3xl text-[#2E3135]">
-                    {product.price}
+                    {displayPrice}
                   </span>
                   {isOnSale && (
                     <span className="font-inter text-md text-gray-400 line-through">
@@ -353,6 +378,74 @@ export default function ProductDetailPage() {
                     </span>
                   )}
                 </div>
+
+                {/* Price Breakdown Collapsible */}
+                {hasLivePrice && (
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setIsBreakdownOpen(!isBreakdownOpen)}
+                      className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                    >
+                      <span>Price Breakdown</span>
+                      <ChevronDown 
+                        className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isBreakdownOpen ? 'rotate-180' : ''}`} 
+                      />
+                    </button>
+                    
+                    {isBreakdownOpen && (
+                      <div className="mt-2 border border-[#E5E5E5] bg-[#FBFBFA] p-4 text-[12px] font-inter text-[#2E3135] space-y-2.5 max-w-md">
+                        {/* Gold item */}
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#888888]">
+                            Gold ({product.net_gold_weight}g × {product.karat || '14K'} Rate ₹{Math.round(priceResult.karatRate).toLocaleString("en-IN")}/g)
+                          </span>
+                          <span className="font-medium">₹{Math.round(priceResult.goldAmount).toLocaleString("en-IN")}</span>
+                        </div>
+                        
+                        {/* Diamond item */}
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#888888]">Diamond</span>
+                          <span className="font-medium">₹{Math.round(priceResult.diamondAmount).toLocaleString("en-IN")}</span>
+                        </div>
+                        
+                        {/* Making item */}
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#888888]">Making</span>
+                          <span className="font-medium">₹{Math.round(priceResult.makingAmount).toLocaleString("en-IN")}</span>
+                        </div>
+                        
+                        {/* Other item (only if > 0) */}
+                        {priceResult.otherAmount > 0 && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-[#888888]">Other</span>
+                            <span className="font-medium">₹{Math.round(priceResult.otherAmount).toLocaleString("en-IN")}</span>
+                          </div>
+                        )}
+                        
+                        {/* Subtotal */}
+                        <div className="flex justify-between items-center pt-1.5 border-t border-[#E5E5E5]/50">
+                          <span className="text-[#2E3135] font-medium">Subtotal</span>
+                          <span className="font-medium">₹{Math.round(priceResult.subtotal).toLocaleString("en-IN")}</span>
+                        </div>
+                        
+                        {/* GST */}
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#888888]">GST ({parseFloat(product.gst_percentage || 0)}%)</span>
+                          <span className="font-medium">₹{Math.round(priceResult.gstAmount).toLocaleString("en-IN")}</span>
+                        </div>
+                        
+                        {/* Thin divider before Total */}
+                        <div className="w-full h-[1px] bg-[#E5E5E5]/80 my-1" />
+                        
+                        {/* Total */}
+                        <div className="flex justify-between items-center font-bold text-[13.5px] text-[#2E3135] pt-0.5">
+                          <span>Total</span>
+                          <span>{displayPrice}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Stock Messaging */}
                 {(product.stock_quantity ?? product.stock ?? 0) === 0 ? (

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin, isAdminUser } from "@/lib/supabase";
+import { supabaseServiceRole, isAdminUser } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 
 // Helper to authenticate requests using client's JWT
@@ -11,7 +11,7 @@ async function getAdminUser(req) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey);
+  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
   
   const { data: { user }, error } = await tempSupabase.auth.getUser(token);
   if (error || !user) return null;
@@ -33,7 +33,7 @@ export async function GET(req) {
   const id = searchParams.get("id");
 
   if (id) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .from("products")
       .select("*")
       .eq("id", id)
@@ -44,7 +44,7 @@ export async function GET(req) {
     }
     return NextResponse.json(data);
   } else {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .from("products")
       .select("*")
       .order("created_at", { ascending: false });
@@ -80,7 +80,7 @@ export async function POST(req) {
         .trim();
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .from("products")
       .insert([body])
       .select()
@@ -123,7 +123,7 @@ export async function PUT(req) {
         .trim();
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .from("products")
       .update(updateData)
       .eq("id", id)
@@ -157,7 +157,7 @@ export async function DELETE(req) {
     return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await supabaseServiceRole
     .from("products")
     .delete()
     .eq("id", id);

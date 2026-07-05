@@ -7,7 +7,7 @@ import { Heart, ShoppingBag, Truck, ShieldCheck, RefreshCw, Star, ChevronRight, 
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useCart } from '@/lib/CartContext'
-import { createClient, mapSupabaseProduct } from '@/lib/supabase'
+import { supabase, mapSupabaseProduct } from '@/lib/supabase'
 import { sampleProducts } from '@/lib/products'
 import ReviewSection from '@/components/product/ReviewSection'
 import { calculateProductPrice } from '@/lib/priceUtils'
@@ -40,7 +40,6 @@ export default function ProductDetailPage() {
     async function fetchProductAndGoldRate() {
       try {
         setLoading(true)
-        const supabase = createClient()
 
         // Fetch gold rate
         const ratePromise = supabase
@@ -110,7 +109,6 @@ export default function ProductDetailPage() {
 
     async function fetchReviewStats() {
       try {
-        const supabase = createClient()
         const { data, error } = await supabase
           .from('reviews')
           .select('rating')

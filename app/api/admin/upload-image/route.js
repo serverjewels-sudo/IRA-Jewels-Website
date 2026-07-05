@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin, isAdminUser } from "@/lib/supabase";
+import { supabaseServiceRole, isAdminUser } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 
 // Helper to authenticate requests using client's JWT
@@ -13,7 +13,7 @@ async function getAdminUser(req) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnonKey) throw new Error("Server missing Supabase env variables.");
 
-  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey);
+  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
   
   const { data: { user }, error } = await tempSupabase.auth.getUser(token);
   if (error) throw new Error(`getUser error: ${error.message}`);
@@ -59,7 +59,7 @@ export async function POST(req) {
     const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
 
     // Upload to Supabase Storage
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .storage
       .from("product-images")
       .upload(uniqueFilename, file, {
@@ -73,7 +73,7 @@ export async function POST(req) {
     }
 
     // Get public URL
-    const { data: { publicUrl } } = supabaseAdmin
+    const { data: { publicUrl } } = supabaseServiceRole
       .storage
       .from("product-images")
       .getPublicUrl(data.path);

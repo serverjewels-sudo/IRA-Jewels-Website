@@ -13,7 +13,7 @@ async function getAdminUser(req) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey);
+  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
   
   const { data: { user }, error } = await tempSupabase.auth.getUser(token);
   if (error || !user) return null;

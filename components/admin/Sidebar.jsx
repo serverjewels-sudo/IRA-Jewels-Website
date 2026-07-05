@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { Package, PlusCircle, ShoppingBag, Coins, LogOut, X } from "lucide-react";
 
 export default function Sidebar({ isOpen, onClose }) {

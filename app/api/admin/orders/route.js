@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin, isAdminUser } from "@/lib/supabase";
+import { supabaseServiceRole, isAdminUser } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 
 // Helper to authenticate requests using client's JWT
@@ -11,7 +11,7 @@ async function getAdminUser(req) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey);
+  const tempSupabase = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
   
   const { data: { user }, error } = await tempSupabase.auth.getUser(token);
   if (error || !user) return null;
@@ -30,7 +30,7 @@ export async function GET(req) {
   }
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .from("orders")
       .select("*")
       .order("created_at", { ascending: false });
@@ -64,7 +64,7 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Missing required id or status" }, { status: 400 });
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabaseServiceRole
       .from("orders")
       .update({ status })
       .eq("id", id)

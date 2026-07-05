@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { supabase } from '@/lib/supabase'
 
 export default function OrderConfirmedPage() {
   const { id } = useParams()
@@ -16,8 +17,6 @@ export default function OrderConfirmedPage() {
     
     async function fetchOrder() {
       try {
-        const { createClient } = await import('@/lib/supabase')
-        const supabase = createClient()
         const { data, error } = await supabase
           .from('orders')
           .select('*')

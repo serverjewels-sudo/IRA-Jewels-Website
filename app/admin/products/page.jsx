@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 import { Plus, Edit3, Trash2, Eye, EyeOff } from "lucide-react";

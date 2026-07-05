@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
-import { supabaseAdmin, supabase } from "@/lib/supabase";
+import { supabaseServiceRole, supabase } from "@/lib/supabase";
 
 export async function POST(request) {
   try {
@@ -19,8 +19,8 @@ export async function POST(request) {
     }
 
     // Insert order into Supabase
-    // Using supabaseAdmin if available, else fallback to standard client
-    const client = supabaseAdmin || supabase;
+    // Using supabaseServiceRole if available, else fallback to standard client
+    const client = supabaseServiceRole || supabase;
 
     const { data: newOrder, error } = await client
       .from("orders")

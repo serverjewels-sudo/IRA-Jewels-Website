@@ -14,6 +14,11 @@ function LoginForm() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   
+  // Unconfirmed email state
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMsg, setResendMsg] = useState("");
+  
   // Forgot password state
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -42,6 +47,8 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
+    setUnconfirmedEmail("");
+    setResendMsg("");
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -50,7 +57,12 @@ function LoginForm() {
       });
 
       if (error) {
-        setErrorMsg(error.message);
+        if (error.message.includes("Email not confirmed")) {
+          setErrorMsg("Please confirm your email before logging in. Check your inbox for the confirmation link.");
+          setUnconfirmedEmail(email);
+        } else {
+          setErrorMsg(error.message);
+        }
       } else if (data.session) {
         router.push(redirect);
         router.refresh();
@@ -60,6 +72,30 @@ function LoginForm() {
       setErrorMsg("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    setResendLoading(true);
+    setResendMsg("");
+    setErrorMsg("");
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: unconfirmedEmail,
+      });
+      
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        setResendMsg("Confirmation email sent! Please check your inbox.");
+      }
+    } catch (err) {
+      console.error("Resend error:", err);
+      setErrorMsg("Failed to resend confirmation email. Please try again.");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -233,6 +269,25 @@ function LoginForm() {
         {errorMsg && (
           <p className="text-red-600 text-sm mt-2 text-center font-inter font-medium">
             {errorMsg}
+          </p>
+        )}
+        
+        {unconfirmedEmail && !resendMsg && (
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={handleResendConfirmation}
+              disabled={resendLoading}
+              className="text-[#2E3135] font-inter font-medium text-[12px] uppercase tracking-wider underline hover:text-[#CDB38B] transition-colors disabled:opacity-50"
+            >
+              {resendLoading ? "Sending..." : "Resend confirmation email"}
+            </button>
+          </div>
+        )}
+        
+        {resendMsg && (
+          <p className="text-green-600 text-sm mt-4 text-center font-inter font-medium">
+            {resendMsg}
           </p>
         )}
       </form>

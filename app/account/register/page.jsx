@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const router = useRouter();
 
   // If user is already logged in, redirect them to /account
@@ -38,6 +39,14 @@ export default function RegisterPage() {
     // Validation
     if (!fullName || !email || !password || !confirmPassword) {
       setErrorMsg("All fields are required.");
+      setLoading(false);
+      return;
+    }
+
+    // Strict email format validation (catches trailing dots, missing domain/tld, consecutive dots)
+    const emailRegex = /^[a-zA-Z0-9!#\$%&'\*\+\-\/=\?\^_`{\|}~]+(?:\.[a-zA-Z0-9!#\$%&'\*\+\-\/=\?\^_`{\|}~]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMsg("Please enter a valid email address.");
       setLoading(false);
       return;
     }
@@ -68,7 +77,8 @@ export default function RegisterPage() {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        setSuccessMsg("Account created! Please check your email to verify.");
+        setRegisteredEmail(email);
+        setSuccessMsg("Check your email to confirm your account before logging in.");
         // Clear fields on success
         setFullName("");
         setEmail("");
@@ -121,8 +131,8 @@ export default function RegisterPage() {
 
           {successMsg ? (
             <div className="text-center space-y-6">
-              <p className="text-green-600 font-inter font-medium text-sm">
-                {successMsg}
+              <p className="text-[#2E3135] font-inter font-medium text-sm leading-relaxed">
+                Check your email (<span className="font-semibold">{registeredEmail}</span>) to confirm your account before logging in.
               </p>
               <div className="pt-4">
                 <Link

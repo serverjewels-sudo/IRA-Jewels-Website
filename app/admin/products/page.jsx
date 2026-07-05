@@ -6,10 +6,12 @@ import { supabaseAdmin as supabase } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 import { Plus, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
+import { calculateProductPrice } from "@/lib/priceUtils";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [rate999, setRate999] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
   const [toast, setToast] = useState(null);
@@ -21,17 +23,26 @@ export default function AdminProductsPage() {
 
       if (!token) return;
 
-      const response = await fetch("/api/admin/products", {
+      const productsPromise = fetch("/api/admin/products", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      const ratePromise = supabase.from("gold_rates").select("rate_999").eq("id", 1).maybeSingle();
 
-      if (response.ok) {
-        const data = await response.json();
+      const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
+
+      if (rateRes.error) {
+        console.error("Error fetching gold rate:", rateRes.error);
+      } else if (rateRes.data) {
+        setRate999(rateRes.data.rate_999);
+      }
+
+      if (productsRes.ok) {
+        const data = await productsRes.json();
         setProducts(data);
       } else {
-        console.error("Failed to fetch products:", response.statusText);
+        console.error("Failed to fetch products:", productsRes.statusText);
       }
     } catch (err) {
       console.error("Error loading products:", err);
@@ -222,12 +233,19 @@ export default function AdminProductsPage() {
 
                       {/* Price */}
                       <td className="p-5 text-right font-medium text-[14px]">
-                        ₹{Number(product.price).toLocaleString("en-IN")}
-                        {product.compare_price && (
-                          <div className="text-[11px] text-gray-400 line-through font-light mt-0.5">
-                            ₹{Number(product.compare_price).toLocaleString("en-IN")}
-                          </div>
-                        )}
+                        {(() => {
+                          const calculated = calculateProductPrice(product, rate999);
+                          return (
+                            <>
+                              {calculated.price}
+                              {product.compare_price && (
+                                <div className="text-[11px] text-gray-400 line-through font-light mt-0.5">
+                                  ₹{Number(product.compare_price).toLocaleString("en-IN")}
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </td>
 
                       {/* Stock */}

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
+import { calculateProductPrice } from "@/lib/priceUtils";
+
 
 const categories = [
   "rings",
@@ -40,7 +42,7 @@ function getSkuPrefix(categoryName) {
   return categoryPrefixMap[clean] || "GEN";
 }
 
-function ImageUploadBox({ label, index, currentUrl, setImages, isRequired }) {
+function ImageUploadBox({ label, index, currentUrl, setImages, isRequired, hasError }) {
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -102,7 +104,9 @@ function ImageUploadBox({ label, index, currentUrl, setImages, isRequired }) {
         {label} {isRequired && <span className="text-red-500 ml-1">*</span>}
       </label>
       
-      <div className="relative aspect-square border-2 border-dashed border-[#E5E5E5] rounded-md flex flex-col items-center justify-center bg-[#FBFBFA] overflow-hidden group hover:border-[#CDB38B] transition-colors">
+      <div className={`relative aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center bg-[#FBFBFA] overflow-hidden group hover:border-[#CDB38B] transition-colors ${
+        hasError ? "border-red-400" : "border-[#E5E5E5]"
+      }`}>
         {uploading ? (
           <div className="flex flex-col items-center space-y-2">
             <div className="w-5 h-5 border-2 border-[#CDB38B]/20 border-t-[#CDB38B] rounded-full animate-spin"></div>
@@ -321,8 +325,19 @@ export default function ProductForm({ productId }) {
     setValidated(true);
     setErrorMsg("");
 
-    // Required field validation
-    if (!name || !category || !price) {
+    // Validate new required fields
+    const missingFields = [];
+    if (!name || !name.trim()) missingFields.push("Product Name is required");
+    if (!category || !category.trim()) missingFields.push("Category is required");
+    if (!styleNumber || !styleNumber.trim()) missingFields.push("Style Number is required");
+    if (!weight || weight.trim() === "") missingFields.push("Weight in grams is required");
+    if (!netGoldWeight || netGoldWeight.trim() === "") missingFields.push("Net Gold Weight is required");
+    if (!diamondNetAmount || diamondNetAmount.trim() === "") missingFields.push("Diamond Net Amount is required");
+    if (!gstPercentage || gstPercentage.trim() === "") missingFields.push("GST % is required");
+    if (!images[0] || !images[0].trim()) missingFields.push("Main Image (Front View) is required");
+
+    if (missingFields.length > 0) {
+      setErrorMsg(missingFields.join(", ") + ".");
       return;
     }
 
@@ -339,12 +354,23 @@ export default function ProductForm({ productId }) {
     // Keep empty strings to preserve image positions
     const imagesPayload = images.map(img => img ? img.trim() : "");
 
+    // Always use the live-calculated price for the database price field
+    const calculated = calculateProductPrice({
+      net_gold_weight: parseFloat(netGoldWeight),
+      karat,
+      diamond_net_amount: parseFloat(diamondNetAmount) || 0,
+      making_net_amount: parseFloat(makingNetAmount) || 0,
+      other_net_amount: parseFloat(otherNetAmount) || 0,
+      gst_percentage: parseFloat(gstPercentage) || 0,
+    }, rate999);
+    const finalPriceToSave = calculated.hasLivePrice ? calculated.priceVal : 0;
+
     const payload = {
       name,
       category,
       sku,
       style_number: styleNumber || null,
-      price: parseFloat(price),
+      price: finalPriceToSave,
       compare_price: comparePrice ? parseFloat(comparePrice) : null,
       karat,
       metal_type: metalType,
@@ -422,21 +448,33 @@ export default function ProductForm({ productId }) {
     );
   }
 
-  // Calculations for Live Preview
+  // Calculations for Live Preview using shared utility
+  const previewProduct = {
+    net_gold_weight: parseFloat(netGoldWeight) ? parseFloat(netGoldWeight) : 0.0000001,
+    karat,
+    diamond_net_amount: parseFloat(diamondNetAmount) || 0,
+    making_net_amount: parseFloat(makingNetAmount) || 0,
+    other_net_amount: parseFloat(otherNetAmount) || 0,
+    gst_percentage: parseFloat(gstPercentage) || 0,
+  };
+  
+  const previewCalculated = calculateProductPrice(previewProduct, rate999);
+  
   const karatMultiplier = karat === "22K" ? 22 : karat === "18K" ? 18 : 14;
   const karatRate = rate999 ? (rate999 / 24) * karatMultiplier : 0;
   
   const weightVal = parseFloat(netGoldWeight) || 0;
-  const goldAmount = weightVal * karatRate;
+  const goldAmount = previewCalculated.goldAmount || 0;
   
-  const diamondVal = parseFloat(diamondNetAmount) || 0;
-  const makingVal = parseFloat(makingNetAmount) || 0;
-  const otherVal = parseFloat(otherNetAmount) || 0;
+  const diamondVal = previewCalculated.diamondAmount || 0;
+  const makingVal = previewCalculated.makingAmount || 0;
+  const otherVal = previewCalculated.otherAmount || 0;
   const gstPctVal = parseFloat(gstPercentage) || 0;
   
-  const subtotal = goldAmount + diamondVal + makingVal + otherVal;
-  const gstAmount = subtotal * (gstPctVal / 100);
-  const finalPrice = subtotal + gstAmount;
+  const subtotal = previewCalculated.subtotal || 0;
+  const gstAmount = previewCalculated.gstAmount || 0;
+  const finalPrice = previewCalculated.priceVal || 0;
+
 
   return (
     <form onSubmit={handleSubmit} className="max-w-6xl space-y-6">
@@ -484,14 +522,17 @@ export default function ProductForm({ productId }) {
             {/* Style Number */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Style Number
+                Style Number <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
+                required
                 value={styleNumber}
                 onChange={(e) => setStyleNumber(e.target.value)}
                 placeholder="e.g. your internal style/reference number"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !styleNumber ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
             </div>
 
@@ -534,18 +575,14 @@ export default function ProductForm({ productId }) {
             {/* Price */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Price (Legacy/Manual) (₹) <span className="text-red-500">*</span>
+                Price (Auto-Calculated) (₹)
               </label>
               <input
                 type="number"
-                required
-                min="0"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="e.g. 18500"
-                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
-                  validated && !price ? "border-red-400" : "border-[#E5E5E5]"
-                }`}
+                readOnly
+                value={finalPrice}
+                placeholder="Auto-calculated..."
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-[#FBFBFA] rounded-md font-inter text-[13px] text-gray-500 focus:outline-none cursor-not-allowed"
               />
             </div>
 
@@ -595,16 +632,19 @@ export default function ProductForm({ productId }) {
             {/* Weight */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Weight in grams
+                Weight in grams <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
                 step="0.01"
+                required
                 min="0"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 placeholder="e.g. 2.3"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !weight ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
             </div>
 
@@ -636,31 +676,37 @@ export default function ProductForm({ productId }) {
             {/* Net Gold Weight (grams) */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Net Gold Weight (grams)
+                Net Gold Weight (grams) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
                 step="0.001"
+                required
                 min="0"
                 value={netGoldWeight}
                 onChange={(e) => setNetGoldWeight(e.target.value)}
                 placeholder="e.g. 5.25"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !netGoldWeight ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
             </div>
 
             {/* Diamond Net Amount */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Diamond Net Amount (₹)
+                Diamond Net Amount (₹) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
+                required
                 min="0"
                 value={diamondNetAmount}
                 onChange={(e) => setDiamondNetAmount(e.target.value)}
                 placeholder="e.g. 0"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !diamondNetAmount ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
             </div>
 
@@ -697,17 +743,20 @@ export default function ProductForm({ productId }) {
             {/* GST % */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                GST %
+                GST % <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
                 step="0.01"
+                required
                 min="0"
                 max="100"
                 value={gstPercentage}
                 onChange={(e) => setGstPercentage(e.target.value)}
                 placeholder="e.g. 3"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+                className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${
+                  validated && !gstPercentage ? "border-red-400 focus:border-red-400" : "border-[#E5E5E5]"
+                }`}
               />
             </div>
 
@@ -762,6 +811,7 @@ export default function ProductForm({ productId }) {
                   currentUrl={images[0]}
                   setImages={setImages}
                   isRequired={true}
+                  hasError={validated && !images[0]}
                 />
                 <ImageUploadBox 
                   label="Close-Up / Detail Shot"

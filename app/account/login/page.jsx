@@ -13,6 +13,14 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  
+  // Forgot password state
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMsg, setResetMsg] = useState("");
+  const [resetError, setResetError] = useState("");
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -76,6 +84,31 @@ function LoginForm() {
     }
   };
 
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetError("");
+    setResetMsg("");
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/account/reset-password`,
+      });
+      
+      if (error) {
+         setResetError(error.message);
+      } else {
+         setResetMsg("If an account exists with this email, a reset link has been sent.");
+         setResetEmail("");
+      }
+    } catch (err) {
+      console.error("Reset password error:", err);
+      setResetError("An unexpected error occurred. Please try again.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-md w-full bg-[#FFFFFF] p-8 sm:p-10 border border-[#2E3135]/10 shadow-sm rounded-none">
       <div className="text-center mb-8">
@@ -83,11 +116,72 @@ function LoginForm() {
           TATVAAN
         </h1>
         <p className="font-inter text-sm text-[#2E3135]/70">
-          Sign in to your account
+          {showReset ? "Reset your password" : "Sign in to your account"}
         </p>
       </div>
 
-      <form className="space-y-6" onSubmit={handleSignIn}>
+      {showReset ? (
+        <div className="space-y-6">
+          <form className="space-y-6" onSubmit={handleResetPassword}>
+            <div>
+              <label 
+                htmlFor="resetEmail" 
+                className="block font-inter text-[12px] uppercase tracking-wider text-[#2E3135] mb-2 font-medium"
+              >
+                Email
+              </label>
+              <input
+                id="resetEmail"
+                name="resetEmail"
+                type="email"
+                required
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                className="w-full bg-[#FFFFFF] border border-[#2E3135] font-inter text-[15px] p-3 focus:outline-none focus:border-[#CDB38B] transition-colors duration-300 rounded-none text-[#2E3135]"
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={resetLoading}
+                className="w-full bg-[#2E3135] text-[#FFFFFF] font-inter font-medium text-[13px] tracking-[2px] uppercase py-3.5 hover:bg-[#CDB38B] transition-colors duration-300 disabled:opacity-50"
+              >
+                {resetLoading ? "SENDING..." : "SEND RESET LINK"}
+              </button>
+            </div>
+            
+            {resetError && (
+              <p className="text-red-600 text-sm mt-2 text-center font-inter font-medium">
+                {resetError}
+              </p>
+            )}
+            {resetMsg && (
+              <p className="text-green-600 text-sm mt-2 text-center font-inter font-medium">
+                {resetMsg}
+              </p>
+            )}
+          </form>
+          
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setShowReset(false);
+                setResetError("");
+                setResetMsg("");
+                setResetEmail("");
+              }}
+              className="font-inter text-[11px] text-[#2E3135]/60 hover:text-[#CDB38B] underline transition-colors"
+            >
+              Back to Sign In
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <form className="space-y-6" onSubmit={handleSignIn}>
         <div>
           <label 
             htmlFor="email" 
@@ -143,6 +237,16 @@ function LoginForm() {
         )}
       </form>
 
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => setShowReset(true)}
+          className="font-inter text-[11px] text-[#2E3135]/60 hover:text-[#CDB38B] underline transition-colors"
+        >
+          Forgot Password?
+        </button>
+      </div>
+
       <div className="my-6 text-center text-xs font-inter text-[#2E3135]/50 uppercase tracking-widest">— or —</div>
 
       <button
@@ -185,6 +289,8 @@ function LoginForm() {
           </Link>
         </p>
       </div>
+      </>
+      )}
     </div>
   );
 }

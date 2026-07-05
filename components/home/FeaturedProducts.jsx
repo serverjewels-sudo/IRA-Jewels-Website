@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import ProductCard from "@/components/shop/ProductCard";
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
 
@@ -101,6 +102,16 @@ export default function FeaturedProducts() {
             </p>
           </div>
         )}
+
+        {/* View All Products Button */}
+        <div className="flex justify-center mt-12 md:mt-16">
+          <Link
+            href="/shop"
+            className="inline-block bg-white text-[#2E3135] border border-[#2E3135] font-inter font-medium text-[12px] uppercase tracking-[2px] px-8 py-4 transition-all duration-300 hover:bg-[#2E3135] hover:text-white"
+          >
+            VIEW ALL PRODUCTS
+          </Link>
+        </div>
         
       </div>
     </section>

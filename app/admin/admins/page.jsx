@@ -293,7 +293,7 @@ export default function AdminsPage() {
               No Admins Found
             </h3>
             <p className="font-inter font-light text-[14px] text-[#888888] max-w-[340px] mb-6">
-              You don't have any admins. Use the form above to invite one.
+              You don&apos;t have any admins. Use the form above to invite one.
             </p>
           </div>
         )}
@@ -308,7 +308,7 @@ export default function AdminsPage() {
                 Permanently Delete Admin Account?
               </h3>
               <p className="font-inter text-[14px] text-[#2E3135]/80 mb-6 font-light leading-relaxed">
-                This cannot be undone. <strong className="font-semibold">{deleteModalAdmin.email}</strong> will lose their login entirely, not just admin access. If you just want to revoke their admin panel access instead, use 'Remove Access' rather than this.
+                This cannot be undone. <strong className="font-semibold">{deleteModalAdmin.email}</strong> will lose their login entirely, not just admin access. If you just want to revoke their admin panel access instead, use &apos;Remove Access&apos; rather than this.
               </p>
               
               <div className="mb-6">

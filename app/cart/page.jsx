@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { X, Plus, Minus, ShieldCheck, Truck } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -11,6 +12,17 @@ import { calculateProductPrice } from "@/lib/priceUtils";
 
 export default function CartPage() {
   const { items, totalCount, updateQuantity, removeFromCart } = useCart();
+  const router = useRouter();
+
+  const handleCheckoutClick = async (e) => {
+    e.preventDefault();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      router.push("/checkout");
+    } else {
+      router.push(`/account/login?redirect=${encodeURIComponent("/checkout")}`);
+    }
+  };
   const [mounted, setMounted] = useState(false);
   const [rate999, setRate999] = useState(null);
 
@@ -213,12 +225,12 @@ export default function CartPage() {
               </p>
 
               {/* Checkout Button */}
-              <Link
-                href="/checkout"
+              <button
+                onClick={handleCheckoutClick}
                 className="w-full h-[52px] bg-[#2E3135] text-white font-inter font-medium text-[12px] tracking-[2px] uppercase flex items-center justify-center hover:bg-[#CDB38B] transition-all duration-300 mb-6 shadow-sm"
               >
                 PROCEED TO CHECKOUT
-              </Link>
+              </button>
 
               {/* Checkout Security / Delivery Footnote */}
               <div className="flex flex-col items-center justify-center space-y-2 text-[#888888] text-[11px] font-inter font-light">

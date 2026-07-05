@@ -54,6 +54,7 @@ export default function CheckoutPage() {
   const { items, isLoaded, clearCart } = useCart();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [rate999, setRate999] = useState(null);
 
   // Form Field States
@@ -100,6 +101,21 @@ export default function CheckoutPage() {
       router.push("/cart");
     }
   }, [mounted, isLoaded, items, router, isSuccess]);
+
+  // Auth protection: redirect to login if not logged in
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push(`/account/login?redirect=${encodeURIComponent("/checkout")}`);
+      } else {
+        setAuthLoading(false);
+      }
+    }
+    if (mounted) {
+      checkAuth();
+    }
+  }, [mounted, router]);
 
   // Live-calculate product prices based on current gold rate
   const cartItemsWithPrice = items.map((item) => {
@@ -353,8 +369,8 @@ export default function CheckoutPage() {
     }
   };
 
-  // Prevent hydration mismatch or premature display while redirecting empty cart
-  if (!mounted || !isLoaded || (items.length === 0 && !isSuccess)) {
+  // Prevent hydration mismatch or premature display while redirecting empty cart or verifying auth
+  if (!mounted || !isLoaded || authLoading || (items.length === 0 && !isSuccess)) {
     return (
       <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
         <Navbar />

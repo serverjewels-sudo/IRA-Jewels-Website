@@ -19,7 +19,7 @@ const categories = [
 ];
 
 const metalTypes = ["All", "Gold", "White Gold", "Rose Gold", "Silver", "Platinum"];
-const karats = ["All", "14K", "18K", "22K"];
+const karats = ["All", "9K", "10K", "14K", "18K", "22K"];
 const sortOptions = ["Featured", "Price Low to High", "Price High to Low", "Newest"];
 
 // Skeleton card sub-component

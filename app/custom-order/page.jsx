@@ -258,6 +258,8 @@ export default function CustomOrderPage() {
                         className="w-full bg-white border border-[#2E3135] p-3 text-[15px] font-inter text-[#2E3135] focus:border-[#CDB38B] focus:outline-none transition-colors rounded-none appearance-none cursor-pointer"
                       >
                         <option value="Not decided yet">Not decided yet</option>
+                        <option value="9K">9K</option>
+                        <option value="10K">10K</option>
                         <option value="14K">14K</option>
                         <option value="18K">18K</option>
                         <option value="22K">22K</option>

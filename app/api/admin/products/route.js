@@ -18,6 +18,36 @@ async function getAdminUser(req) {
   return user;
 }
 
+// Helper to generate a unique slug
+async function generateUniqueSlug(baseSlug, currentId = null) {
+  let uniqueSlug = baseSlug;
+  let counter = 2;
+  
+  while (true) {
+    let query = supabaseServiceRole
+      .from("products")
+      .select("id")
+      .eq("slug", uniqueSlug)
+      .limit(1);
+      
+    if (currentId) {
+      query = query.neq("id", currentId);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    
+    if (!data || data.length === 0) {
+      break;
+    }
+    
+    uniqueSlug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+  
+  return uniqueSlug;
+}
+
 export async function GET(req) {
   const user = await getAdminUser(req);
   if (!user) {
@@ -70,14 +100,18 @@ export async function POST(req) {
   try {
     const body = await req.json();
     
-    // Auto-generate slug from name if not provided
-    if (!body.slug && body.name) {
-      body.slug = body.name
+    // Auto-generate or guarantee unique slug
+    let baseSlug = body.slug;
+    if (!baseSlug && body.name) {
+      baseSlug = body.name
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-")
         .trim();
+    }
+    if (baseSlug) {
+      body.slug = await generateUniqueSlug(baseSlug);
     }
 
     const { data, error } = await supabaseServiceRole
@@ -113,14 +147,18 @@ export async function PUT(req) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }
 
-    // Auto-generate slug from name if not provided
-    if (!updateData.slug && updateData.name) {
-      updateData.slug = updateData.name
+    // Auto-generate or guarantee unique slug
+    let baseSlug = updateData.slug;
+    if (!baseSlug && updateData.name) {
+      baseSlug = updateData.name
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-")
         .trim();
+    }
+    if (baseSlug) {
+      updateData.slug = await generateUniqueSlug(baseSlug, id);
     }
 
     const { data, error } = await supabaseServiceRole

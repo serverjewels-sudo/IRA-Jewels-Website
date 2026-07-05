@@ -20,7 +20,7 @@ const categories = [
   "nose pins"
 ];
 
-const karats = ["14K", "18K", "22K"];
+const karats = ["9K", "10K", "14K", "18K", "22K"];
 
 const categoryPrefixMap = {
   "rings": "RIN",
@@ -463,8 +463,7 @@ export default function ProductForm({ productId }) {
   
   const previewCalculated = calculateProductPrice(previewProduct, rate999);
   
-  const karatMultiplier = karat === "22K" ? 22 : karat === "18K" ? 18 : 14;
-  const karatRate = rate999 ? (rate999 / 24) * karatMultiplier : 0;
+  const karatRate = previewCalculated.karatRate || 0;
   
   const weightVal = parseFloat(netGoldWeight) || 0;
   const goldAmount = previewCalculated.goldAmount || 0;

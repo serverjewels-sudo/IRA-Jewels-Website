@@ -114,6 +114,8 @@ export default function GoldRatePage() {
   const rate22K = (currentRateNum / 24) * 22;
   const rate18K = (currentRateNum / 24) * 18;
   const rate14K = (currentRateNum / 24) * 14;
+  const rate10K = (currentRateNum / 24) * 10;
+  const rate9K = (currentRateNum / 24) * 9;
 
   if (loading) {
     return (
@@ -223,14 +225,34 @@ export default function GoldRatePage() {
               These reference values are calculated live using standard karat ratios from the 999 rate above.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* 22K Preview */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
+              {/* 9K Preview */}
               <div className="flex flex-col space-y-1.5">
                 <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                  22K Gold Rate (₹/g)
+                  9K Gold Rate (₹/g)
                 </label>
                 <div className="px-4 py-2.5 border border-[#E5E5E5] bg-[#F3F1EC]/60 rounded-md font-inter text-[13px] text-[#2E3135]/80 font-medium">
-                  ₹ {rate22K.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ₹ {rate9K.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
+
+              {/* 10K Preview */}
+              <div className="flex flex-col space-y-1.5">
+                <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                  10K Gold Rate (₹/g)
+                </label>
+                <div className="px-4 py-2.5 border border-[#E5E5E5] bg-[#F3F1EC]/60 rounded-md font-inter text-[13px] text-[#2E3135]/80 font-medium">
+                  ₹ {rate10K.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              </div>
+
+              {/* 14K Preview */}
+              <div className="flex flex-col space-y-1.5">
+                <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                  14K Gold Rate (₹/g)
+                </label>
+                <div className="px-4 py-2.5 border border-[#E5E5E5] bg-[#F3F1EC]/60 rounded-md font-inter text-[13px] text-[#2E3135]/80 font-medium">
+                  ₹ {rate14K.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
 
@@ -244,13 +266,13 @@ export default function GoldRatePage() {
                 </div>
               </div>
 
-              {/* 14K Preview */}
+              {/* 22K Preview */}
               <div className="flex flex-col space-y-1.5">
                 <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                  14K Gold Rate (₹/g)
+                  22K Gold Rate (₹/g)
                 </label>
                 <div className="px-4 py-2.5 border border-[#E5E5E5] bg-[#F3F1EC]/60 rounded-md font-inter text-[13px] text-[#2E3135]/80 font-medium">
-                  ₹ {rate14K.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ₹ {rate22K.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
             </div>

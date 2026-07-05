@@ -135,6 +135,9 @@ function ImageUploadBox({ label, index, currentUrl, setImages, isRequired, hasEr
           </label>
         )}
       </div>
+      <span className="font-inter text-[10px] text-[#888888] text-center font-light leading-tight">
+        Best fit: square image, 1000–2000px, max 5MB
+      </span>
     </div>
   );
 }

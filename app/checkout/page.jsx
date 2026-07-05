@@ -226,10 +226,15 @@ export default function CheckoutPage() {
           price: calculated.priceVal, // freshly calculated price
           quantity: item.quantity,
           image: item.image,
+          gst_percentage: parseFloat(item.gst_percentage) || 3,
+          gst_amount: calculated.gstAmount,
+          pre_tax_price: calculated.subtotal,
         };
       });
 
       const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const preTaxSubtotal = orderItems.reduce((sum, item) => sum + (item.pre_tax_price * item.quantity), 0);
+      const totalGstAmount = orderItems.reduce((sum, item) => sum + (item.gst_amount * item.quantity), 0);
       const shippingCost = deliveryPref === "express" ? 199 : 0;
       const finalTotal = subtotal + shippingCost;
 
@@ -252,6 +257,8 @@ export default function CheckoutPage() {
               customer_phone: formData.phone,
               items: orderItems,
               subtotal: subtotal,
+              pre_tax_subtotal: preTaxSubtotal,
+              total_gst_amount: totalGstAmount,
               shipping: shippingCost,
               total: finalTotal,
               payment_method: "cod",
@@ -311,6 +318,8 @@ export default function CheckoutPage() {
                     customer_phone: formData.phone,
                     items: orderItems,
                     subtotal: subtotal,
+                    pre_tax_subtotal: preTaxSubtotal,
+                    total_gst_amount: totalGstAmount,
                     shipping: shippingCost,
                     total: finalTotal,
                     payment_method: "razorpay",

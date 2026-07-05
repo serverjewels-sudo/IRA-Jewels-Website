@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { supabase } from "@/lib/supabase";
+import { generateInvoice } from "@/lib/invoiceGenerator";
 
 export const dynamic = 'force-dynamic';
 
@@ -170,6 +171,15 @@ export default function AccountPage() {
                           <span className="text-[16px] font-medium text-[#2E3135]">
                             ₹{Number(order.total).toLocaleString("en-IN")}
                           </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              generateInvoice(order);
+                            }}
+                            className="mt-2 text-[10px] uppercase tracking-wider text-[#CDB38B] hover:text-[#2E3135] transition-colors duration-300 font-medium"
+                          >
+                            DOWNLOAD INVOICE
+                          </button>
                         </div>
                       </div>
                     );

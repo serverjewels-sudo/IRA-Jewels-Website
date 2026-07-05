@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { supabase } from '@/lib/supabase'
+import { generateInvoice } from '@/lib/invoiceGenerator'
 
 export default function OrderConfirmedPage() {
   const { id } = useParams()
@@ -113,7 +114,17 @@ export default function OrderConfirmedPage() {
             </p>
           </div>
 
-          <a href="/shop" style={{display:'inline-block', background:'#2E3135', color:'#fff', padding:'16px 40px', fontSize:'12px', letterSpacing:'2px', textDecoration:'none'}}>CONTINUE SHOPPING</a>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            <button 
+              onClick={() => generateInvoice(order)} 
+              style={{background:'#fff', color:'#2E3135', border:'1px solid #2E3135', padding:'16px 40px', fontSize:'12px', letterSpacing:'2px', cursor:'pointer'}}
+            >
+              DOWNLOAD INVOICE
+            </button>
+            <a href="/shop" style={{display:'inline-block', background:'#2E3135', color:'#fff', padding:'16px 40px', fontSize:'12px', letterSpacing:'2px', textDecoration:'none'}}>
+              CONTINUE SHOPPING
+            </a>
+          </div>
         </div>
       </main>
       <Footer />

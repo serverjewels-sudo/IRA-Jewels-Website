@@ -88,7 +88,7 @@ export default function CustomOrderPage() {
               Your Vision, Our Craft
             </h2>
             <div className="w-[60px] h-[1px] bg-[#CDB38B] mx-auto my-6"></div>
-            <p className="font-inter text-[16px] text-[#555555] leading-[1.8] font-light">
+            <p className="font-inter text-[16px] text-[#555555] leading-[1.8] font-light max-w-3xl mx-auto">
               Every piece of jewellery has a story. Whether it&apos;s a ring for your engagement, a necklace for your mother, or a bangle to mark a milestone — we craft it exactly the way you imagine it. Share your vision below and our team will get back to you within 24 hours.
             </p>
           </div>

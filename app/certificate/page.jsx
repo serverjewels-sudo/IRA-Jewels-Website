@@ -129,7 +129,7 @@ export default function CertificatePage() {
             </h2>
             <div className="w-[60px] h-[1px] bg-[#CDB38B] mx-auto mt-4 mb-8"></div>
 
-            <p className="font-inter text-[16px] text-[#555] leading-[1.8] font-light text-center mb-8">
+            <p className="font-inter text-[16px] text-[#555] leading-[1.8] font-light text-center max-w-3xl mx-auto mb-8">
               Every TATVAAN diamond comes with a unique IGI report number. You can verify your certificate anytime at{" "}
               <a 
                 href="https://www.igi.org" 
@@ -144,7 +144,7 @@ export default function CertificatePage() {
 
             {/* Gold Bordered Reminder Box */}
             <div className="border border-[#CDB38B] rounded-lg p-6 bg-white text-center">
-              <p className="font-inter text-[15px] text-[#2E3135] leading-relaxed font-normal">
+              <p className="font-inter text-[15px] text-[#2E3135] leading-relaxed font-normal max-w-3xl mx-auto">
                 Your certificate is included with your order. Store it safely &mdash; you&apos;ll need it for insurance, resale, or future servicing.
               </p>
             </div>

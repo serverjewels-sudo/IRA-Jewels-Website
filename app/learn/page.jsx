@@ -32,13 +32,13 @@ export default function LearnPage() {
             </h2>
             <div className="w-[60px] h-[1px] bg-[#CDB38B] mx-auto mt-4 mb-8"></div>
 
-            <p className="font-inter text-[16px] text-[#555] leading-[1.8] font-light mb-8">
+            <p className="font-inter text-[16px] text-[#555] leading-[1.8] font-light max-w-3xl mx-auto mb-8">
               Lab-grown diamonds are real diamonds &mdash; chemically, physically, and optically identical to diamonds mined from the earth. The only difference is where they were created. Instead of forming deep underground over millions of years, they are grown in a controlled laboratory environment in a matter of weeks.
             </p>
 
             {/* Highlight box */}
             <div className="bg-[#F3F1EC] rounded-lg p-6 border-l-4 border-[#CDB38B]">
-              <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-normal">
+              <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-normal max-w-3xl mx-auto">
                 A lab-grown diamond is not a fake diamond, a cubic zirconia, or a simulant. It is a <strong className="text-[#2E3135] font-medium">real diamond</strong> &mdash; with the same carbon crystal structure, the same hardness (10 on the Mohs scale), and the same brilliance.
               </p>
             </div>

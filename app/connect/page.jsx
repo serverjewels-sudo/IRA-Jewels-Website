@@ -127,7 +127,7 @@ export default function ConnectPage() {
             <h2 className="font-cormorant italic text-[36px] text-white font-normal mb-3">
               Tag us in your photos
             </h2>
-            <p className="font-inter text-[15px] text-ira-gold tracking-wide font-normal">
+            <p className="font-inter text-[15px] text-ira-gold tracking-wide font-normal max-w-3xl mx-auto">
               Use #TATVAAN and get featured on our page.
             </p>
           </div>

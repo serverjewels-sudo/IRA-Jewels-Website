@@ -123,7 +123,7 @@ export default function CarePage() {
 
             {/* Warning Box */}
             <div className="border border-[#CDB38B] rounded-lg p-6 bg-white text-center">
-              <p className="font-inter text-[15px] text-[#2E3135] leading-relaxed font-normal">
+              <p className="font-inter text-[15px] text-[#2E3135] leading-relaxed font-normal max-w-3xl mx-auto">
                 ⚠️ <strong className="text-[#2E3135] font-medium">Warning:</strong> Never use ultrasonic cleaners, toothpaste, or baking soda on your lab diamond jewellery.
               </p>
             </div>

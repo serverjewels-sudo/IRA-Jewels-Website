@@ -24,27 +24,31 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const check = await isAdminUser(user.email);
+  const checkPromise = isAdminUser(user.email);
+
+  const dataPromise = (async () => {
+    try {
+      return await supabaseServiceRole
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+    } catch (err) {
+      return { error: err };
+    }
+  })();
+
+  const [check, dataResult] = await Promise.all([checkPromise, dataPromise]);
+
   if (!check) {
     return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
   }
 
-  try {
-    const { data, error } = await supabaseServiceRole
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      // Safely handle missing orders table (does not crash, returns empty list)
-      console.warn("Orders table error / not found:", error.message);
-      return NextResponse.json([]);
-    }
-    return NextResponse.json(data || []);
-  } catch (err) {
-    console.warn("Unexpected error fetching orders:", err.message);
+  const { data, error } = dataResult;
+  if (error) {
+    console.warn("Orders error / not found:", error.message);
     return NextResponse.json([]);
   }
+  return NextResponse.json(data || []);
 }
 
 export async function PATCH(req) {

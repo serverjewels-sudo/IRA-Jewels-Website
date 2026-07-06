@@ -54,36 +54,27 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const check = await isAdminUser(user.email);
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  const checkPromise = isAdminUser(user.email);
+
+  const dataPromise = id
+    ? supabaseServiceRole.from("products").select("*").eq("id", id).single()
+    : supabaseServiceRole.from("products").select("*").order("created_at", { ascending: false });
+
+  const [check, dataResult] = await Promise.all([checkPromise, dataPromise]);
+
   if (!check) {
     return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
   }
 
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  const { data, error } = dataResult;
 
-  if (id) {
-    const { data, error } = await supabaseServiceRole
-      .from("products")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-    return NextResponse.json(data);
-  } else {
-    const { data, error } = await supabaseServiceRole
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-    return NextResponse.json(data);
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  return NextResponse.json(data);
 }
 
 export async function POST(req) {

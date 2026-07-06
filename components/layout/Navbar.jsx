@@ -173,10 +173,17 @@ export default function Navbar() {
         </div>
       </header>
 
+      {/* Slide-out Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-[#2E3135]/40 backdrop-blur-sm md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Slide-out Mobile Menu Panel */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-[#2E3135]/40 backdrop-blur-sm md:hidden">
-          <div className="fixed top-0 left-0 w-[280px] h-dvh bg-white p-6 shadow-2xl flex flex-col justify-between">
+        <div className="fixed top-0 left-0 w-[280px] h-dvh bg-white p-6 shadow-2xl flex flex-col justify-between z-50 md:hidden">
             <div>
               <div className="flex justify-between items-center mb-10">
                 <span className="font-serif text-[18px] tracking-[0.2em] text-[#2E3135] uppercase">
@@ -298,7 +305,6 @@ export default function Navbar() {
               </p>
             </div>
           </div>
-        </div>
       )}
     </>
   );

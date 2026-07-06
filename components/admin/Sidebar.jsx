@@ -40,7 +40,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* Sidebar aside panel */}
       <aside 
-        className={`w-[240px] shrink-0 bg-[#2E3135] flex flex-col justify-between min-h-screen text-white z-40 shadow-xl border-r border-white/5 transition-transform duration-300
+        className={`w-[240px] shrink-0 bg-[#2E3135] flex flex-col justify-between min-h-screen md:h-screen text-white z-40 shadow-xl border-r border-white/5 transition-transform duration-300
           fixed md:sticky top-0 bottom-0 left-0 md:translate-x-0
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}

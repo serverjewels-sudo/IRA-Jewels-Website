@@ -68,6 +68,7 @@ export default function RegisterPage() {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/account`,
           data: {
             full_name: fullName,
           },

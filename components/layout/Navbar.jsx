@@ -29,6 +29,17 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-[#F3F1EC]">
@@ -165,7 +176,7 @@ export default function Navbar() {
       {/* Slide-out Mobile Menu Panel */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 bg-[#2E3135]/40 backdrop-blur-sm md:hidden">
-          <div className="fixed top-0 left-0 bottom-0 w-[280px] bg-white p-6 shadow-2xl flex flex-col justify-between">
+          <div className="fixed top-0 left-0 w-[280px] h-dvh bg-white p-6 shadow-2xl flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-center mb-10">
                 <span className="font-serif text-[18px] tracking-[0.2em] text-[#2E3135] uppercase">
@@ -180,7 +191,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <div className="flex flex-col space-y-5 overflow-y-auto max-h-[calc(100vh-180px)] pr-2">
+              <div className="flex flex-col space-y-5 overflow-y-auto max-h-[calc(100dvh-180px)] pr-2">
                 <Link 
                   href="/shop" 
                   onClick={() => setIsMobileMenuOpen(false)}

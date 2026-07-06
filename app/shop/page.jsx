@@ -320,7 +320,7 @@ function ShopInner() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
           
           {/* DESKTOP SIDEBAR FILTER */}
-          <aside className="hidden lg:block lg:col-span-1 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24">
+          <aside className="hidden lg:block lg:col-span-1 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24 max-h-[calc(100dvh-120px)] overflow-y-auto custom-scrollbar">
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#2E3135]/10">
               <span className="font-inter font-medium text-[14px] uppercase tracking-wider text-[#2E3135]">Filters</span>
               {(selectedCategory !== "All" || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || sortBy !== "Featured") && (

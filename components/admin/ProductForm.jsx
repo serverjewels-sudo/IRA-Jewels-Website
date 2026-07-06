@@ -485,10 +485,10 @@ export default function ProductForm({ productId }) {
           {errorMsg}
         </div>
       )}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
         
         {/* Left Column: Form Fields */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-[#2E3135]/5 p-8 space-y-6">
+        <div className="xl:col-span-2 bg-white rounded-lg shadow-sm border border-[#2E3135]/5 p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Product Name */}
             <div className="flex flex-col space-y-1.5 md:col-span-2">
@@ -906,7 +906,7 @@ export default function ProductForm({ productId }) {
         </div>
 
         {/* Right Column: Live Price Preview (Sticky) */}
-        <div className="lg:col-span-1 lg:sticky lg:top-6 space-y-6">
+        <div className="xl:col-span-1 xl:sticky xl:top-6 space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-[#2E3135]/5 p-6 space-y-6">
             <h3 className="font-serif font-normal text-[20px] tracking-wide text-[#2E3135] uppercase pb-3 border-b border-[#2E3135]/10">
               Live Price Preview

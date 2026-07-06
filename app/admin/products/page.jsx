@@ -167,7 +167,7 @@ export default function AdminProductsPage() {
           </div>
         ) : products.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[1000px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#2E3135]/10 bg-[#F3F1EC]/30">
                   <th className="p-5 font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Image</th>

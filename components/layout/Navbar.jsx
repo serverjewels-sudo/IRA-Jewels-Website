@@ -43,20 +43,20 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-[#F3F1EC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-4 lg:px-8 h-20 flex items-center justify-between">
           
           {/* Left Side: Navigation Links (Desktop) */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-8 md:space-x-2 lg:space-x-4 xl:space-x-8">
             <Link 
               href="/shop" 
-              className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+              className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
             >
               Shop
             </Link>
             
             {/* Collections Dropdown */}
             <div className="relative group py-2">
-              <button className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase flex items-center gap-1">
+              <button className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase flex items-center gap-1">
                 Collections
                 <ChevronDown className="w-3 h-3 transition-transform duration-300 group-hover:rotate-180" />
               </button>
@@ -86,13 +86,13 @@ export default function Navbar() {
 
             <Link 
               href="/offers" 
-              className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+              className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
             >
               Offers
             </Link>
             <Link 
               href="/blog" 
-              className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+              className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
             >
               Blog
             </Link>
@@ -112,25 +112,25 @@ export default function Navbar() {
           {/* Center: Brand Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link href="/" className="group flex flex-col items-center">
-              <span className="font-serif text-[14px] min-[400px]:text-[22px] sm:text-[26px] font-normal tracking-[0.12em] min-[400px]:tracking-[0.25em] text-[#2E3135] uppercase transition-colors duration-300 group-hover:text-[#CDB38B]">
+              <span className="font-serif text-[14px] min-[400px]:text-[22px] sm:text-[26px] md:text-[17px] lg:text-[21px] xl:text-[26px] font-normal tracking-[0.12em] min-[400px]:tracking-[0.25em] md:tracking-[0.12em] lg:tracking-[0.18em] xl:tracking-[0.25em] text-[#2E3135] uppercase transition-colors duration-300 group-hover:text-[#CDB38B]">
                 TATVAAN
               </span>
             </Link>
           </div>
 
           {/* Right Side: Search, Account, Cart + Our Story, Contact */}
-          <div className="flex items-center space-x-3 sm:space-x-5">
+          <div className="flex items-center space-x-3 sm:space-x-5 md:space-x-2 lg:space-x-3 xl:space-x-5">
             {/* Navigation Links for Desktop on Right Side */}
-            <div className="hidden md:flex items-center space-x-8 mr-4 lg:mr-6">
+            <div className="hidden md:flex items-center space-x-8 md:space-x-2 lg:space-x-4 xl:space-x-8 mr-4 md:mr-2 lg:mr-4 xl:mr-6">
               <Link 
                 href="/about" 
-                className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+                className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
               >
                 Our Story
               </Link>
               <Link 
                 href="/contact" 
-                className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+                className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
               >
                 Contact
               </Link>

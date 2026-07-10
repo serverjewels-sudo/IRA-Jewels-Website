@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, User, ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
 import { useCart } from "@/lib/CartContext";
@@ -14,6 +14,61 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHomepage = pathname === '/';
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const [isSignatureOpen, setIsSignatureOpen] = useState(false);
+  const [collections, setCollections] = useState([]);
+  const [previewData, setPreviewData] = useState({ imageUrl: '', label: '' });
+  const closeTimeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    setIsSignatureOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsSignatureOpen(false);
+    }, 150);
+  };
+
+  // Fixed categories and their temporary placeholder images
+  const CATEGORIES = [
+    { name: "Rings", slug: "rings", image: "https://images.unsplash.com/photo-1605100804763-247f679f419a?auto=format&fit=crop&q=80&w=800" },
+    { name: "Necklaces", slug: "necklaces", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" },
+    { name: "Bangles", slug: "bangles", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=800" },
+    { name: "Earrings", slug: "earrings", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800" },
+    { name: "Bracelets", slug: "bracelets", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=800" }, // Using bangles image temporarily
+    { name: "Pendants", slug: "pendants", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
+    { name: "Chains", slug: "chains", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
+    { name: "Mangalsutra", slug: "mangalsutra", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
+    { name: "Sets", slug: "sets", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
+    { name: "Anklets", slug: "anklets", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=800" }, // Using bangles image temporarily
+    { name: "Nose Pins", slug: "nose-pins", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800" }, // Using earrings image temporarily
+  ];
+
+  const METALS = ["Gold", "White Gold", "Rose Gold", "Silver", "Platinum"];
+  const KARATS = ["9K", "10K", "14K", "18K", "22K"];
+
+  useEffect(() => {
+    async function fetchCollections() {
+      const { data } = await supabase.from('collections').select('id, name, slug, cover_image_url').order('name');
+      if (data) {
+        setCollections(data);
+        if (data.length > 0) {
+          setPreviewData({ imageUrl: data[0].cover_image_url || '', label: data[0].name });
+        }
+      }
+    }
+    fetchCollections();
+  }, []);
+
+  useEffect(() => {
+    if (!isSignatureOpen && collections.length > 0) {
+      setPreviewData({ imageUrl: collections[0].cover_image_url || '', label: collections[0].name });
+    }
+  }, [isSignatureOpen, collections]);
 
   useEffect(() => {
     if (!isHomepage) return;
@@ -76,7 +131,118 @@ export default function Navbar() {
           </Link>
 
           {/* Center: Navigation Links (Desktop) */}
-          <div className="hidden md:flex flex-1 justify-center items-center space-x-6 md:space-x-3 lg:space-x-5 xl:space-x-8 px-4">
+          <div className="hidden md:flex flex-1 justify-center items-center space-x-4 md:space-x-2 lg:space-x-4 xl:space-x-6 px-2 xl:px-4">
+              
+              {/* Signature Mega Menu Wrapper */}
+              <div 
+                onMouseLeave={handleMouseLeave}
+                onMouseEnter={handleMouseEnter}
+                className="py-2 static"
+              >
+                <button 
+                  className={`text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest ${isSignatureOpen ? 'text-[#CDB38B]' : 'text-[#2E3135]'} hover:text-[#CDB38B] transition-colors duration-300 uppercase flex items-center gap-1`}
+                >
+                  Signature
+                  <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isSignatureOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Full-width Dropdown Panel */}
+                <div 
+                  className={`absolute left-0 top-full w-full bg-white border-t border-b border-[#F3F1EC] shadow-xl transition-all duration-300 overflow-hidden ${isSignatureOpen ? 'opacity-100 visible max-h-[75vh]' : 'opacity-0 invisible max-h-0'}`}
+                >
+                  <div className="w-full max-w-[1400px] mx-auto flex h-full max-h-[75vh]">
+                    {/* Left Third: Image Preview */}
+                    <div className="w-1/3 bg-[#F9F8F6] border-r border-[#F3F1EC] h-full flex flex-col overflow-hidden">
+                      <div className="w-full flex-1 relative">
+                        {previewData.imageUrl ? (
+                          <img src={previewData.imageUrl} alt={previewData.label} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-300 text-sm bg-white border border-[#E5E5E5]">No Image</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right Two-Thirds: Link Columns */}
+                    <div className="w-2/3 p-10 grid grid-cols-4 gap-8 overflow-y-auto">
+                      {/* Shop by Collection */}
+                      <div>
+                        <h4 className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase mb-5">Shop by Collection</h4>
+                        <ul className="space-y-3">
+                          {collections.map(collection => (
+                            <li key={collection.id}>
+                              <Link 
+                                href={`/shop?collection=${collection.slug}`}
+                                onClick={() => setIsSignatureOpen(false)}
+                                onMouseEnter={() => setPreviewData({ imageUrl: collection.cover_image_url || '', label: collection.name })}
+                                className="text-[12px] font-medium tracking-wider text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-200"
+                              >
+                                {collection.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Shop by Category */}
+                      <div>
+                        <h4 className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase mb-5">Shop by Category</h4>
+                        <ul className="space-y-3">
+                          {CATEGORIES.map(category => (
+                            <li key={category.slug}>
+                              <Link 
+                                href={`/shop?category=${category.slug}`}
+                                onClick={() => setIsSignatureOpen(false)}
+                                onMouseEnter={() => setPreviewData({ imageUrl: category.image, label: category.name })}
+                                className="text-[12px] font-medium tracking-wider text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-200"
+                              >
+                                {category.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Shop by Metal */}
+                      <div>
+                        <h4 className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase mb-5">Shop by Metal</h4>
+                        <ul className="space-y-3">
+                          {METALS.map(metal => (
+                            <li key={metal}>
+                              <Link 
+                                href={`/shop?metal=${metal.toLowerCase().replace(' ', '-')}`}
+                                onClick={() => setIsSignatureOpen(false)}
+                                className="text-[12px] font-medium tracking-wider text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-200"
+                              >
+                                {metal}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Shop by Karat */}
+                      <div>
+                        <h4 className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase mb-5">Shop by Karat</h4>
+                        <ul className="space-y-3">
+                          {KARATS.map(karat => (
+                            <li key={karat}>
+                              <Link 
+                                href={`/shop?karat=${karat.toLowerCase()}`}
+                                onClick={() => setIsSignatureOpen(false)}
+                                className="text-[12px] font-medium tracking-wider text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-200"
+                              >
+                                {karat}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <Link 
                 href="/shop" 
                 className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
@@ -216,6 +382,85 @@ export default function Navbar() {
               </div>
 
               <div className="flex flex-col space-y-5 overflow-y-auto max-h-[calc(100dvh-180px)] pr-2">
+                
+                {/* Signature Mobile */}
+                <div className="space-y-2">
+                  <span className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase block">
+                    Signature
+                  </span>
+                  <div className="pl-3 flex flex-col space-y-4 border-l border-[#F3F1EC]">
+                    
+                    {/* Collections */}
+                    <div>
+                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Collection</span>
+                      <div className="flex flex-col space-y-2.5">
+                        {collections.map(collection => (
+                          <Link 
+                            key={collection.id}
+                            href={`/shop?collection=${collection.slug}`} 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                          >
+                            {collection.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Categories */}
+                    <div>
+                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Category</span>
+                      <div className="flex flex-col space-y-2.5">
+                        {CATEGORIES.map(category => (
+                          <Link 
+                            key={category.slug}
+                            href={`/shop?category=${category.slug}`} 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                          >
+                            {category.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Metals */}
+                    <div>
+                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Metal</span>
+                      <div className="flex flex-col space-y-2.5">
+                        {METALS.map(metal => (
+                          <Link 
+                            key={metal}
+                            href={`/shop?metal=${metal.toLowerCase().replace(' ', '-')}`} 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                          >
+                            {metal}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Karats */}
+                    <div>
+                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Karat</span>
+                      <div className="flex flex-col space-y-2.5">
+                        {KARATS.map(karat => (
+                          <Link 
+                            key={karat}
+                            href={`/shop?karat=${karat.toLowerCase()}`} 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-[12px] font-medium tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                          >
+                            {karat}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
                 <Link 
                   href="/shop" 
                   onClick={() => setIsMobileMenuOpen(false)}

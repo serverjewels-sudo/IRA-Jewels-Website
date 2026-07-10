@@ -17,10 +17,10 @@ export default function AboutPage() {
         <section className="w-full bg-[#2E3135] py-[100px] text-center px-4" id="about-hero">
           <div className="max-w-4xl mx-auto">
             <h1 className="font-cormorant italic text-[48px] sm:text-[64px] text-white leading-tight font-normal">
-              Our Story
+              Every Piece, A Promise.
             </h1>
             <p className="font-inter text-[14px] sm:text-[16px] text-[#CDB38B] tracking-[0.05em] mt-4 font-light">
-              Born in Surat. Built for the modern woman.
+              Some jewellery is worn. Some becomes a part of your life. At Tatvaan, we believe jewellery is more than a beautiful accessory. It is a symbol of love, a celebration of milestones, and a reflection of the moments that matter most. Every piece carries a story—of a promise made, a dream fulfilled, a new beginning, or a memory that deserves to last forever. That belief inspires everything we create. Tatvaan brings together timeless design, exceptional craftsmanship, and the brilliance of premium lab-grown diamonds to create jewellery that feels meaningful today and remains beautiful for generations. For us, luxury is not about owning more. It is about choosing something that truly lasts.
             </p>
           </div>
         </section>
@@ -42,10 +42,10 @@ export default function AboutPage() {
                 WHO WE ARE
               </span>
               <h2 className="font-cormorant text-[32px] sm:text-[36px] text-[#2E3135] leading-tight font-normal mb-5">
-                Fine Jewellery for Everyday Life
+                Our Story
               </h2>
               <p className="font-inter text-[15px] sm:text-[16px] text-[#555] leading-[1.8] font-light">
-                TATVAAN was founded with one belief &mdash; that fine jewellery should not wait for special occasions. Every woman deserves to wear something beautiful every day. We create lab-grown diamond jewellery that is ethical, affordable, and crafted for real life.
+                Tatvaan was born from a simple belief. The future of fine jewellery deserves a new definition of luxury. As the world evolves, so do the values of those who wear fine jewellery. Today, people seek beauty with meaning, quality with honesty, and craftsmanship without compromise. Tatvaan was created for those who believe luxury should reflect not only elegance, but also authenticity and purpose. Our name is inspired by the Sanskrit word Tatva, meaning the true essence. It reminds us that genuine luxury is never defined by appearance alone. It is built through integrity, craftsmanship, and the emotions every piece carries. Every creation begins with a promise—to craft jewellery worthy of life's most meaningful moments.
               </p>
             </div>
           </div>
@@ -79,10 +79,10 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="font-cormorant text-[22px] text-[#2E3135] mb-3 font-normal">
-                  Lab-Grown Diamonds
+                  Craftsmanship
                 </h3>
                 <p className="font-inter text-[15px] text-[#555] leading-relaxed font-light">
-                  Every diamond we use is grown in a laboratory &mdash; chemically identical to mined diamonds, but ethically sourced and conflict-free.
+                  Every Tatvaan creation begins with extraordinary attention to detail. Our skilled artisans combine years of experience with modern techniques to transform precious materials into jewellery that is refined, elegant, and made to last. From the careful selection of every diamond to the final polish, every step is guided by patience, precision, and an uncompromising commitment to excellence.
                 </p>
               </div>
 
@@ -106,10 +106,10 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="font-cormorant text-[22px] text-[#2E3135] mb-3 font-normal">
-                  Everyday Luxury
+                  Our Diamonds
                 </h3>
                 <p className="font-inter text-[15px] text-[#555] leading-relaxed font-light">
-                  We design jewellery for real life &mdash; pieces you can wear to work, to dinner, and everywhere in between. Luxury that doesn&apos;t live in a box.
+                  Every Tatvaan diamond is a real diamond. Our lab-grown diamonds possess the same physical, chemical, and optical properties as mined diamonds, offering the same exceptional brilliance, fire, sparkle, and durability. Every diamond is carefully selected and IGI certified, ensuring it meets our uncompromising standards before becoming part of a Tatvaan creation.
                 </p>
               </div>
 
@@ -132,11 +132,15 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <h3 className="font-cormorant text-[22px] text-[#2E3135] mb-3 font-normal">
-                  Made to Last
+                  Our Promise
                 </h3>
-                <p className="font-inter text-[15px] text-[#555] leading-relaxed font-light">
-                  Each piece is crafted with precision and care, using the finest metals and certified lab-grown diamonds. Built to be worn every day, for a lifetime.
-                </p>
+                <ul className="font-inter text-[15px] text-[#555] leading-relaxed font-light list-disc pl-5">
+                  <li>Timeless designs that remain elegant for years to come</li>
+                  <li>Premium IGI-certified lab-grown diamonds selected for their exceptional beauty and quality</li>
+                  <li>Craftsmanship that values every detail</li>
+                  <li>Honesty, transparency, and uncompromising standards</li>
+                  <li>Jewellery that becomes part of your story</li>
+                </ul>
               </div>
             </div>
           </div>
@@ -146,14 +150,14 @@ export default function AboutPage() {
         <section className="bg-white py-[80px] px-6" id="founder-note">
           <div className="max-w-[680px] mx-auto text-center flex flex-col items-center">
             <span className="font-inter text-[11px] text-[#CDB38B] tracking-[2px] font-semibold uppercase block mb-6">
-              A NOTE FROM OUR FOUNDER
+              OUR PHILOSOPHY
             </span>
             <span className="text-[#CDB38B] text-4xl font-serif leading-none mb-2" aria-hidden="true">&ldquo;</span>
             <blockquote className="font-cormorant italic text-[24px] sm:text-[28px] text-[#2E3135] leading-relaxed mb-6 font-normal">
-              We started TATVAAN because we believed every woman deserves to feel luxurious &mdash; not just on her wedding day, but every single day.
+              Because the true value of jewellery is never measured by its sparkle alone. It is measured by the memories it holds, the emotions it represents, and the promises it keeps.
             </blockquote>
             <cite className="font-inter text-[14px] text-[#888] font-normal not-italic">
-              &mdash; Pavasiya Lakshya, Founder
+              &mdash; Tatvaan
             </cite>
           </div>
         </section>
@@ -161,12 +165,9 @@ export default function AboutPage() {
         {/* SECTION 5 — CTA Banner */}
         <section className="w-full bg-[#2E3135] py-[80px] px-6 text-center" id="cta-banner">
           <div className="max-w-4xl mx-auto">
-            <h2 className="font-cormorant text-[34px] sm:text-[40px] text-white font-normal mb-4">
-              Explore Our Collection
+            <h2 className="font-cormorant text-[34px] sm:text-[40px] text-white font-normal mb-8">
+              Every Piece, A Promise.
             </h2>
-            <p className="font-inter text-[15px] sm:text-[16px] text-[#CDB38B] tracking-wide mb-8 font-light max-w-lg mx-auto">
-              Lab-grown diamonds, crafted for everyday luxury. Starting from ₹8,000.
-            </p>
             <Link
               href="/shop"
               id="cta-shop-btn"

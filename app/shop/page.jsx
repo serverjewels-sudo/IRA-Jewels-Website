@@ -46,12 +46,16 @@ function SkeletonCard() {
 function ShopInner() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
+  const metalParam = searchParams.get("metal");
+  const karatParam = searchParams.get("karat");
+  const collectionParam = searchParams.get("collection");
 
   const [products, setProducts] = useState([]);
   const [rate999, setRate999] = useState(null);
   const [dbLoading, setDbLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCollectionId, setSelectedCollectionId] = useState(null);
   const [priceRange, setPriceRange] = useState(200000);
   const [selectedMetal, setSelectedMetal] = useState("All");
   const [selectedKarat, setSelectedKarat] = useState("All");
@@ -71,6 +75,48 @@ function ShopInner() {
       }
     }
   }, [categoryParam]);
+
+  // Sync metal query parameter
+  useEffect(() => {
+    if (metalParam) {
+      const matched = metalTypes.find(
+        (m) => m.toLowerCase().replace(' ', '-') === metalParam.toLowerCase()
+      );
+      if (matched) setSelectedMetal(matched);
+    }
+  }, [metalParam]);
+
+  // Sync karat query parameter
+  useEffect(() => {
+    if (karatParam) {
+      const matched = karats.find(
+        (k) => k.toLowerCase() === karatParam.toLowerCase()
+      );
+      if (matched) setSelectedKarat(matched);
+    }
+  }, [karatParam]);
+
+  // Fetch collection ID if collection query parameter exists
+  useEffect(() => {
+    async function fetchCollectionId() {
+      if (collectionParam) {
+        const { data } = await supabase
+          .from("collections")
+          .select("id")
+          .eq("slug", collectionParam)
+          .maybeSingle();
+        
+        if (data) {
+          setSelectedCollectionId(data.id);
+        } else {
+          setSelectedCollectionId(null);
+        }
+      } else {
+        setSelectedCollectionId(null);
+      }
+    }
+    fetchCollectionId();
+  }, [collectionParam]);
 
   // Fetch products and gold rate from Supabase on mount
   useEffect(() => {
@@ -121,13 +167,14 @@ function ShopInner() {
       setFilterLoading(false);
     }, 450);
     return () => clearTimeout(timer);
-  }, [selectedCategory, selectedMetal, selectedKarat, sortBy]);
+  }, [selectedCategory, selectedMetal, selectedKarat, sortBy, selectedCollectionId]);
 
   const isLoading = dbLoading || filterLoading;
 
   // Reset all filters back to default values
   const handleResetFilters = () => {
     setSelectedCategory("All");
+    setSelectedCollectionId(null);
     setPriceRange(200000);
     setSelectedMetal("All");
     setSelectedKarat("All");
@@ -147,10 +194,17 @@ function ShopInner() {
       };
     });
 
+    // Filter by Collection
+    if (selectedCollectionId) {
+      result = result.filter(
+        (p) => p.collection_ids && p.collection_ids.includes(selectedCollectionId)
+      );
+    }
+
     // Filter by Category
     if (selectedCategory !== "All") {
       result = result.filter(
-        (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
+        (p) => p.category && p.category.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
@@ -180,7 +234,7 @@ function ShopInner() {
     }
 
     return result;
-  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, sortBy, rate999]);
+  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, sortBy, rate999, selectedCollectionId]);
 
   // Content for filters to share between desktop sidebar and mobile drawer
   const renderFilters = () => (
@@ -323,7 +377,7 @@ function ShopInner() {
           <aside className="hidden min-[901px]:block flex-shrink-0 w-72 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24 max-h-[calc(100dvh-120px)] overflow-y-auto custom-scrollbar">
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#2E3135]/10">
               <span className="font-inter font-medium text-[14px] uppercase tracking-wider text-[#2E3135]">Filters</span>
-              {(selectedCategory !== "All" || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || sortBy !== "Featured") && (
+              {(selectedCategory !== "All" || selectedCollectionId !== null || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || sortBy !== "Featured") && (
                 <button
                   onClick={handleResetFilters}
                   className="font-inter text-[10px] text-[#888888] hover:text-[#CDB38B] transition-colors uppercase tracking-wider flex items-center gap-1.5"

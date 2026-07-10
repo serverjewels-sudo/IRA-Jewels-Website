@@ -45,7 +45,7 @@ export default function AboutPage() {
                 Our Story
               </h2>
               <p className="font-inter text-[15px] sm:text-[16px] text-[#555] leading-[1.8] font-light">
-                Tatvaan was born from a simple belief. The future of fine jewellery deserves a new definition of luxury. As the world evolves, so do the values of those who wear fine jewellery. Today, people seek beauty with meaning, quality with honesty, and craftsmanship without compromise. Tatvaan was created for those who believe luxury should reflect not only elegance, but also authenticity and purpose. Our name is inspired by the Sanskrit word Tatva, meaning the true essence. It reminds us that genuine luxury is never defined by appearance alone. It is built through integrity, craftsmanship, and the emotions every piece carries. Every creation begins with a promise—to craft jewellery worthy of life's most meaningful moments.
+                Tatvaan was born from a simple belief. The future of fine jewellery deserves a new definition of luxury. As the world evolves, so do the values of those who wear fine jewellery. Today, people seek beauty with meaning, quality with honesty, and craftsmanship without compromise. Tatvaan was created for those who believe luxury should reflect not only elegance, but also authenticity and purpose. Our name is inspired by the Sanskrit word Tatva, meaning the true essence. It reminds us that genuine luxury is never defined by appearance alone. It is built through integrity, craftsmanship, and the emotions every piece carries. Every creation begins with a promise—to craft jewellery worthy of life&apos;s most meaningful moments.
               </p>
             </div>
           </div>

@@ -74,7 +74,7 @@ export default function ProductDetailPage() {
             setProduct(fallbackProduct)
             // Pre-select first options if available
             setSelectedSize(fallbackProduct.size_options?.[0] || null)
-            setSelectedColour(fallbackProduct.colour_options?.[0] || null)
+            setSelectedColour(fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null)
           } else {
             setProduct(null)
           }
@@ -83,7 +83,7 @@ export default function ProductDetailPage() {
           setProduct(mapped)
           // Pre-select first options if available
           setSelectedSize(mapped.size_options?.[0] || null)
-          setSelectedColour(mapped.colour_options?.[0] || null)
+          setSelectedColour(mapped.colour_variants?.[0]?.colour || mapped.colour_options?.[0] || null)
         }
       } catch (err) {
         console.error('[ProductDetail] Unexpected fetch error:', err)
@@ -92,7 +92,7 @@ export default function ProductDetailPage() {
         if (fallbackProduct) {
           setProduct(fallbackProduct)
           setSelectedSize(fallbackProduct.size_options?.[0] || null)
-          setSelectedColour(fallbackProduct.colour_options?.[0] || null)
+          setSelectedColour(fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null)
         } else {
           setProduct(null)
         }
@@ -266,10 +266,19 @@ export default function ProductDetailPage() {
     ? Math.round(((product.comparePriceVal - displayPriceVal) / product.comparePriceVal) * 100) 
     : 0
 
-  const validImages = product.images ? product.images.filter(img => img && img.trim() !== "") : [];
+  const activeVariant = product.colour_variants && product.colour_variants.length > 0
+    ? product.colour_variants.find(v => v.colour === selectedColour) || product.colour_variants[0]
+    : null;
+
+  const validImages = activeVariant 
+    ? (activeVariant.images || []).filter(img => img && img.trim() !== "")
+    : product.images ? product.images.filter(img => img && img.trim() !== "") : [];
+  
   const mediaItems = validImages.map(img => ({ type: 'image', url: img }));
-  if (product.video_url) {
-    mediaItems.push({ type: 'video', url: product.video_url });
+  
+  const activeVideoUrl = activeVariant ? activeVariant.video_url : product.video_url;
+  if (activeVideoUrl) {
+    mediaItems.push({ type: 'video', url: activeVideoUrl });
   }
 
   return (
@@ -541,27 +550,57 @@ export default function ProductDetailPage() {
                 )}
 
                 {/* Colour Selector */}
-                {product.colour_options && product.colour_options.length > 0 && (
+                {(product.colour_variants && product.colour_variants.length > 0) ? (
                   <div className="mb-8">
                     <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                      Select Tone
+                      Select Tone: {selectedColour}
                     </span>
-                    <div className="flex flex-wrap gap-2">
-                      {product.colour_options.map((col) => (
+                    <div className="flex flex-wrap gap-3">
+                      {product.colour_variants.map((variant) => (
                         <button
-                          key={col}
-                          onClick={() => setSelectedColour(col)}
-                          className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
-                            selectedColour === col
-                              ? "bg-[#2E3135] border-[#2E3135] text-white"
-                              : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                          key={variant.colour}
+                          onClick={() => {
+                            setSelectedColour(variant.colour)
+                            setActiveImageIndex(0)
+                          }}
+                          aria-label={`Select ${variant.colour}`}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            selectedColour === variant.colour
+                              ? "ring-1 ring-offset-2 ring-[#2E3135]"
+                              : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
                           }`}
                         >
-                          {col}
+                          <span 
+                            className="w-full h-full rounded-full border border-black/10" 
+                            style={{ backgroundColor: variant.swatch_hex || '#e5e5e5' }}
+                          />
                         </button>
                       ))}
                     </div>
                   </div>
+                ) : (
+                  product.colour_options && product.colour_options.length > 0 && (
+                    <div className="mb-8">
+                      <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                        Select Tone
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {product.colour_options.map((col) => (
+                          <button
+                            key={col}
+                            onClick={() => setSelectedColour(col)}
+                            className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
+                              selectedColour === col
+                                ? "bg-[#2E3135] border-[#2E3135] text-white"
+                                : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                            }`}
+                          >
+                            {col}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
                 )}
 
                 {/* Quantity & Actions Stack */}

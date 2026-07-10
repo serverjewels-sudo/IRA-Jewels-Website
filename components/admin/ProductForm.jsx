@@ -259,8 +259,25 @@ export default function ProductForm({ productId }) {
   const [description, setDescription] = useState("");
   const [sizesStr, setSizesStr] = useState("");
   const [coloursStr, setColoursStr] = useState("");
+  const [colourVariants, setColourVariants] = useState([]);
   const [images, setImages] = useState(["", "", "", ""]);
   const [videoUrl, setVideoUrl] = useState("");
+
+  const handleAddColourVariant = () => {
+    setColourVariants([...colourVariants, { colour: "", swatch_hex: "#E8B4A8", images: ["", "", "", ""], video_url: "" }]);
+  };
+
+  const handleRemoveColourVariant = (index) => {
+    setColourVariants(colourVariants.filter((_, i) => i !== index));
+  };
+
+  const isValidHex = (hex) => typeof hex === 'string' && /^#[0-9A-Fa-f]{6}$/i.test(hex);
+
+  const handleVariantChange = (index, field, value) => {
+    const newVariants = [...colourVariants];
+    newVariants[index][field] = value;
+    setColourVariants(newVariants);
+  };
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
@@ -393,6 +410,9 @@ export default function ProductForm({ productId }) {
           if (Array.isArray(p.colour_options)) {
             setColoursStr(p.colour_options.join(", "));
           }
+          if (Array.isArray(p.colour_variants)) {
+            setColourVariants(p.colour_variants);
+          }
           if (Array.isArray(p.images)) {
             setImages([
               p.images[0] || "",
@@ -435,7 +455,17 @@ export default function ProductForm({ productId }) {
     if (!netGoldWeight || netGoldWeight.trim() === "") missingFields.push("Net Gold Weight is required");
     if (!diamondNetAmount || diamondNetAmount.trim() === "") missingFields.push("Diamond Net Amount is required");
     if (!gstPercentage || gstPercentage.trim() === "") missingFields.push("GST % is required");
-    if (!images[0] || !images[0].trim()) missingFields.push("Main Image (Front View) is required");
+    
+    if (colourVariants.length > 0) {
+      if (colourVariants.some(v => !v.images[0] || !v.images[0].trim())) {
+        missingFields.push("Main Image is required for all colour variants");
+      }
+      if (colourVariants.some(v => !v.colour || !v.colour.trim())) {
+        missingFields.push("Colour Name is required for all colour variants");
+      }
+    } else {
+      if (!images[0] || !images[0].trim()) missingFields.push("Main Image (Front View) is required");
+    }
 
     if (missingFields.length > 0) {
       setErrorMsg(missingFields.join(", ") + ".");
@@ -448,12 +478,22 @@ export default function ProductForm({ productId }) {
     const sizes = sizesStr
       ? sizesStr.split(",").map((s) => s.trim()).filter(Boolean)
       : [];
-    const colours = coloursStr
+    let colours = coloursStr
       ? coloursStr.split(",").map((c) => c.trim()).filter(Boolean)
       : [];
     
+    if (colourVariants.length > 0) {
+      colours = colourVariants.map(v => v.colour.trim()).filter(Boolean);
+    }
+    
     // Keep empty strings to preserve image positions
-    const imagesPayload = images.map(img => img ? img.trim() : "");
+    let imagesPayload = images.map(img => img ? img.trim() : "");
+    let videoUrlPayload = videoUrl ? videoUrl.trim() : null;
+    
+    if (colourVariants.length > 0) {
+      imagesPayload = colourVariants[0].images.map(img => img ? img.trim() : "");
+      videoUrlPayload = colourVariants[0].video_url ? colourVariants[0].video_url.trim() : null;
+    }
 
     // Always use the live-calculated price for the database price field
     const calculated = calculateProductPrice({
@@ -481,6 +521,7 @@ export default function ProductForm({ productId }) {
       description,
       size_options: sizes,
       colour_options: colours,
+      colour_variants: colourVariants,
       images: imagesPayload,
       is_featured: isFeatured,
       is_active: isActive,
@@ -489,7 +530,7 @@ export default function ProductForm({ productId }) {
       making_net_amount: makingNetAmount ? parseFloat(makingNetAmount) : 0,
       other_net_amount: otherNetAmount ? parseFloat(otherNetAmount) : 0,
       gst_percentage: gstPercentage ? parseFloat(gstPercentage) : null,
-      video_url: videoUrl ? videoUrl.trim() : null,
+      video_url: videoUrlPayload,
     };
 
     if (productId) {
@@ -883,65 +924,183 @@ export default function ProductForm({ productId }) {
             </div>
 
             {/* Colour Options */}
-            <div className="flex flex-col space-y-1.5 md:col-span-2">
-              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Colour Options (comma separated)
-              </label>
-              <input
-                type="text"
-                value={coloursStr}
-                onChange={(e) => setColoursStr(e.target.value)}
-                placeholder="e.g. White Gold, Yellow Gold, Rose Gold"
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-              />
+            {colourVariants.length === 0 && (
+              <div className="flex flex-col space-y-1.5 md:col-span-2">
+                <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                  Colour Options (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={coloursStr}
+                  onChange={(e) => setColoursStr(e.target.value)}
+                  placeholder="e.g. White Gold, Yellow Gold, Rose Gold"
+                  className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+                />
+              </div>
+            )}
+
+            {/* Colour Variants */}
+            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                    Colour Variants
+                  </h3>
+                  <p className="font-inter text-[12px] text-[#888888] font-light">
+                    Add full photo sets per colour. If added, this replaces the basic Colour Options and global Product Images.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddColourVariant}
+                  className="px-4 py-2 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300 flex items-center justify-center whitespace-nowrap"
+                >
+                  + Add Variant
+                </button>
+              </div>
+
+              {colourVariants.map((variant, index) => (
+                <div key={index} className="mb-6 p-6 border border-[#E5E5E5] rounded-md bg-[#FBFBFA] space-y-4">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-inter text-[13px] font-semibold uppercase tracking-wider text-[#2E3135]">Variant {index + 1}</h4>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveColourVariant(index)}
+                      className="text-red-500 hover:text-red-700 font-inter text-[11px] uppercase tracking-wider font-semibold transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Colour Name *</label>
+                      <input
+                        type="text"
+                        value={variant.colour}
+                        onChange={(e) => handleVariantChange(index, "colour", e.target.value)}
+                        placeholder="e.g. Rose Gold"
+                        className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && !variant.colour ? "border-red-400" : "border-[#E5E5E5]"}`}
+                      />
+                    </div>
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Swatch Colour</label>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          value={isValidHex(variant.swatch_hex) ? variant.swatch_hex : "#000000"}
+                          onChange={(e) => handleVariantChange(index, "swatch_hex", e.target.value.toUpperCase())}
+                          className="w-10 h-10 px-1 py-1 border border-[#E5E5E5] rounded-md cursor-pointer flex-shrink-0"
+                        />
+                        <input 
+                          type="text"
+                          value={variant.swatch_hex || ""}
+                          onChange={(e) => handleVariantChange(index, "swatch_hex", e.target.value)}
+                          placeholder="#E8B4A8"
+                          maxLength={7}
+                          className={`w-full px-4 py-2 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${variant.swatch_hex && !isValidHex(variant.swatch_hex) ? "border-red-400" : "border-[#E5E5E5]"}`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+                    <ImageUploadBox 
+                      label="Main Image"
+                      index={0}
+                      currentUrl={variant.images[0]}
+                      setImages={(updater) => {
+                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                        handleVariantChange(index, "images", newImages);
+                      }}
+                      isRequired={true}
+                      hasError={validated && !variant.images[0]}
+                    />
+                    <ImageUploadBox 
+                      label="Close-Up"
+                      index={1}
+                      currentUrl={variant.images[1]}
+                      setImages={(updater) => {
+                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                        handleVariantChange(index, "images", newImages);
+                      }}
+                    />
+                    <ImageUploadBox 
+                      label="Side View"
+                      index={2}
+                      currentUrl={variant.images[2]}
+                      setImages={(updater) => {
+                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                        handleVariantChange(index, "images", newImages);
+                      }}
+                    />
+                    <ImageUploadBox 
+                      label="Worn Shot"
+                      index={3}
+                      currentUrl={variant.images[3]}
+                      setImages={(updater) => {
+                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                        handleVariantChange(index, "images", newImages);
+                      }}
+                    />
+                    <VideoUploadBox 
+                      label="Video"
+                      currentUrl={variant.video_url}
+                      setVideoUrl={(url) => handleVariantChange(index, "video_url", url)}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Product Images (4 Slots) */}
-            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
-              <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
-                Product Images
-              </h3>
-              <p className="font-inter text-[12px] text-[#888888] mb-4 font-light">
-                Upload up to 4 images for this product. The main image is required.
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <ImageUploadBox 
-                  label="Main Image (Front View)"
-                  index={0}
-                  currentUrl={images[0]}
-                  setImages={setImages}
-                  isRequired={true}
-                  hasError={validated && !images[0]}
-                />
-                <ImageUploadBox 
-                  label="Close-Up / Detail Shot"
-                  index={1}
-                  currentUrl={images[1]}
-                  setImages={setImages}
-                  isRequired={false}
-                />
-                <ImageUploadBox 
-                  label="Side View"
-                  index={2}
-                  currentUrl={images[2]}
-                  setImages={setImages}
-                  isRequired={false}
-                />
-                <ImageUploadBox 
-                  label="Worn / Lifestyle Shot"
-                  index={3}
-                  currentUrl={images[3]}
-                  setImages={setImages}
-                  isRequired={false}
-                />
-                <VideoUploadBox 
-                  label="Product Video (Optional)"
-                  currentUrl={videoUrl}
-                  setVideoUrl={setVideoUrl}
-                />
+            {colourVariants.length === 0 && (
+              <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+                <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                  Product Images
+                </h3>
+                <p className="font-inter text-[12px] text-[#888888] mb-4 font-light">
+                  Upload up to 4 images for this product. The main image is required.
+                </p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <ImageUploadBox 
+                    label="Main Image (Front View)"
+                    index={0}
+                    currentUrl={images[0]}
+                    setImages={setImages}
+                    isRequired={true}
+                    hasError={validated && !images[0]}
+                  />
+                  <ImageUploadBox 
+                    label="Close-Up / Detail Shot"
+                    index={1}
+                    currentUrl={images[1]}
+                    setImages={setImages}
+                    isRequired={false}
+                  />
+                  <ImageUploadBox 
+                    label="Side View"
+                    index={2}
+                    currentUrl={images[2]}
+                    setImages={setImages}
+                    isRequired={false}
+                  />
+                  <ImageUploadBox 
+                    label="Worn / Lifestyle Shot"
+                    index={3}
+                    currentUrl={images[3]}
+                    setImages={setImages}
+                    isRequired={false}
+                  />
+                  <VideoUploadBox 
+                    label="Product Video (Optional)"
+                    currentUrl={videoUrl}
+                    setVideoUrl={setVideoUrl}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Description */}
             <div className="flex flex-col space-y-1.5 md:col-span-2">

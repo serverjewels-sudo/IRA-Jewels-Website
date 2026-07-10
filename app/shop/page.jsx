@@ -305,7 +305,7 @@ function ShopInner() {
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
       <Navbar />
 
-      <main className="flex-grow py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full">
+      <main className="flex-grow py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-[1600px] min-[901px]:max-w-none mx-auto w-full">
         {/* Header Title Section */}
         <div className="flex flex-col items-center mb-12 md:mb-16 text-center">
           <h1 className="font-cormorant font-normal text-[40px] sm:text-[48px] text-[#2E3135] tracking-wide leading-tight mb-3">
@@ -317,10 +317,10 @@ function ShopInner() {
           <div className="w-12 h-[1px] bg-[#2E3135]/20 mt-5"></div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
+        <div className="flex flex-col min-[901px]:flex-row gap-10 items-start">
           
           {/* DESKTOP SIDEBAR FILTER */}
-          <aside className="hidden lg:block lg:col-span-1 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24 max-h-[calc(100dvh-120px)] overflow-y-auto custom-scrollbar">
+          <aside className="hidden min-[901px]:block flex-shrink-0 w-72 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24 max-h-[calc(100dvh-120px)] overflow-y-auto custom-scrollbar">
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#2E3135]/10">
               <span className="font-inter font-medium text-[14px] uppercase tracking-wider text-[#2E3135]">Filters</span>
               {(selectedCategory !== "All" || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || sortBy !== "Featured") && (
@@ -337,10 +337,10 @@ function ShopInner() {
           </aside>
 
           {/* PRODUCTS MAIN SECTION */}
-          <section className="col-span-1 lg:col-span-3 flex flex-col">
+          <section className="flex-1 flex flex-col min-w-0">
             
             {/* MOBILE FILTER TRIGGER BAR */}
-            <div className="flex justify-between items-center mb-6 lg:hidden bg-[#F3F1EC]/40 p-4 rounded-md border border-[#F3F1EC]">
+            <div className="flex justify-between items-center mb-6 min-[901px]:hidden bg-[#F3F1EC]/40 p-4 rounded-md border border-[#F3F1EC]">
               <button
                 onClick={() => setIsMobileDrawerOpen(true)}
                 className="flex items-center gap-2 px-4 py-2.5 bg-[#F3F1EC] text-[#2E3135] rounded-md font-inter font-medium text-[11px] tracking-wider uppercase border border-[#E5E5E5]/60 hover:bg-[#CDB38B]/10 hover:border-[#CDB38B] transition-colors"
@@ -394,7 +394,7 @@ function ShopInner() {
 
       {/* MOBILE DRAWER DIALOG / SIDE SHEET */}
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
+        <div className="fixed inset-0 z-50 flex min-[901px]:hidden">
           {/* Backdrop blur overlay */}
           <div
             onClick={() => setIsMobileDrawerOpen(false)}

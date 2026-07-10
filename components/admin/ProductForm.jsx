@@ -262,6 +262,10 @@ export default function ProductForm({ productId }) {
   const [colourVariants, setColourVariants] = useState([]);
   const [images, setImages] = useState(["", "", "", ""]);
   const [videoUrl, setVideoUrl] = useState("");
+  
+  // Collections State
+  const [allCollections, setAllCollections] = useState([]);
+  const [selectedCollectionIds, setSelectedCollectionIds] = useState([]);
 
   const handleAddColourVariant = () => {
     setColourVariants([...colourVariants, { colour: "", swatch_hex: "#E8B4A8", images: ["", "", "", ""], video_url: "" }]);
@@ -367,6 +371,28 @@ export default function ProductForm({ productId }) {
     fetchGoldRates();
   }, [productId]);
 
+  // Fetch all collections on load
+  useEffect(() => {
+    async function fetchCollections() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) return;
+
+        const res = await fetch("/api/admin/collections", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setAllCollections(data);
+        }
+      } catch (err) {
+        console.error("Error fetching collections:", err);
+      }
+    }
+    fetchCollections();
+  }, []);
+
   // Fetch product data if editing
   useEffect(() => {
     if (!productId) return;
@@ -427,6 +453,9 @@ export default function ProductForm({ productId }) {
           setVideoUrl(p.video_url || "");
           setIsFeatured(!!p.is_featured);
           setIsActive(p.is_active !== undefined ? !!p.is_active : true);
+          if (Array.isArray(p.collection_ids)) {
+            setSelectedCollectionIds(p.collection_ids);
+          }
         } else {
           setErrorMsg("Could not load product details. It may have been deleted.");
         }
@@ -531,6 +560,7 @@ export default function ProductForm({ productId }) {
       other_net_amount: otherNetAmount ? parseFloat(otherNetAmount) : 0,
       gst_percentage: gstPercentage ? parseFloat(gstPercentage) : null,
       video_url: videoUrlPayload,
+      collection_ids: selectedCollectionIds,
     };
 
     if (productId) {
@@ -1142,6 +1172,44 @@ export default function ProductForm({ productId }) {
                 </span>
               </label>
             </div>
+
+            {/* Collections Section */}
+            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6 mt-4">
+              <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                Collections
+              </h3>
+              <p className="font-inter text-[12px] text-[#888888] mb-4 font-light">
+                Assign this product to one or more collections.
+              </p>
+              {allCollections.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {allCollections.map((col) => (
+                    <label key={col.id} className="flex items-center space-x-3 cursor-pointer p-3 border border-[#E5E5E5] rounded-md hover:border-[#CDB38B] transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={selectedCollectionIds.includes(col.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedCollectionIds([...selectedCollectionIds, col.id]);
+                          } else {
+                            setSelectedCollectionIds(selectedCollectionIds.filter(id => id !== col.id));
+                          }
+                        }}
+                        className="w-4.5 h-4.5 rounded border-[#E5E5E5] text-[#CDB38B] focus:ring-[#CDB38B] cursor-pointer"
+                      />
+                      <span className="font-inter text-[13px] text-[#2E3135]">
+                        {col.name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-inter text-[12px] text-[#888888] font-light italic">
+                  No collections available. Create collections from the Collections menu.
+                </p>
+              )}
+            </div>
+
           </div>
 
           {/* Form Action Buttons */}

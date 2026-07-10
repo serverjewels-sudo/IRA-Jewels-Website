@@ -109,6 +109,20 @@ export default function Sidebar({ isOpen, onClose }) {
               Add Product
             </Link>
 
+            {/* Collections Link */}
+            <Link
+              href="/admin/collections"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 py-3 px-6 text-[12px] font-medium tracking-[1.5px] uppercase font-inter transition-all duration-200 hover:text-[#CDB38B] ${
+                pathname.startsWith("/admin/collections")
+                  ? "border-l-[3px] border-[#CDB38B] text-[#CDB38B] pl-[21px]"
+                  : "border-l-[3px] border-transparent text-white/70"
+              }`}
+            >
+              <Package className="w-4 h-4 stroke-[1.5]" />
+              Collections
+            </Link>
+
             {/* Orders Link */}
             <Link
               href="/admin/orders"

@@ -214,7 +214,7 @@ export default function AdminCollectionsPage() {
               No Collections Found
             </h3>
             <p className="font-inter font-light text-[14px] text-[#888888] max-w-[340px] mb-6">
-              You haven't created any collections yet. Group your products together for better discovery.
+              You haven&apos;t created any collections yet. Group your products together for better discovery.
             </p>
             <Link
               href="/admin/collections/new"

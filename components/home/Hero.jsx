@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
+import { Gem, ShieldCheck, Flower2 } from "lucide-react";
 
 export default function Hero() {
   const containerRef = useRef(null);
@@ -12,7 +13,7 @@ export default function Hero() {
       const tl = gsap.timeline();
       
       // Set initial states to prevent FOUC (flash of unstyled content)
-      gsap.set([".hero-headline", ".hero-subheadline", ".hero-cta"], { 
+      gsap.set([".hero-headline", ".hero-divider", ".hero-subheadline", ".hero-cta", ".hero-trust"], { 
         opacity: 0, 
         y: 30 
       });
@@ -23,19 +24,30 @@ export default function Hero() {
         duration: 1.2,
         ease: "power3.out"
       })
+      .to(".hero-divider", {
+        opacity: 1,
+        y: 0,
+        duration: 1.0,
+        ease: "power3.out"
+      }, "-=0.8")
       .to(".hero-subheadline", {
         opacity: 1,
         y: 0,
         duration: 1.0,
         ease: "power3.out"
-      }, "+=0.3") // Stagger 0.3s after headline starts/finishes
+      }, "-=0.8")
       .to(".hero-cta", {
         opacity: 1,
         y: 0,
         duration: 1.0,
         ease: "power3.out",
-        stagger: 0.3 // Stagger 0.3s between the buttons
-      }, "+=0.3"); // Stagger 0.3s after subheadline
+      }, "-=0.6")
+      .to(".hero-trust", {
+        opacity: 1,
+        y: 0,
+        duration: 1.0,
+        ease: "power3.out"
+      }, "-=0.6");
     }, containerRef);
 
     return () => ctx.revert();
@@ -44,52 +56,94 @@ export default function Hero() {
   return (
     <section 
       ref={containerRef}
-      className="relative w-full min-h-[calc(100vh-80px)] md:h-[calc(100vh-80px)] bg-white flex flex-col md:grid md:grid-cols-12 overflow-hidden select-none"
+      className="relative w-full min-h-screen flex items-center overflow-hidden select-none"
     >
-      {/* Left Column: Copy & CTAs */}
-      <div className="col-span-6 flex flex-col justify-center px-6 py-12 sm:px-12 md:px-16 lg:px-24 xl:px-28 bg-white h-full">
+      {/* Background Image - Object Right ensures we never crop the model/jewelry on the right */}
+      <img 
+        src="https://vlfxeyrhbsftlxczlgrs.supabase.co/storage/v1/object/public/product-images/Perfect_change_need_white_2K_202607102235.jpeg" 
+        alt="Premium Lab-Grown Diamond Jewelry" 
+        className="absolute inset-0 w-full h-full object-cover object-right z-0"
+        loading="eager"
+      />
+
+      {/* Light Gradient Overlay for text readability (specifically for mobile where image crops from left) */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#F3F1EC]/90 via-[#F3F1EC]/50 to-transparent md:from-[#F3F1EC]/30 md:via-transparent z-0"></div>
+
+      {/* Content Column */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 md:px-16 lg:px-8 xl:px-12 pt-20">
         <div className="max-w-[540px]">
           {/* Headline */}
-          <h1 className="hero-headline font-serif italic font-light text-[46px] sm:text-[62px] md:text-[68px] lg:text-[82px] xl:text-[90px] text-[#2E3135] leading-[1.1] tracking-tight opacity-0">
-            You Deserve to Wear Fine Jewelry Every Day.
+          <h1 className="hero-headline font-serif italic font-light text-[52px] sm:text-[68px] md:text-[76px] lg:text-[84px] xl:text-[92px] text-[#2E3135] leading-[1.05] tracking-tight opacity-0">
+            Every Piece,<br />
+            a Promise.
           </h1>
           
+          {/* Decorative Divider */}
+          <div className="hero-divider flex items-center gap-4 mt-6 opacity-0">
+            <div className="h-[1px] w-12 bg-[#2E3135]/30"></div>
+            <Gem className="w-4 h-4 text-[#2E3135]/60 stroke-[1.5]" />
+            <div className="h-[1px] w-12 bg-[#2E3135]/30"></div>
+          </div>
+
           {/* Subheadline */}
-          <p className="hero-subheadline font-sans font-normal text-[17px] text-[#2E3135] leading-[1.8] mt-6 md:mt-8 max-w-[460px] opacity-0">
-            Not just on anniversaries. Not just for celebrations. Everyday luxury — for you.
+          <p className="hero-subheadline font-sans font-normal text-[16px] sm:text-[17px] text-[#2E3135] leading-[1.8] mt-6 max-w-[420px] opacity-0">
+            Luxury fine jewellery crafted to celebrate the moments that become memories.
           </p>
 
           {/* CTA Buttons */}
-          <div className="hero-cta-group flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 mt-8 md:mt-12 opacity-0 hero-cta">
+          <div className="hero-cta flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8 md:mt-10 opacity-0">
             <Link 
               href="/shop"
-              className="w-full sm:w-auto inline-block text-center bg-[#2E3135] text-white font-sans font-medium text-[13px] uppercase tracking-[2px] px-8 py-[18px] transition-all duration-300 hover:bg-[#CDB38B] hover:shadow-md"
+              className="w-full sm:w-auto inline-block text-center bg-[#2E3135] text-white font-sans font-medium text-[12px] sm:text-[13px] uppercase tracking-[2px] px-6 sm:px-8 py-[16px] transition-all duration-300 hover:bg-[#CDB38B]"
             >
-              FIND YOUR EVERYDAY PIECE
+              EXPLORE COLLECTION &rarr;
             </Link>
             
             <Link 
-              href="/shop?collection=all"
-              className="text-[#2E3135] font-sans font-medium text-[13px] uppercase tracking-[2px] py-3 border-b border-transparent hover:border-[#2E3135] transition-all duration-300"
+              href="/about"
+              className="w-full sm:w-auto inline-block text-center bg-white/30 backdrop-blur-sm border border-[#2E3135] text-[#2E3135] font-sans font-medium text-[12px] sm:text-[13px] uppercase tracking-[2px] px-6 sm:px-8 py-[16px] transition-all duration-300 hover:bg-[#2E3135] hover:text-white"
             >
-              Shop by Collection
+              OUR STORY &rarr;
             </Link>
           </div>
-        </div>
-      </div>
 
-      {/* Right Column: Beautiful Lab Diamond Jewelry Image */}
-      <div className="col-span-6 relative w-full h-[45vh] md:h-full overflow-hidden bg-[#F3F1EC]">
-        <img 
-          src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=1200" 
-          alt="Premium Lab-Grown Diamond Jewelry" 
-          className="w-full h-full object-cover object-center transition-transform duration-1000 hover:scale-105"
-          loading="eager"
-        />
-        {/* Subtle Overlay to match high-end photo toning */}
-        <div className="absolute inset-0 bg-[#2E3135]/5 mix-blend-multiply pointer-events-none"></div>
+          {/* Trust Badges */}
+          <div className="hero-trust flex flex-wrap items-center gap-x-6 gap-y-4 sm:gap-8 mt-12 md:mt-16 opacity-0">
+            {/* Badge 1 */}
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
+                <Gem className="w-[18px] h-[18px] text-[#2E3135] stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">IGI Certified</span>
+                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">Diamonds</span>
+              </div>
+            </div>
+
+            {/* Badge 2 */}
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
+                <ShieldCheck className="w-[18px] h-[18px] text-[#2E3135] stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">Lifetime</span>
+                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">Service</span>
+              </div>
+            </div>
+
+            {/* Badge 3 */}
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
+                <Flower2 className="w-[18px] h-[18px] text-[#2E3135] stroke-[1.5]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">Crafted</span>
+                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">in India</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-

@@ -90,13 +90,13 @@ export default function OffersPage() {
 
         {/* Products Section */}
         <section className="bg-white py-16 px-6 sm:px-8 lg:px-12">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-[1600px] mx-auto">
             {loading ? (
               <>
                 <h2 className="font-cormorant text-[32px] sm:text-[36px] text-[#2E3135] font-normal mb-8">
                   On Sale Now
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-8">
                   <SkeletonCard />
                   <SkeletonCard />
                   <SkeletonCard />
@@ -107,7 +107,7 @@ export default function OffersPage() {
                 <h2 className="font-cormorant text-[32px] sm:text-[36px] text-[#2E3135] font-normal mb-8">
                   On Sale Now
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-8">
                   {products.map((product) => (
                     <ProductCard key={product.id} product={product} rate_999={rate999} />
                   ))}

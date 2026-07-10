@@ -305,7 +305,7 @@ function ShopInner() {
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
       <Navbar />
 
-      <main className="flex-grow py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <main className="flex-grow py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full">
         {/* Header Title Section */}
         <div className="flex flex-col items-center mb-12 md:mb-16 text-center">
           <h1 className="font-cormorant font-normal text-[40px] sm:text-[48px] text-[#2E3135] tracking-wide leading-tight mb-3">
@@ -355,13 +355,13 @@ function ShopInner() {
 
             {/* PRODUCT GRID OR SKELETON OR EMPTY STATE */}
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-[1600px]:grid-cols-4 gap-x-6 gap-y-10">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-[1600px]:grid-cols-4 gap-x-6 gap-y-10">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} rate_999={rate999} />
                 ))}

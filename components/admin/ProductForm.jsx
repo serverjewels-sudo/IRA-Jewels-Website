@@ -142,6 +142,102 @@ function ImageUploadBox({ label, index, currentUrl, setImages, isRequired, hasEr
   );
 }
 
+function VideoUploadBox({ label, currentUrl, setVideoUrl }) {
+  const [uploading, setUploading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setErrorMsg("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const response = await fetch("/api/admin/upload-video", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setVideoUrl(data.url);
+      } else {
+        const errData = await response.json();
+        setErrorMsg(errData.error || "Upload failed");
+        alert(errData.error || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setErrorMsg("Network error");
+      alert("Network error");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = (e) => {
+    e.preventDefault();
+    setVideoUrl("");
+  };
+
+  return (
+    <div className="flex flex-col space-y-2">
+      <label className="font-inter text-[10px] font-semibold tracking-wider text-[#2E3135]/60 uppercase text-center min-h-[30px] flex items-center justify-center">
+        {label}
+      </label>
+      
+      <div className={`relative aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center bg-[#FBFBFA] overflow-hidden group hover:border-[#CDB38B] transition-colors border-[#E5E5E5]`}>
+        {uploading ? (
+          <div className="flex flex-col items-center space-y-2">
+            <div className="w-5 h-5 border-2 border-[#CDB38B]/20 border-t-[#CDB38B] rounded-full animate-spin"></div>
+            <span className="font-inter text-[10px] text-[#888] uppercase tracking-widest">Uploading...</span>
+          </div>
+        ) : currentUrl ? (
+          <>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
+              <svg className="w-8 h-8 text-[#CDB38B] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-inter text-[10px] text-gray-500 truncate max-w-[80%]">Video Uploaded</span>
+            </div>
+            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <label className="cursor-pointer px-4 py-2 bg-white text-[#2E3135] font-inter text-[11px] uppercase tracking-wider font-semibold hover:bg-[#F3F1EC] transition-colors mb-2">
+                Change
+                <input type="file" className="hidden" accept="video/mp4" onChange={handleFileChange} />
+              </label>
+              <button onClick={handleRemove} className="text-white font-inter text-[11px] uppercase tracking-wider hover:text-red-400 transition-colors">
+                Remove
+              </button>
+            </div>
+          </>
+        ) : (
+          <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center text-[#888] hover:text-[#CDB38B] transition-colors">
+            <svg className="w-6 h-6 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span className="font-inter text-[10px] uppercase tracking-widest">Select Video</span>
+            <input type="file" className="hidden" accept="video/mp4" onChange={handleFileChange} />
+          </label>
+        )}
+      </div>
+      <span className="font-inter text-[10px] text-[#888888] text-center font-light leading-tight">
+        MP4 format, max 25MB, keep it short (10-20s)
+      </span>
+    </div>
+  );
+}
+
 export default function ProductForm({ productId }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -164,6 +260,7 @@ export default function ProductForm({ productId }) {
   const [sizesStr, setSizesStr] = useState("");
   const [coloursStr, setColoursStr] = useState("");
   const [images, setImages] = useState(["", "", "", ""]);
+  const [videoUrl, setVideoUrl] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
@@ -307,6 +404,7 @@ export default function ProductForm({ productId }) {
             setImages(["", "", "", ""]);
           }
 
+          setVideoUrl(p.video_url || "");
           setIsFeatured(!!p.is_featured);
           setIsActive(p.is_active !== undefined ? !!p.is_active : true);
         } else {
@@ -391,6 +489,7 @@ export default function ProductForm({ productId }) {
       making_net_amount: makingNetAmount ? parseFloat(makingNetAmount) : 0,
       other_net_amount: otherNetAmount ? parseFloat(otherNetAmount) : 0,
       gst_percentage: gstPercentage ? parseFloat(gstPercentage) : null,
+      video_url: videoUrl ? videoUrl.trim() : null,
     };
 
     if (productId) {
@@ -835,6 +934,11 @@ export default function ProductForm({ productId }) {
                   currentUrl={images[3]}
                   setImages={setImages}
                   isRequired={false}
+                />
+                <VideoUploadBox 
+                  label="Product Video (Optional)"
+                  currentUrl={videoUrl}
+                  setVideoUrl={setVideoUrl}
                 />
               </div>
             </div>

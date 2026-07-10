@@ -266,6 +266,10 @@ export default function ProductDetailPage() {
     : 0
 
   const validImages = product.images ? product.images.filter(img => img && img.trim() !== "") : [];
+  const mediaItems = validImages.map(img => ({ type: 'image', url: img }));
+  if (product.video_url) {
+    mediaItems.push({ type: 'video', url: product.video_url });
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
@@ -295,12 +299,23 @@ export default function ProductDetailPage() {
                     {discountPercent}% OFF
                   </span>
                 )}
-                {validImages.length > 0 ? (
-                  <img
-                    src={validImages[activeImageIndex] || validImages[0]}
-                    alt={`${product.name} main view`}
-                    className="w-full h-full object-contain transition-all duration-700 ease-out group-hover:scale-105"
-                  />
+                {mediaItems.length > 0 ? (
+                  mediaItems[activeImageIndex]?.type === 'video' ? (
+                    <video
+                      src={mediaItems[activeImageIndex].url}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <img
+                      src={mediaItems[activeImageIndex]?.url || mediaItems[0].url}
+                      alt={`${product.name} main view`}
+                      className="w-full h-full object-contain transition-all duration-700 ease-out group-hover:scale-105"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-[#F3F1EC]">
                     <span className="text-[#888] font-inter text-[11px] tracking-wider">NO IMAGE AVAILABLE</span>
@@ -309,9 +324,9 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Thumbnails */}
-              {validImages.length > 1 && (
+              {mediaItems.length > 1 && (
                 <div className="flex gap-4 mt-4 overflow-x-auto pb-2 scrollbar-thin">
-                  {validImages.map((img, idx) => (
+                  {mediaItems.map((item, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImageIndex(idx)}
@@ -320,13 +335,30 @@ export default function ProductDetailPage() {
                           ? "border-2 border-[#CDB38B] opacity-100"
                           : "border border-[#F3F1EC] hover:border-[#CDB38B]/50 opacity-70 hover:opacity-100"
                       }`}
-                      aria-label={`View detail image ${idx + 1}`}
+                      aria-label={`View detail item ${idx + 1}`}
                     >
-                      <img
-                        src={img}
-                        alt={`${product.name} thumbnail ${idx + 1}`}
-                        className="w-full h-full object-contain"
-                      />
+                      {item.type === 'video' ? (
+                        <div className="w-full h-full relative group-hover:opacity-90 transition-opacity">
+                          <video
+                            src={item.url}
+                            preload="metadata"
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                            <svg className="w-8 h-8 text-[#CDB38B]" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                      ) : (
+                        <img
+                          src={item.url}
+                          alt={`${product.name} thumbnail ${idx + 1}`}
+                          className="w-full h-full object-contain"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>

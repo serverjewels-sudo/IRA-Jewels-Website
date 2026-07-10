@@ -22,6 +22,7 @@ export default function ProductDetailPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [rate999, setRate999] = useState(null)
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
+  const [isSizeOpen, setIsSizeOpen] = useState(false)
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
@@ -502,29 +503,40 @@ export default function ProductDetailPage() {
                 {/* Size Selector */}
                 {product.size_options && product.size_options.length > 0 && (
                   <div className="mb-6">
-                    <div className="flex justify-between mb-3">
-                      <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
-                        Select Size
-                      </span>
+                    <div className="flex justify-between items-center mb-3">
+                      <button
+                        onClick={() => setIsSizeOpen(!isSizeOpen)}
+                        className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                      >
+                        <span>SELECT SIZE: {selectedSize || "CHOOSE A SIZE"}</span>
+                        <ChevronDown 
+                          className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isSizeOpen ? 'rotate-180' : ''}`} 
+                        />
+                      </button>
                       <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider">
                         Size Guide
                       </Link>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {product.size_options.map((sz) => (
-                        <button
-                          key={sz}
-                          onClick={() => setSelectedSize(sz)}
-                          className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 min-w-[52px] ${
-                            selectedSize === sz
-                              ? "bg-[#2E3135] border-[#2E3135] text-white"
-                              : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
-                          }`}
-                        >
-                          {sz}
-                        </button>
-                      ))}
-                    </div>
+                    {isSizeOpen && (
+                      <div className="flex flex-col gap-2 mt-1">
+                        {product.size_options.map((sz) => (
+                          <button
+                            key={sz}
+                            onClick={() => {
+                              setSelectedSize(sz)
+                              setIsSizeOpen(false)
+                            }}
+                            className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
+                              selectedSize === sz
+                                ? "text-[#CDB38B] font-medium"
+                                : "text-[#2E3135] hover:text-[#CDB38B]"
+                            }`}
+                          >
+                            {sz}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 

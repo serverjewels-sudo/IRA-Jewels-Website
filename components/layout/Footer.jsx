@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="w-full bg-[#FFFFFF] border-t border-[#F3F1EC] pt-16 pb-12 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Top: Columns Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-16">
           {/* Column 0: Logo & Bio */}
           <div className="flex flex-col space-y-4">
             <div className="font-serif text-[20px] tracking-[0.2em] text-[#2E3135] uppercase">
@@ -115,9 +115,18 @@ export default function Footer() {
                   Our Story
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Connect */}
+          <div>
+            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+              Connect
+            </h3>
+            <ul className="space-y-3">
               <li>
                 <Link href="/connect" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Connect
+                  Connect With Us
                 </Link>
               </li>
             </ul>

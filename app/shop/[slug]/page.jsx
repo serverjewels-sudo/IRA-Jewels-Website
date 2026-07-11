@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Heart, ShoppingBag, Truck, ShieldCheck, RefreshCw, Star, ChevronRight, ChevronDown, Minus, Plus } from 'lucide-react'
@@ -42,6 +42,25 @@ export default function ProductDetailPage() {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [cartStatus, setCartStatus] = useState("ADD TO CART")
   const [reviewsStats, setReviewsStats] = useState({ count: 0, average: 0 })
+  
+  const sizeDropdownRef = useRef(null)
+  const karatDropdownRef = useRef(null)
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sizeDropdownRef.current && !sizeDropdownRef.current.contains(event.target)) {
+        setIsSizeOpen(false)
+      }
+      if (karatDropdownRef.current && !karatDropdownRef.current.contains(event.target)) {
+        setIsKaratOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
   
   // Fetch product from Supabase (or local fallback)
   useEffect(() => {
@@ -547,8 +566,8 @@ export default function ProductDetailPage() {
                     
                     {/* Size Selector */}
                     {product.size_options && product.size_options.length > 0 && (
-                      <div>
-                        <div className="flex justify-between items-center mb-3">
+                      <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
+                        <div className="flex justify-between items-center gap-6">
                           <button
                             onClick={() => setIsSizeOpen(!isSizeOpen)}
                             className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
@@ -563,7 +582,7 @@ export default function ProductDetailPage() {
                           </Link>
                         </div>
                         {isSizeOpen && (
-                          <div className="flex flex-col gap-2 mt-1">
+                          <div className="absolute top-full left-0 mt-1 w-full min-w-full bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col py-1.5">
                             {product.size_options.map((sz) => (
                               <button
                                 key={sz}
@@ -571,10 +590,10 @@ export default function ProductDetailPage() {
                                   setSelectedSize(sz)
                                   setIsSizeOpen(false)
                                 }}
-                                className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
+                                className={`text-left text-[12px] font-inter transition-colors focus:outline-none px-5 py-1.5 ${
                                   selectedSize === sz
-                                    ? "text-[#CDB38B] font-medium"
-                                    : "text-[#2E3135] hover:text-[#CDB38B]"
+                                    ? "text-[#CDB38B] font-medium bg-gray-50"
+                                    : "text-[#2E3135] hover:text-[#CDB38B] hover:bg-gray-50"
                                 }`}
                               >
                                 {sz}
@@ -587,10 +606,10 @@ export default function ProductDetailPage() {
 
                     {/* Karat Selector */}
                     {product.karat && (
-                      <div>
+                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
                         {product.available_karats && product.available_karats.length > 1 ? (
                           <>
-                            <div className="flex justify-between items-center mb-3">
+                            <div className="flex justify-between items-center">
                               <button
                                 onClick={() => setIsKaratOpen(!isKaratOpen)}
                                 className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
@@ -602,7 +621,7 @@ export default function ProductDetailPage() {
                               </button>
                             </div>
                             {isKaratOpen && (
-                              <div className="flex flex-col gap-2 mt-1">
+                              <div className="absolute top-full left-0 mt-1 w-full min-w-full bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col py-1.5">
                                 {sortedKarats.map((krt) => (
                                   <button
                                     key={krt}
@@ -610,10 +629,10 @@ export default function ProductDetailPage() {
                                       setSelectedKarat(krt)
                                       setIsKaratOpen(false)
                                     }}
-                                    className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
+                                    className={`text-left text-[12px] font-inter transition-colors focus:outline-none px-5 py-1.5 ${
                                       selectedKarat === krt
-                                        ? "text-[#CDB38B] font-medium"
-                                        : "text-[#2E3135] hover:text-[#CDB38B]"
+                                        ? "text-[#CDB38B] font-medium bg-gray-50"
+                                        : "text-[#2E3135] hover:text-[#CDB38B] hover:bg-gray-50"
                                     }`}
                                   >
                                     {krt}
@@ -732,13 +751,13 @@ export default function ProductDetailPage() {
                 )}
 
                 {/* Engraving Section */}
-                <div className="mb-8 p-6 border border-[#E5E5E5] bg-[#FBFBFA]">
+                <div className="mb-8 px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit">
                   <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-4 block">
                     Personalization (Optional)
                   </span>
                   
                   {/* Yes/No Toggle */}
-                  <div className="flex gap-4 mb-4">
+                  <div className={`flex gap-4 ${hasEngraving === "Yes" ? "mb-4" : "mb-0"}`}>
                     <label className="flex items-center gap-2 cursor-pointer font-inter text-[13px] text-[#2E3135]">
                       <input 
                         type="radio" 
@@ -886,7 +905,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Trust Services Badges */}
-                <div className="grid grid-cols-3 gap-4 border-t border-b border-[#2E3135]/10 py-6 mb-2 text-center bg-[#FBFBFA]">
+                <div className="grid grid-cols-3 gap-4 border-t border-b border-[#2E3135]/10 py-3 mb-2 text-center bg-[#FBFBFA]">
                   <div className="flex flex-col items-center p-2">
                     <Truck className="w-5 h-5 text-[#CDB38B] mb-2" />
                     <span className="font-inter font-medium text-[10px] tracking-wider uppercase text-[#2E3135]">Free Insured Shipping</span>

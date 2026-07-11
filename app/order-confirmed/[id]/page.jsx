@@ -104,7 +104,7 @@ export default function OrderConfirmedPage() {
                       {item.hasEngraving && (
                         <div style={{marginTop:'8px', background:'#FFFBEB', border:'1px solid #FDE68A', color:'#92400E', padding:'6px 10px', borderRadius:'4px', display:'inline-block'}}>
                           <span style={{fontSize:'10px', fontWeight:600, textTransform:'uppercase', letterSpacing:'1px', display:'block', marginBottom:'2px'}}>Personalization</span>
-                          <span style={{fontSize:'13px'}}>Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit", fontStyle: item.engravingFont === 'Garamond' ? 'italic' : 'normal', fontSize: item.engravingFont === 'Garamond' ? '15px' : 'inherit'}}>"{item.engravingText}"</strong></span>
+                          <span style={{fontSize:'13px'}}>Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit", fontStyle: item.engravingFont === 'Garamond' ? 'italic' : 'normal', fontSize: item.engravingFont === 'Garamond' ? '15px' : 'inherit'}}>&quot;{item.engravingText}&quot;</strong></span>
                         </div>
                       )}
                     </div>

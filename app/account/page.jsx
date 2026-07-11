@@ -183,8 +183,8 @@ export default function AccountPage() {
                                     )}
                                     {item.hasEngraving && (
                                       <div className="mt-1.5 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-2.5 py-1.5 rounded self-start">
-                                        <span className="text-[9px] font-semibold text-transform:uppercase tracking-wider block mb-0.5 uppercase">Personalization</span>
-                                        <span className="text-[11px]">Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[13px]' : ''}>"{item.engravingText}"</strong></span>
+                                        <span className="text-[9px] font-semibold tracking-wider block mb-0.5 uppercase">Personalization</span>
+                                        <span className="text-[11px]">Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[13px]' : ''}>&quot;{item.engravingText}&quot;</strong></span>
                                       </div>
                                     )}
                                   </div>

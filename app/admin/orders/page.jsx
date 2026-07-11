@@ -268,7 +268,7 @@ export default function AdminOrdersPage() {
                                           <div className="mt-3 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-3 py-2 rounded">
                                             <span className="font-inter font-semibold text-[11px] uppercase tracking-wider block mb-1">Personalization</span>
                                             <span className="font-inter text-[13px]">
-                                              Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[15px]' : ''}>"{item.engravingText}"</strong>
+                                              Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[15px]' : ''}>&quot;{item.engravingText}&quot;</strong>
                                             </span>
                                           </div>
                                         )}

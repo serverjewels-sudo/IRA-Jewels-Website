@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "Lab-Grown Diamonds | IRA Jewels",
+  title: "Lab-Grown Diamonds | TATVAAN",
   description: "Learn about lab-grown diamonds. Discover how they are made (CVD & HPHT), see how they compare to mined diamonds, and find answers to frequently asked questions.",
 };
 
@@ -246,7 +246,7 @@ export default function LearnPage() {
                   <span className="text-[#CDB38B] font-light text-[22px] hidden group-open:block leading-none">&minus;</span>
                 </summary>
                 <p className="mt-3 font-inter text-[15px] text-[#555] leading-[1.8] font-light pl-2">
-                  Yes. Every IRA Jewels diamond comes with an IGI certificate confirming its quality and lab-grown origin.
+                  Yes. Every TATVAAN diamond comes with an IGI certificate confirming its quality and lab-grown origin.
                 </p>
               </details>
             </div>

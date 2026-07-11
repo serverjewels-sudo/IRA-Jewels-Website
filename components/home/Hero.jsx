@@ -56,7 +56,7 @@ export default function Hero() {
   return (
     <section 
       ref={containerRef}
-      className="relative w-full min-h-screen flex items-center overflow-hidden select-none"
+      className="relative w-full min-h-dvh flex items-end md:items-center overflow-hidden select-none"
     >
       {/* Background Image - Object Right ensures we never crop the model/jewelry on the right */}
       <img 
@@ -70,7 +70,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-[#F3F1EC]/90 via-[#F3F1EC]/50 to-transparent md:from-[#F3F1EC]/30 md:via-transparent z-0"></div>
 
       {/* Content Column */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 md:px-16 lg:px-8 xl:px-12 pt-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 md:px-16 lg:px-8 xl:px-12 pt-20 pb-16 md:pb-0">
         <div className="max-w-[540px]">
           {/* Headline */}
           <h1 className="hero-headline font-serif italic font-light text-[52px] sm:text-[68px] md:text-[76px] lg:text-[84px] xl:text-[92px] text-[#2E3135] leading-[1.05] tracking-tight opacity-0">

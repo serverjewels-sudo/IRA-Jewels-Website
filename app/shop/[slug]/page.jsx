@@ -23,10 +23,12 @@ export default function ProductDetailPage() {
   const [rate999, setRate999] = useState(null)
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
   const [isSizeOpen, setIsSizeOpen] = useState(false)
+  const [isKaratOpen, setIsKaratOpen] = useState(false)
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
   const [selectedColour, setSelectedColour] = useState(null)
+  const [selectedKarat, setSelectedKarat] = useState(null)
   const [quantity, setQuantity] = useState(1)
   
   // Wishlist state
@@ -75,6 +77,7 @@ export default function ProductDetailPage() {
             // Pre-select first options if available
             setSelectedSize(fallbackProduct.size_options?.[0] || null)
             setSelectedColour(fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null)
+            setSelectedKarat(fallbackProduct.karat || null)
           } else {
             setProduct(null)
           }
@@ -84,6 +87,7 @@ export default function ProductDetailPage() {
           // Pre-select first options if available
           setSelectedSize(mapped.size_options?.[0] || null)
           setSelectedColour(mapped.colour_variants?.[0]?.colour || mapped.colour_options?.[0] || null)
+          setSelectedKarat(mapped.karat || null)
         }
       } catch (err) {
         console.error('[ProductDetail] Unexpected fetch error:', err)
@@ -93,6 +97,7 @@ export default function ProductDetailPage() {
           setProduct(fallbackProduct)
           setSelectedSize(fallbackProduct.size_options?.[0] || null)
           setSelectedColour(fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null)
+          setSelectedKarat(fallbackProduct.karat || null)
         } else {
           setProduct(null)
         }
@@ -213,7 +218,7 @@ export default function ProductDetailPage() {
 
     // Call addToCart multiple times if quantity > 1
     for (let i = 0; i < quantity; i++) {
-      addToCart(product, selectedSize, selectedColour)
+      addToCart(product, selectedSize, selectedColour, selectedKarat)
     }
 
     setCartStatus("ADDED TO CART ✓")
@@ -258,7 +263,8 @@ export default function ProductDetailPage() {
     )
   }
 
-  const priceResult = calculateProductPrice(product, rate999);
+  const overriddenProduct = product ? { ...product, karat: selectedKarat || product.karat } : null;
+  const priceResult = calculateProductPrice(overriddenProduct, rate999);
   const { hasLivePrice, priceVal: displayPriceVal, price: displayPrice } = priceResult;
 
   const isOnSale = product.comparePriceVal && product.comparePriceVal > displayPriceVal
@@ -280,6 +286,10 @@ export default function ProductDetailPage() {
   if (activeVideoUrl) {
     mediaItems.push({ type: 'video', url: activeVideoUrl });
   }
+
+  const sortedKarats = product.available_karats 
+    ? [...product.available_karats].sort((a, b) => (parseInt(a.replace(/\D/g, '')) || 0) - (parseInt(b.replace(/\D/g, '')) || 0))
+    : [];
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
@@ -549,6 +559,49 @@ export default function ProductDetailPage() {
                   </div>
                 )}
 
+                {/* Karat Selector */}
+                {product.available_karats && product.available_karats.length > 1 ? (
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-3">
+                      <button
+                        onClick={() => setIsKaratOpen(!isKaratOpen)}
+                        className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                      >
+                        <span>SELECT KARAT: {selectedKarat || product.karat || "CHOOSE A KARAT"}</span>
+                        <ChevronDown 
+                          className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isKaratOpen ? 'rotate-180' : ''}`} 
+                        />
+                      </button>
+                    </div>
+                    {isKaratOpen && (
+                      <div className="flex flex-col gap-2 mt-1">
+                        {sortedKarats.map((krt) => (
+                          <button
+                            key={krt}
+                            onClick={() => {
+                              setSelectedKarat(krt)
+                              setIsKaratOpen(false)
+                            }}
+                            className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
+                              selectedKarat === krt
+                                ? "text-[#CDB38B] font-medium"
+                                : "text-[#2E3135] hover:text-[#CDB38B]"
+                            }`}
+                          >
+                            {krt}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mb-6">
+                    <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
+                      KARAT: {product.karat}
+                    </span>
+                  </div>
+                )}
+
                 {/* Colour Selector */}
                 {(product.colour_variants && product.colour_variants.length > 0) ? (
                   <div className="mb-8">
@@ -681,16 +734,16 @@ export default function ProductDetailPage() {
                   Specifications
                 </h3>
                 <div className="border border-[#E5E5E5] text-xs font-inter divide-y divide-[#E5E5E5]">
-                  {product.metal && (
+                  {(selectedColour || product.metalType || product.metal) && (
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Metal & Color</span>
-                      <span className="text-[#2E3135] font-medium">{product.metal}</span>
+                      <span className="text-[#2E3135] font-medium">{selectedColour || product.metalType || product.metal}</span>
                     </div>
                   )}
-                  {product.karat && (
+                  {(selectedKarat || product.karat) && (
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Purity</span>
-                      <span className="text-[#2E3135] font-medium">{product.karat} Gold</span>
+                      <span className="text-[#2E3135] font-medium">{selectedKarat || product.karat}</span>
                     </div>
                   )}
                   {product.weight && (

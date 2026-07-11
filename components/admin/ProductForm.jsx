@@ -252,6 +252,7 @@ export default function ProductForm({ productId }) {
   const [price, setPrice] = useState("");
   const [comparePrice, setComparePrice] = useState("");
   const [karat, setKarat] = useState("14K");
+  const [availableKarats, setAvailableKarats] = useState(["14K"]);
   const [metalType, setMetalType] = useState("yellow gold");
   const [stoneType, setStoneType] = useState("lab diamond");
   const [weight, setWeight] = useState("");
@@ -266,6 +267,21 @@ export default function ProductForm({ productId }) {
   // Collections State
   const [allCollections, setAllCollections] = useState([]);
   const [selectedCollectionIds, setSelectedCollectionIds] = useState([]);
+
+  const handleKaratToggle = (k) => {
+    let newKarats;
+    if (availableKarats.includes(k)) {
+      newKarats = availableKarats.filter((item) => item !== k);
+    } else {
+      newKarats = [...availableKarats, k];
+    }
+    setAvailableKarats(newKarats);
+    if (newKarats.length > 0) {
+      setKarat(newKarats[0]); // Update primary karat
+    } else {
+      setKarat(""); // Validation handles empty
+    }
+  };
 
   const handleAddColourVariant = () => {
     setColourVariants([...colourVariants, { colour: "", swatch_hex: "#E8B4A8", images: ["", "", "", ""], video_url: "" }]);
@@ -417,6 +433,7 @@ export default function ProductForm({ productId }) {
           setPrice(p.price !== undefined ? String(p.price) : "");
           setComparePrice(p.compare_price !== undefined && p.compare_price !== null ? String(p.compare_price) : "");
           setKarat(p.karat || "14K");
+          setAvailableKarats(p.available_karats && p.available_karats.length > 0 ? p.available_karats : (p.karat ? [p.karat] : ["14K"]));
           setMetalType(p.metal_type || "");
           setStoneType(p.stone_type || "");
           setWeight(p.weight_grams !== undefined && p.weight_grams !== null ? String(p.weight_grams) : "");
@@ -480,6 +497,7 @@ export default function ProductForm({ productId }) {
     if (!name || !name.trim()) missingFields.push("Product Name is required");
     if (!category || !category.trim()) missingFields.push("Category is required");
     if (!styleNumber || !styleNumber.trim()) missingFields.push("Style Number is required");
+    if (availableKarats.length === 0) missingFields.push("At least one Karat option must be selected");
     if (!weight || weight.trim() === "") missingFields.push("Weight in grams is required");
     if (!netGoldWeight || netGoldWeight.trim() === "") missingFields.push("Net Gold Weight is required");
     if (!diamondNetAmount || diamondNetAmount.trim() === "") missingFields.push("Diamond Net Amount is required");
@@ -543,6 +561,7 @@ export default function ProductForm({ productId }) {
       price: finalPriceToSave,
       compare_price: comparePrice ? parseFloat(comparePrice) : null,
       karat,
+      available_karats: availableKarats,
       metal_type: metalType,
       stone_type: stoneType,
       weight_grams: weight ? parseFloat(weight) : null,
@@ -729,19 +748,21 @@ export default function ProductForm({ productId }) {
             {/* Karat */}
             <div className="flex flex-col space-y-1.5">
               <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                Karat
+                Available Karats <span className="text-red-500">*</span>
               </label>
-              <select
-                value={karat}
-                onChange={(e) => setKarat(e.target.value)}
-                className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-white rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all cursor-pointer"
-              >
+              <div className="flex flex-wrap gap-3 mt-1">
                 {karats.map((k) => (
-                  <option key={k} value={k}>
-                    {k}
-                  </option>
+                  <label key={k} className="flex items-center space-x-2 cursor-pointer font-inter text-[13px] text-[#2E3135]">
+                    <input
+                      type="checkbox"
+                      checked={availableKarats.includes(k)}
+                      onChange={() => handleKaratToggle(k)}
+                      className="w-4 h-4 text-[#2E3135] bg-white border-[#E5E5E5] rounded focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#2E3135]"
+                    />
+                    <span>{k}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
 
             {/* Price */}

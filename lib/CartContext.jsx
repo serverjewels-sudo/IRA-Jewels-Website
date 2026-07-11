@@ -80,9 +80,9 @@ export const CartProvider = ({ children }) => {
   }, [items, isLoaded]);
 
   // Add to cart function
-  const addToCart = (product, selectedSize = null, selectedColour = null) => {
+  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null) => {
     // Construct a unique composite key for item variation
-    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}`;
+    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}`;
     
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex((item) => item.productId === cartItemId);
@@ -114,7 +114,7 @@ export const CartProvider = ({ children }) => {
           making_net_amount: product.making_net_amount,
           other_net_amount: product.other_net_amount,
           gst_percentage: product.gst_percentage,
-          karat: product.karat,
+          karat: selectedKarat || product.karat,
           
           // Legacy / fallback fields:
           price: product.price,

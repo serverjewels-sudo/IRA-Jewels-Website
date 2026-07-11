@@ -134,6 +134,11 @@ export default function Footer() {
               GSTIN: 24AAHCI5512M1ZH
             </div>
           </div>
+          <div className="flex space-x-6">
+            <Link href="/privacy-policy" className="text-[11px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300 uppercase tracking-widest">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

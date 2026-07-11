@@ -746,7 +746,9 @@ export default function CheckoutPage() {
               {cartItemsWithPrice.map((item) => {
                 const variationDetails = [
                   item.selectedSize ? `Size: ${item.selectedSize}` : null,
-                  item.selectedColour ? `Colour: ${item.selectedColour}` : null
+                  item.selectedColour ? `Colour: ${item.selectedColour}` : null,
+                  item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
+                  item.karat ? `Karat: ${item.karat}` : null
                 ]
                   .filter(Boolean)
                   .join("  •  ");

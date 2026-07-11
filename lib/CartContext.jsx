@@ -80,9 +80,9 @@ export const CartProvider = ({ children }) => {
   }, [items, isLoaded]);
 
   // Add to cart function
-  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null) => {
+  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null, selectedShape = null) => {
     // Construct a unique composite key for item variation
-    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}`;
+    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}-${selectedShape || "default"}`;
     
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex((item) => item.productId === cartItemId);
@@ -106,6 +106,7 @@ export const CartProvider = ({ children }) => {
           image: image,
           selectedSize: selectedSize,
           selectedColour: selectedColour,
+          selectedShape: selectedShape,
           quantity: 1,
           
           // Raw pricing component fields:

@@ -4,8 +4,20 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { calculateProductPrice } from "@/lib/priceUtils";
+import { StoneShapeIcon } from "@/components/ui/StoneShapeIcons";
 
-
+const ALL_SHAPES = [
+  { id: "round", name: "Round" },
+  { id: "princess", name: "Princess" },
+  { id: "oval", name: "Oval" },
+  { id: "cushion", name: "Cushion" },
+  { id: "emerald", name: "Emerald" },
+  { id: "pear", name: "Pear" },
+  { id: "marquise", name: "Marquise" },
+  { id: "radiant", name: "Radiant" },
+  { id: "asscher", name: "Asscher" },
+  { id: "heart", name: "Heart" },
+];
 const categories = [
   "rings",
   "necklaces",
@@ -284,7 +296,7 @@ export default function ProductForm({ productId }) {
   };
 
   const handleAddColourVariant = () => {
-    setColourVariants([...colourVariants, { colour: "", swatch_hex: "#E8B4A8", images: ["", "", "", ""], video_url: "" }]);
+    setColourVariants([...colourVariants, { colour: "", swatch_hex: "#E8B4A8", images: ["", "", "", ""], video_url: "", shapes: [] }]);
   };
 
   const handleRemoveColourVariant = (index) => {
@@ -504,8 +516,13 @@ export default function ProductForm({ productId }) {
     if (!gstPercentage || gstPercentage.trim() === "") missingFields.push("GST % is required");
     
     if (colourVariants.length > 0) {
-      if (colourVariants.some(v => !v.images[0] || !v.images[0].trim())) {
-        missingFields.push("Main Image is required for all colour variants");
+      if (colourVariants.some(v => {
+        if (v.shapes && v.shapes.length > 0) {
+          return v.shapes.some(s => !s.images[0] || !s.images[0].trim());
+        }
+        return !v.images[0] || !v.images[0].trim();
+      })) {
+        missingFields.push("Main Image is required for all colour variants and their selected shapes");
       }
       if (colourVariants.some(v => !v.colour || !v.colour.trim())) {
         missingFields.push("Colour Name is required for all colour variants");
@@ -538,8 +555,14 @@ export default function ProductForm({ productId }) {
     let videoUrlPayload = videoUrl ? videoUrl.trim() : null;
     
     if (colourVariants.length > 0) {
-      imagesPayload = colourVariants[0].images.map(img => img ? img.trim() : "");
-      videoUrlPayload = colourVariants[0].video_url ? colourVariants[0].video_url.trim() : null;
+      const firstVariant = colourVariants[0];
+      if (firstVariant.shapes && firstVariant.shapes.length > 0) {
+        imagesPayload = firstVariant.shapes[0].images.map(img => img ? img.trim() : "");
+        videoUrlPayload = firstVariant.shapes[0].video_url ? firstVariant.shapes[0].video_url.trim() : null;
+      } else {
+        imagesPayload = firstVariant.images.map(img => img ? img.trim() : "");
+        videoUrlPayload = firstVariant.video_url ? firstVariant.video_url.trim() : null;
+      }
     }
 
     // Always use the live-calculated price for the database price field
@@ -1055,51 +1078,166 @@ export default function ProductForm({ productId }) {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-                    <ImageUploadBox 
-                      label="Main Image"
-                      index={0}
-                      currentUrl={variant.images[0]}
-                      setImages={(updater) => {
-                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
-                        handleVariantChange(index, "images", newImages);
-                      }}
-                      isRequired={true}
-                      hasError={validated && !variant.images[0]}
-                    />
-                    <ImageUploadBox 
-                      label="Close-Up"
-                      index={1}
-                      currentUrl={variant.images[1]}
-                      setImages={(updater) => {
-                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
-                        handleVariantChange(index, "images", newImages);
-                      }}
-                    />
-                    <ImageUploadBox 
-                      label="Side View"
-                      index={2}
-                      currentUrl={variant.images[2]}
-                      setImages={(updater) => {
-                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
-                        handleVariantChange(index, "images", newImages);
-                      }}
-                    />
-                    <ImageUploadBox 
-                      label="Worn Shot"
-                      index={3}
-                      currentUrl={variant.images[3]}
-                      setImages={(updater) => {
-                        const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
-                        handleVariantChange(index, "images", newImages);
-                      }}
-                    />
-                    <VideoUploadBox 
-                      label="Video"
-                      currentUrl={variant.video_url}
-                      setVideoUrl={(url) => handleVariantChange(index, "video_url", url)}
-                    />
+                  <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
+                    <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase mb-3 block">
+                      Available Shapes (Optional)
+                    </label>
+                    <div className="flex flex-wrap gap-4">
+                      {ALL_SHAPES.map((shape) => {
+                        const isChecked = (variant.shapes || []).some(s => s.shape_id === shape.id);
+                        return (
+                          <label key={shape.id} className="flex items-center space-x-2 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const currentShapes = variant.shapes || [];
+                                let newShapes;
+                                if (e.target.checked) {
+                                  newShapes = [...currentShapes, { shape_id: shape.id, images: ["", "", "", ""], video_url: "" }];
+                                } else {
+                                  newShapes = currentShapes.filter(s => s.shape_id !== shape.id);
+                                }
+                                handleVariantChange(index, "shapes", newShapes);
+                              }}
+                              className="w-4 h-4 text-[#2E3135] bg-white border-[#E5E5E5] rounded focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#2E3135]"
+                            />
+                            <StoneShapeIcon shapeId={shape.id} className="w-5 h-5 text-[#2E3135] opacity-70 group-hover:opacity-100 transition-opacity" />
+                            <span className="font-inter text-[12px] text-[#2E3135]">{shape.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {(variant.shapes && variant.shapes.length > 0) && (
+                    <div className="mt-4 bg-blue-50 border border-blue-100 text-blue-800 px-4 py-3 rounded-md font-inter text-[12px]">
+                      <strong>Note:</strong> Shapes are enabled. The Colour-level images below will not be shown to customers. They act only as a fallback if all shapes are later removed.
+                    </div>
+                  )}
+
+                  <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
+                    <h5 className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase mb-4">
+                      Colour-Level Images (Fallback)
+                    </h5>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                      <ImageUploadBox 
+                        label="Main Image"
+                        index={0}
+                        currentUrl={variant.images[0]}
+                        setImages={(updater) => {
+                          const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                          handleVariantChange(index, "images", newImages);
+                        }}
+                        isRequired={!(variant.shapes && variant.shapes.length > 0)}
+                        hasError={validated && !(variant.shapes && variant.shapes.length > 0) && !variant.images[0]}
+                      />
+                      <ImageUploadBox 
+                        label="Close-Up"
+                        index={1}
+                        currentUrl={variant.images[1]}
+                        setImages={(updater) => {
+                          const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                          handleVariantChange(index, "images", newImages);
+                        }}
+                      />
+                      <ImageUploadBox 
+                        label="Side View"
+                        index={2}
+                        currentUrl={variant.images[2]}
+                        setImages={(updater) => {
+                          const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                          handleVariantChange(index, "images", newImages);
+                        }}
+                      />
+                      <ImageUploadBox 
+                        label="Worn Shot"
+                        index={3}
+                        currentUrl={variant.images[3]}
+                        setImages={(updater) => {
+                          const newImages = typeof updater === 'function' ? updater(variant.images) : updater;
+                          handleVariantChange(index, "images", newImages);
+                        }}
+                      />
+                      <VideoUploadBox 
+                        label="Video"
+                        currentUrl={variant.video_url}
+                        setVideoUrl={(url) => handleVariantChange(index, "video_url", url)}
+                      />
+                    </div>
+                  </div>
+
+                  {(variant.shapes && variant.shapes.length > 0) && (
+                    <div className="mt-6 space-y-6">
+                      {variant.shapes.map((shapeItem, shapeIdx) => {
+                        const shapeMeta = ALL_SHAPES.find(s => s.id === shapeItem.shape_id);
+                        return (
+                          <div key={shapeItem.shape_id} className="p-4 border border-[#E5E5E5] rounded bg-white">
+                            <h5 className="font-inter text-[12px] font-semibold uppercase tracking-wider text-[#2E3135] mb-4">
+                              {shapeMeta?.name} — Photos
+                            </h5>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                              <ImageUploadBox 
+                                label="Main Image"
+                                index={0}
+                                currentUrl={shapeItem.images[0]}
+                                setImages={(updater) => {
+                                  const newImages = typeof updater === 'function' ? updater(shapeItem.images) : updater;
+                                  const newShapes = [...variant.shapes];
+                                  newShapes[shapeIdx].images = newImages;
+                                  handleVariantChange(index, "shapes", newShapes);
+                                }}
+                                isRequired={true}
+                                hasError={validated && !shapeItem.images[0]}
+                              />
+                              <ImageUploadBox 
+                                label="Close-Up"
+                                index={1}
+                                currentUrl={shapeItem.images[1]}
+                                setImages={(updater) => {
+                                  const newImages = typeof updater === 'function' ? updater(shapeItem.images) : updater;
+                                  const newShapes = [...variant.shapes];
+                                  newShapes[shapeIdx].images = newImages;
+                                  handleVariantChange(index, "shapes", newShapes);
+                                }}
+                              />
+                              <ImageUploadBox 
+                                label="Side View"
+                                index={2}
+                                currentUrl={shapeItem.images[2]}
+                                setImages={(updater) => {
+                                  const newImages = typeof updater === 'function' ? updater(shapeItem.images) : updater;
+                                  const newShapes = [...variant.shapes];
+                                  newShapes[shapeIdx].images = newImages;
+                                  handleVariantChange(index, "shapes", newShapes);
+                                }}
+                              />
+                              <ImageUploadBox 
+                                label="Worn Shot"
+                                index={3}
+                                currentUrl={shapeItem.images[3]}
+                                setImages={(updater) => {
+                                  const newImages = typeof updater === 'function' ? updater(shapeItem.images) : updater;
+                                  const newShapes = [...variant.shapes];
+                                  newShapes[shapeIdx].images = newImages;
+                                  handleVariantChange(index, "shapes", newShapes);
+                                }}
+                              />
+                              <VideoUploadBox 
+                                label="Video"
+                                currentUrl={shapeItem.video_url}
+                                setVideoUrl={(url) => {
+                                  const newShapes = [...variant.shapes];
+                                  newShapes[shapeIdx].video_url = url;
+                                  handleVariantChange(index, "shapes", newShapes);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

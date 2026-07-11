@@ -11,6 +11,7 @@ import { supabase, mapSupabaseProduct } from '@/lib/supabase'
 import { sampleProducts } from '@/lib/products'
 import ReviewSection from '@/components/product/ReviewSection'
 import { calculateProductPrice } from '@/lib/priceUtils'
+import { StoneShapeIcon } from '@/components/ui/StoneShapeIcons'
 
 export default function ProductDetailPage() {
   const { slug } = useParams()
@@ -29,6 +30,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState(null)
   const [selectedColour, setSelectedColour] = useState(null)
   const [selectedKarat, setSelectedKarat] = useState(null)
+  const [selectedShape, setSelectedShape] = useState(null)
   const [quantity, setQuantity] = useState(1)
   
   // Wishlist state
@@ -74,9 +76,12 @@ export default function ProductDetailPage() {
           const fallbackProduct = sampleProducts.find(p => p.slug === slug)
           if (fallbackProduct) {
             setProduct(fallbackProduct)
-            // Pre-select first options if available
             setSelectedSize(fallbackProduct.size_options?.[0] || null)
-            setSelectedColour(fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null)
+            const fallbackColour = fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null;
+            setSelectedColour(fallbackColour)
+            if (fallbackProduct.colour_variants?.[0]?.shapes && fallbackProduct.colour_variants[0].shapes.length > 0) {
+              setSelectedShape(fallbackProduct.colour_variants[0].shapes[0].shape_id)
+            }
             setSelectedKarat(fallbackProduct.karat || null)
           } else {
             setProduct(null)
@@ -84,19 +89,25 @@ export default function ProductDetailPage() {
         } else {
           const mapped = mapSupabaseProduct(data)
           setProduct(mapped)
-          // Pre-select first options if available
           setSelectedSize(mapped.size_options?.[0] || null)
-          setSelectedColour(mapped.colour_variants?.[0]?.colour || mapped.colour_options?.[0] || null)
+          const mappedColour = mapped.colour_variants?.[0]?.colour || mapped.colour_options?.[0] || null;
+          setSelectedColour(mappedColour)
+          if (mapped.colour_variants?.[0]?.shapes && mapped.colour_variants[0].shapes.length > 0) {
+            setSelectedShape(mapped.colour_variants[0].shapes[0].shape_id)
+          }
           setSelectedKarat(mapped.karat || null)
         }
       } catch (err) {
         console.error('[ProductDetail] Unexpected fetch error:', err)
-        // Fallback check
         const fallbackProduct = sampleProducts.find(p => p.slug === slug)
         if (fallbackProduct) {
           setProduct(fallbackProduct)
           setSelectedSize(fallbackProduct.size_options?.[0] || null)
-          setSelectedColour(fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null)
+          const fallbackColour = fallbackProduct.colour_variants?.[0]?.colour || fallbackProduct.colour_options?.[0] || null;
+          setSelectedColour(fallbackColour)
+          if (fallbackProduct.colour_variants?.[0]?.shapes && fallbackProduct.colour_variants[0].shapes.length > 0) {
+            setSelectedShape(fallbackProduct.colour_variants[0].shapes[0].shape_id)
+          }
           setSelectedKarat(fallbackProduct.karat || null)
         } else {
           setProduct(null)
@@ -218,7 +229,7 @@ export default function ProductDetailPage() {
 
     // Call addToCart multiple times if quantity > 1
     for (let i = 0; i < quantity; i++) {
-      addToCart(product, selectedSize, selectedColour, selectedKarat)
+      addToCart(product, selectedSize, selectedColour, selectedKarat, selectedShape)
     }
 
     setCartStatus("ADDED TO CART ✓")
@@ -276,13 +287,19 @@ export default function ProductDetailPage() {
     ? product.colour_variants.find(v => v.colour === selectedColour) || product.colour_variants[0]
     : null;
 
-  const validImages = activeVariant 
-    ? (activeVariant.images || []).filter(img => img && img.trim() !== "")
-    : product.images ? product.images.filter(img => img && img.trim() !== "") : [];
+  const activeShape = activeVariant && activeVariant.shapes && activeVariant.shapes.length > 0
+    ? activeVariant.shapes.find(s => s.shape_id === selectedShape) || activeVariant.shapes[0]
+    : null;
+
+  const validImages = activeShape 
+    ? (activeShape.images || []).filter(img => img && img.trim() !== "")
+    : activeVariant 
+      ? (activeVariant.images || []).filter(img => img && img.trim() !== "")
+      : product.images ? product.images.filter(img => img && img.trim() !== "") : [];
   
   const mediaItems = validImages.map(img => ({ type: 'image', url: img }));
   
-  const activeVideoUrl = activeVariant ? activeVariant.video_url : product.video_url;
+  const activeVideoUrl = activeShape ? activeShape.video_url : (activeVariant ? activeVariant.video_url : product.video_url);
   if (activeVideoUrl) {
     mediaItems.push({ type: 'video', url: activeVideoUrl });
   }
@@ -519,141 +536,194 @@ export default function ProductDetailPage() {
                   {product.description || "Indulge in absolute luxury. Meticulously handcrafted by master artisans, this piece features premium conflict-free lab-grown diamonds, delivering brilliance and ethical sophistication for everyday elegance."}
                 </p>
 
-                {/* Size Selector */}
-                {product.size_options && product.size_options.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-3">
-                      <button
-                        onClick={() => setIsSizeOpen(!isSizeOpen)}
-                        className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
-                      >
-                        <span>SELECT SIZE: {selectedSize || "CHOOSE A SIZE"}</span>
-                        <ChevronDown 
-                          className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isSizeOpen ? 'rotate-180' : ''}`} 
-                        />
-                      </button>
-                      <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider">
-                        Size Guide
-                      </Link>
-                    </div>
-                    {isSizeOpen && (
-                      <div className="flex flex-col gap-2 mt-1">
-                        {product.size_options.map((sz) => (
+                {/* Row 1: Size & Karat */}
+                {(product.size_options?.length > 0 || product.karat) && (
+                  <div className={`grid grid-cols-1 ${(product.size_options?.length > 0 && product.karat) ? 'sm:grid-cols-2' : ''} gap-x-6 gap-y-6 mb-6`}>
+                    
+                    {/* Size Selector */}
+                    {product.size_options && product.size_options.length > 0 && (
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
                           <button
-                            key={sz}
-                            onClick={() => {
-                              setSelectedSize(sz)
-                              setIsSizeOpen(false)
-                            }}
-                            className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
-                              selectedSize === sz
-                                ? "text-[#CDB38B] font-medium"
-                                : "text-[#2E3135] hover:text-[#CDB38B]"
-                            }`}
+                            onClick={() => setIsSizeOpen(!isSizeOpen)}
+                            className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
                           >
-                            {sz}
+                            <span>SELECT SIZE: {selectedSize || "CHOOSE A SIZE"}</span>
+                            <ChevronDown 
+                              className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isSizeOpen ? 'rotate-180' : ''}`} 
+                            />
                           </button>
-                        ))}
+                          <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider">
+                            Size Guide
+                          </Link>
+                        </div>
+                        {isSizeOpen && (
+                          <div className="flex flex-col gap-2 mt-1">
+                            {product.size_options.map((sz) => (
+                              <button
+                                key={sz}
+                                onClick={() => {
+                                  setSelectedSize(sz)
+                                  setIsSizeOpen(false)
+                                }}
+                                className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
+                                  selectedSize === sz
+                                    ? "text-[#CDB38B] font-medium"
+                                    : "text-[#2E3135] hover:text-[#CDB38B]"
+                                }`}
+                              >
+                                {sz}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Karat Selector */}
+                    {product.karat && (
+                      <div>
+                        {product.available_karats && product.available_karats.length > 1 ? (
+                          <>
+                            <div className="flex justify-between items-center mb-3">
+                              <button
+                                onClick={() => setIsKaratOpen(!isKaratOpen)}
+                                className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                              >
+                                <span>SELECT KARAT: {selectedKarat || product.karat || "CHOOSE A KARAT"}</span>
+                                <ChevronDown 
+                                  className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isKaratOpen ? 'rotate-180' : ''}`} 
+                                />
+                              </button>
+                            </div>
+                            {isKaratOpen && (
+                              <div className="flex flex-col gap-2 mt-1">
+                                {sortedKarats.map((krt) => (
+                                  <button
+                                    key={krt}
+                                    onClick={() => {
+                                      setSelectedKarat(krt)
+                                      setIsKaratOpen(false)
+                                    }}
+                                    className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
+                                      selectedKarat === krt
+                                        ? "text-[#CDB38B] font-medium"
+                                        : "text-[#2E3135] hover:text-[#CDB38B]"
+                                    }`}
+                                  >
+                                    {krt}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] flex items-center h-[34px]">
+                            KARAT: {product.karat}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Karat Selector */}
-                {product.available_karats && product.available_karats.length > 1 ? (
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-3">
-                      <button
-                        onClick={() => setIsKaratOpen(!isKaratOpen)}
-                        className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
-                      >
-                        <span>SELECT KARAT: {selectedKarat || product.karat || "CHOOSE A KARAT"}</span>
-                        <ChevronDown 
-                          className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isKaratOpen ? 'rotate-180' : ''}`} 
-                        />
-                      </button>
-                    </div>
-                    {isKaratOpen && (
-                      <div className="flex flex-col gap-2 mt-1">
-                        {sortedKarats.map((krt) => (
-                          <button
-                            key={krt}
-                            onClick={() => {
-                              setSelectedKarat(krt)
-                              setIsKaratOpen(false)
-                            }}
-                            className={`text-left text-[12px] font-inter transition-colors focus:outline-none ${
-                              selectedKarat === krt
-                                ? "text-[#CDB38B] font-medium"
-                                : "text-[#2E3135] hover:text-[#CDB38B]"
-                            }`}
-                          >
-                            {krt}
-                          </button>
-                        ))}
+                {/* Row 2: Tone & Shape */}
+                {((product.colour_variants?.length > 0 || product.colour_options?.length > 0) || (activeVariant?.shapes?.length > 0)) && (
+                  <div className={`grid grid-cols-1 ${
+                    ((product.colour_variants?.length > 0 || product.colour_options?.length > 0) && (activeVariant?.shapes?.length > 0)) ? 'sm:grid-cols-2' : ''
+                  } gap-x-6 gap-y-6 mb-8`}>
+                    
+                    {/* Colour Selector */}
+                    {((product.colour_variants && product.colour_variants.length > 0) || (product.colour_options && product.colour_options.length > 0)) && (
+                      <div>
+                        {product.colour_variants && product.colour_variants.length > 0 ? (
+                          <>
+                            <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                              Select Tone: {selectedColour}
+                            </span>
+                            <div className="flex flex-wrap gap-3">
+                              {product.colour_variants.map((variant) => (
+                                <button
+                                  key={variant.colour}
+                                  onClick={() => {
+                                    setSelectedColour(variant.colour)
+                                    if (variant.shapes && variant.shapes.length > 0) {
+                                      if (!variant.shapes.some(s => s.shape_id === selectedShape)) {
+                                        setSelectedShape(variant.shapes[0].shape_id);
+                                      }
+                                    } else {
+                                      setSelectedShape(null);
+                                    }
+                                    setActiveImageIndex(0)
+                                  }}
+                                  aria-label={`Select ${variant.colour}`}
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                    selectedColour === variant.colour
+                                      ? "ring-1 ring-offset-2 ring-[#2E3135]"
+                                      : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
+                                  }`}
+                                >
+                                  <span 
+                                    className="w-full h-full rounded-full border border-black/10" 
+                                    style={{ backgroundColor: variant.swatch_hex || '#e5e5e5' }}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                              Select Tone
+                            </span>
+                            <div className="flex flex-wrap gap-2">
+                              {product.colour_options.map((col) => (
+                                <button
+                                  key={col}
+                                  onClick={() => setSelectedColour(col)}
+                                  className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
+                                    selectedColour === col
+                                      ? "bg-[#2E3135] border-[#2E3135] text-white"
+                                      : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                                  }`}
+                                >
+                                  {col}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Shape Selector */}
+                    {activeVariant && activeVariant.shapes && activeVariant.shapes.length > 0 && (
+                      <div>
+                        <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                          Select Stone Shape: {selectedShape ? selectedShape.charAt(0).toUpperCase() + selectedShape.slice(1) : ""}
+                        </span>
+                        <div className="flex flex-wrap gap-3">
+                          {activeVariant.shapes.map((shapeItem) => (
+                            <button
+                              key={shapeItem.shape_id}
+                              onClick={() => {
+                                setSelectedShape(shapeItem.shape_id)
+                                setActiveImageIndex(0)
+                              }}
+                              title={shapeItem.shape_id.charAt(0).toUpperCase() + shapeItem.shape_id.slice(1)}
+                              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                selectedShape === shapeItem.shape_id
+                                  ? "bg-[#2E3135] text-white"
+                                  : "bg-white border border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                              }`}
+                            >
+                              <StoneShapeIcon shapeId={shapeItem.shape_id} className="w-5 h-5" />
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div className="mb-6">
-                    <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
-                      KARAT: {product.karat}
-                    </span>
-                  </div>
-                )}
-
-                {/* Colour Selector */}
-                {(product.colour_variants && product.colour_variants.length > 0) ? (
-                  <div className="mb-8">
-                    <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                      Select Tone: {selectedColour}
-                    </span>
-                    <div className="flex flex-wrap gap-3">
-                      {product.colour_variants.map((variant) => (
-                        <button
-                          key={variant.colour}
-                          onClick={() => {
-                            setSelectedColour(variant.colour)
-                            setActiveImageIndex(0)
-                          }}
-                          aria-label={`Select ${variant.colour}`}
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                            selectedColour === variant.colour
-                              ? "ring-1 ring-offset-2 ring-[#2E3135]"
-                              : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
-                          }`}
-                        >
-                          <span 
-                            className="w-full h-full rounded-full border border-black/10" 
-                            style={{ backgroundColor: variant.swatch_hex || '#e5e5e5' }}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  product.colour_options && product.colour_options.length > 0 && (
-                    <div className="mb-8">
-                      <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                        Select Tone
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {product.colour_options.map((col) => (
-                          <button
-                            key={col}
-                            onClick={() => setSelectedColour(col)}
-                            className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
-                              selectedColour === col
-                                ? "bg-[#2E3135] border-[#2E3135] text-white"
-                                : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
-                            }`}
-                          >
-                            {col}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )
                 )}
 
                 {/* Quantity & Actions Stack */}

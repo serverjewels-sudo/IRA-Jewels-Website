@@ -60,7 +60,7 @@ export default function AboutPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Card 1 */}
-              <div className="bg-white rounded-[12px] p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-start transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1">
+              <div id="craftsmanship" className="bg-white rounded-[12px] p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-start transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1">
                 <div className="flex items-center justify-center mb-6">
                   {/* Diamond SVG icon */}
                   <svg 
@@ -87,7 +87,7 @@ export default function AboutPage() {
               </div>
 
               {/* Card 2 */}
-              <div className="bg-white rounded-[12px] p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-start transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1">
+              <div id="our-diamonds" className="bg-white rounded-[12px] p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-start transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1">
                 <div className="flex items-center justify-center mb-6">
                   {/* Sparkle SVG icon */}
                   <svg 
@@ -114,7 +114,7 @@ export default function AboutPage() {
               </div>
 
               {/* Card 3 */}
-              <div className="bg-white rounded-[12px] p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-start transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1">
+              <div id="our-promise" className="bg-white rounded-[12px] p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-start transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1">
                 <div className="flex items-center justify-center mb-6">
                   {/* Shield Check SVG icon */}
                   <svg 

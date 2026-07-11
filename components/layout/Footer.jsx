@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="w-full bg-[#FFFFFF] border-t border-[#F3F1EC] pt-16 pb-12 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Top: Columns Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-10 mb-16">
           {/* Column 0: Logo & Bio */}
           <div className="flex flex-col space-y-4">
             <div className="font-serif text-[20px] tracking-[0.2em] text-[#2E3135] uppercase">
@@ -110,15 +110,44 @@ export default function Footer() {
                   Blog
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          {/* Column 4: About */}
+          <div>
+            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+              About
+            </h3>
+            <ul className="space-y-3">
               <li>
-                <Link href="/about" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                <Link href="/about#brand-mission" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Our Story
+                </Link>
+              </li>
+              <li>
+                <Link href="/about#our-diamonds" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  Our Diamonds
+                </Link>
+              </li>
+              <li>
+                <Link href="/about#craftsmanship" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  Craftsmanship
+                </Link>
+              </li>
+              <li>
+                <Link href="/about#our-promise" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  Our Promise
+                </Link>
+              </li>
+              <li>
+                <Link href="/about#founder-note" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  Our Philosophy
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Connect */}
+          {/* Column 5: Connect */}
           <div>
             <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
               Connect

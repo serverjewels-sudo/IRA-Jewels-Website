@@ -233,6 +233,11 @@ export default function CheckoutPage() {
           selectedColour: item.selectedColour || null,
           selectedShape: item.selectedShape || null,
           karat: item.karat || null,
+          hasEngraving: item.hasEngraving || false,
+          engravingFont: item.engravingFont || null,
+          engravingText: item.engravingText || null,
+          style_number: item.style_number || null,
+          sku: item.sku || null,
         };
       });
 

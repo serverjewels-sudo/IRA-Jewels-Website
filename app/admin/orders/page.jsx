@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import React from "react";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrderIds, setExpandedOrderIds] = useState(new Set());
 
   async function fetchOrders() {
     try {
@@ -101,6 +104,18 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const toggleOrderExpand = (orderId) => {
+    setExpandedOrderIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+      } else {
+        next.add(orderId);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="space-y-8">
       {/* Header section */}
@@ -156,51 +171,121 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#2E3135]/5 font-inter text-[13px] text-[#2E3135]">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#F3F1EC]/20 transition-colors">
-                    <td className="p-5 font-medium tracking-wide">
-                      <span className="font-mono text-[12px]">{order.order_number}</span>
-                      <span className="block font-mono text-[9px] text-gray-400 mt-0.5">{order.id}</span>
-                    </td>
-                    <td className="p-5">
-                      <div className="font-medium">{order.customer_name || "Guest User"}</div>
-                      <div className="text-[11px] text-gray-400">{order.customer_email || "no-email"}</div>
-                      {order.customer_phone && <div className="text-[10px] text-gray-400 mt-0.5">{order.customer_phone}</div>}
-                    </td>
-                    <td className="p-5 text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="p-5 text-right font-medium text-[14px]">
-                      ₹{Number(order.total).toLocaleString("en-IN")}
-                    </td>
-                    <td className="p-5 text-center">
-                      <span className="font-medium">{getPaymentMethodLabel(order.payment_method)}</span>
-                      <span className="block text-[9px] uppercase tracking-wider text-gray-400 mt-0.5">{order.payment_status}</span>
-                    </td>
-                    <td className="p-5 text-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase ${getStatusBadgeClass(order.status)}`}>
-                        {order.status || "placed"}
-                      </span>
-                    </td>
-                    <td className="p-5 text-center">
-                      <select
-                        value={order.status || "placed"}
-                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className="bg-white border border-[#E0E0E0] rounded px-2.5 py-1.5 font-inter text-[12px] text-[#2E3135] focus:outline-none focus:border-[#2E3135] cursor-pointer"
-                      >
-                        <option value="placed">Placed</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
+                {orders.map((order) => {
+                  const isExpanded = expandedOrderIds.has(order.id);
+                  const items = Array.isArray(order.items) ? order.items : [];
+                  return (
+                    <React.Fragment key={order.id}>
+                      <tr className="hover:bg-[#F3F1EC]/20 transition-colors">
+                        <td className="p-5 font-medium tracking-wide">
+                          <button
+                            onClick={() => toggleOrderExpand(order.id)}
+                            className="flex items-center gap-2 text-left focus:outline-none group"
+                          >
+                            <span className="font-mono text-[12px] group-hover:text-[#CDB38B] transition-colors">{order.order_number}</span>
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-[#CDB38B]" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-[#888] group-hover:text-[#CDB38B]" />
+                            )}
+                          </button>
+                          <span className="block font-mono text-[9px] text-gray-400 mt-0.5">{order.id}</span>
+                        </td>
+                        <td className="p-5">
+                          <div className="font-medium">{order.customer_name || "Guest User"}</div>
+                          <div className="text-[11px] text-gray-400">{order.customer_email || "no-email"}</div>
+                          {order.customer_phone && <div className="text-[10px] text-gray-400 mt-0.5">{order.customer_phone}</div>}
+                        </td>
+                        <td className="p-5 text-gray-500">
+                          {new Date(order.created_at).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="p-5 text-right font-medium text-[14px]">
+                          ₹{Number(order.total).toLocaleString("en-IN")}
+                        </td>
+                        <td className="p-5 text-center">
+                          <span className="font-medium">{getPaymentMethodLabel(order.payment_method)}</span>
+                          <span className="block text-[9px] uppercase tracking-wider text-gray-400 mt-0.5">{order.payment_status}</span>
+                        </td>
+                        <td className="p-5 text-center">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase ${getStatusBadgeClass(order.status)}`}>
+                            {order.status || "placed"}
+                          </span>
+                        </td>
+                        <td className="p-5 text-center">
+                          <select
+                            value={order.status || "placed"}
+                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                            className="bg-white border border-[#E0E0E0] rounded px-2.5 py-1.5 font-inter text-[12px] text-[#2E3135] focus:outline-none focus:border-[#2E3135] cursor-pointer"
+                          >
+                            <option value="placed">Placed</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                      </tr>
+                      
+                      {/* Expanded Items Row */}
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan="7" className="p-0 border-b border-[#2E3135]/10 bg-[#FAFAFA]">
+                            <div className="p-6">
+                              <h4 className="font-inter font-medium text-[11px] tracking-[1.5px] text-[#888] uppercase mb-4">Order Items</h4>
+                              <div className="space-y-4">
+                                {items.length > 0 ? items.map((item, idx) => {
+                                  const variationDetails = [
+                                    item.style_number ? `Style: ${item.style_number}` : null,
+                                    item.sku ? `SKU: ${item.sku}` : null,
+                                    item.selectedSize ? `Size: ${item.selectedSize}` : null,
+                                    item.selectedColour ? `Colour: ${item.selectedColour}` : null,
+                                    item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
+                                    item.karat ? `Karat: ${item.karat}` : null
+                                  ].filter(Boolean).join(" • ");
+
+                                  return (
+                                    <div key={idx} className="flex gap-4 items-start bg-white p-4 border border-[#E0E0E0] rounded-md shadow-sm">
+                                      {item.image && (
+                                        <div className="w-16 h-16 flex-shrink-0 bg-[#F3F1EC] rounded overflow-hidden border border-[#E5E5E5]">
+                                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        </div>
+                                      )}
+                                      <div className="flex-grow">
+                                        <div className="flex justify-between items-start">
+                                          <h5 className="font-inter font-medium text-[14px] text-[#2E3135]">{item.name}</h5>
+                                          <span className="font-inter font-medium text-[14px] text-[#2E3135]">
+                                            {item.quantity} x ₹{Number(item.price).toLocaleString("en-IN")}
+                                          </span>
+                                        </div>
+                                        {variationDetails && (
+                                          <p className="font-inter text-[12px] text-[#888] mt-1">{variationDetails}</p>
+                                        )}
+                                        {item.hasEngraving && (
+                                          <div className="mt-3 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-3 py-2 rounded">
+                                            <span className="font-inter font-semibold text-[11px] uppercase tracking-wider block mb-1">Personalization</span>
+                                            <span className="font-inter text-[13px]">
+                                              Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[15px]' : ''}>"{item.engravingText}"</strong>
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                }) : (
+                                  <p className="font-inter text-[13px] text-[#888]">No items data found for this order.</p>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

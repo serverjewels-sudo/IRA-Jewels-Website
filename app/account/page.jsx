@@ -160,9 +160,38 @@ export default function AccountPage() {
                               year: "numeric",
                             })}
                           </div>
-                          <div className="text-[12px] text-[#2E3135]/80">
+                          <div className="text-[12px] text-[#2E3135]/80 mb-2">
                             {itemCount} {itemCount === 1 ? "item" : "items"}
                           </div>
+                          
+                          {/* Item Details List */}
+                          {Array.isArray(order.items) && order.items.length > 0 && (
+                            <div className="mt-3 space-y-3 border-t border-[#E5E5E5] pt-3">
+                              {order.items.map((item, idx) => {
+                                const variationDetails = [
+                                  item.selectedSize ? `Size: ${item.selectedSize}` : null,
+                                  item.selectedColour ? `Colour: ${item.selectedColour}` : null,
+                                  item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
+                                  item.karat ? `Karat: ${item.karat}` : null
+                                ].filter(Boolean).join(" • ");
+
+                                return (
+                                  <div key={idx} className="flex flex-col">
+                                    <span className="text-[13px] text-[#2E3135] font-medium">{item.name} {item.quantity > 1 ? `x${item.quantity}` : ''}</span>
+                                    {variationDetails && (
+                                      <span className="text-[11px] text-[#888] mt-0.5">{variationDetails}</span>
+                                    )}
+                                    {item.hasEngraving && (
+                                      <div className="mt-1.5 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-2.5 py-1.5 rounded self-start">
+                                        <span className="text-[9px] font-semibold text-transform:uppercase tracking-wider block mb-0.5 uppercase">Personalization</span>
+                                        <span className="text-[11px]">Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[13px]' : ''}>"{item.engravingText}"</strong></span>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                         <div className="flex sm:flex-col items-baseline sm:items-end justify-between sm:justify-center gap-1 font-inter">
                           <span className="text-[11px] uppercase tracking-wider text-[#888888] font-light sm:block hidden">

@@ -85,12 +85,34 @@ export default function OrderConfirmedPage() {
 
           <div style={{background:'#F3F1EC', padding:'32px', marginBottom:'24px', textAlign:'left'}}>
             <p style={{fontSize:'11px', letterSpacing:'2px', color:'#888', marginBottom:'16px', textTransform:'uppercase'}}>Items Ordered</p>
-            {items.map((item, i) => (
-              <div key={i} style={{display:'flex', justifyContent:'space-between', paddingBottom:'12px', marginBottom:'12px', borderBottom:'1px solid #e5e5e5'}}>
-                <span style={{fontSize:'14px', color:'#2E3135'}}>{item.name} {item.quantity > 1 ? `x${item.quantity}` : ''}</span>
-                <span style={{fontSize:'14px', color:'#2E3135'}}>₹{(item.price * item.quantity)?.toLocaleString('en-IN')}</span>
-              </div>
-            ))}
+            {items.map((item, i) => {
+              const variationDetails = [
+                item.selectedSize ? `Size: ${item.selectedSize}` : null,
+                item.selectedColour ? `Colour: ${item.selectedColour}` : null,
+                item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
+                item.karat ? `Karat: ${item.karat}` : null
+              ].filter(Boolean).join(" • ");
+
+              return (
+                <div key={i} style={{paddingBottom:'12px', marginBottom:'12px', borderBottom:'1px solid #e5e5e5'}}>
+                  <div style={{display:'flex', justifyContent:'space-between', alignItems: 'flex-start'}}>
+                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                      <span style={{fontSize:'14px', color:'#2E3135'}}>{item.name} {item.quantity > 1 ? `x${item.quantity}` : ''}</span>
+                      {variationDetails && (
+                        <span style={{fontSize:'12px', color:'#888', marginTop:'4px'}}>{variationDetails}</span>
+                      )}
+                      {item.hasEngraving && (
+                        <div style={{marginTop:'8px', background:'#FFFBEB', border:'1px solid #FDE68A', color:'#92400E', padding:'6px 10px', borderRadius:'4px', display:'inline-block'}}>
+                          <span style={{fontSize:'10px', fontWeight:600, textTransform:'uppercase', letterSpacing:'1px', display:'block', marginBottom:'2px'}}>Personalization</span>
+                          <span style={{fontSize:'13px'}}>Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit", fontStyle: item.engravingFont === 'Garamond' ? 'italic' : 'normal', fontSize: item.engravingFont === 'Garamond' ? '15px' : 'inherit'}}>"{item.engravingText}"</strong></span>
+                        </div>
+                      )}
+                    </div>
+                    <span style={{fontSize:'14px', color:'#2E3135'}}>₹{(item.price * item.quantity)?.toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+              );
+            })}
             <div style={{display:'flex', justifyContent:'space-between', marginTop:'8px'}}>
               <span style={{fontSize:'14px', fontWeight:'500', color:'#2E3135'}}>Total</span>
               <span style={{fontSize:'14px', fontWeight:'500', color:'#2E3135'}}>₹{order.total?.toLocaleString('en-IN')}</span>

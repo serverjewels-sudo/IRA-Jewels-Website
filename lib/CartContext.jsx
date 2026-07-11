@@ -80,9 +80,10 @@ export const CartProvider = ({ children }) => {
   }, [items, isLoaded]);
 
   // Add to cart function
-  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null, selectedShape = null) => {
+  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null, selectedShape = null, hasEngraving = false, engravingFont = null, engravingText = null) => {
     // Construct a unique composite key for item variation
-    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}-${selectedShape || "default"}`;
+    const engravingPart = hasEngraving && engravingText ? `engrave-${engravingFont}-${engravingText.replace(/\s+/g, '-')}` : "no-engrave";
+    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}-${selectedShape || "default"}-${engravingPart}`;
     
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex((item) => item.productId === cartItemId);
@@ -107,6 +108,11 @@ export const CartProvider = ({ children }) => {
           selectedSize: selectedSize,
           selectedColour: selectedColour,
           selectedShape: selectedShape,
+          hasEngraving: hasEngraving,
+          engravingFont: engravingFont,
+          engravingText: engravingText,
+          style_number: product.style_number,
+          sku: product.sku,
           quantity: 1,
           
           // Raw pricing component fields:

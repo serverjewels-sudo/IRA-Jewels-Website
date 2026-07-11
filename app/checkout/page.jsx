@@ -229,6 +229,10 @@ export default function CheckoutPage() {
           gst_percentage: parseFloat(item.gst_percentage) || 3,
           gst_amount: calculated.gstAmount,
           pre_tax_price: calculated.subtotal,
+          selectedSize: item.selectedSize || null,
+          selectedColour: item.selectedColour || null,
+          selectedShape: item.selectedShape || null,
+          karat: item.karat || null,
         };
       });
 

@@ -830,7 +830,7 @@ export default function ProductDetailPage() {
                   )}
                   <div className="grid grid-cols-2 p-3">
                     <span className="text-[#888] uppercase tracking-wider">Certificate</span>
-                    <span className="text-[#2E3135] font-medium">IGL / SGL Certified</span>
+                    <span className="text-[#2E3135] font-medium">IGI Certified</span>
                   </div>
                 </div>
               </div>

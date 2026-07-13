@@ -1,0 +1,24 @@
+{
+  "settingsAll": [
+    {
+      "id": 1,
+      "visible_setting_styles": [
+        "4 Prong",
+        "3 Prong",
+        "5 Prong",
+        "6 Prong",
+        "8 Prong",
+        "Bezel",
+        "Pavé",
+        "Flush",
+        "Halo"
+      ],
+      "updated_at": "2026-07-13T09:51:52.552918+00:00"
+    }
+  ],
+  "singleSettings": {
+    "visible_setting_styles": [
+      "4 Prong"
+    ]
+  }
+}

@@ -12,13 +12,20 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const { data: settings } = await supabaseAdmin.from('homepage_settings').select('visible_setting_styles').single();
-  const visibleStyles = settings?.visible_setting_styles || [];
-  
-  // Filter SETTING_STYLES based on whether the name or slug is in the visibleStyles array
-  const filteredStyles = SETTING_STYLES.filter(style => 
-    visibleStyles.includes(style.slug) || visibleStyles.includes(style.name)
+  // Fetch setting_style from all active products to ensure we only show styles with real inventory
+  const { data: activeProducts } = await supabaseAdmin
+    .from('products')
+    .select('setting_style')
+    .eq('is_active', true);
+    
+  const activeStyleNames = new Set(
+    activeProducts?.map(p => p.setting_style).filter(Boolean) || []
   );
+
+  // Filter SETTING_STYLES: Must have at least one active product
+  const filteredStyles = SETTING_STYLES.filter(style => {
+    return activeStyleNames.has(style.name) || activeStyleNames.has(style.slug);
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-white">

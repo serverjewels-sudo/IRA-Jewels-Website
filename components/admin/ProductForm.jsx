@@ -17,6 +17,9 @@ const ALL_SHAPES = [
   { id: "radiant", name: "Radiant" },
   { id: "asscher", name: "Asscher" },
   { id: "heart", name: "Heart" },
+  { id: "trillion", name: "Trillion" },
+  { id: "baguette", name: "Baguette" },
+  { id: "triangle", name: "Triangle" },
 ];
 const categories = [
   "rings",

@@ -78,6 +78,27 @@ export function StoneShapeIcon({ shapeId, className = "w-6 h-6", ...props }) {
             <path d="M12 17 C12 17 6.5 11.5 6.5 7.5 C6.5 5.5 7.5 4.5 9 4.5 C10.5 4.5 11 5 12 6 C13 5 13.5 4.5 15 4.5 C16.5 4.5 17.5 5.5 17.5 7.5 C17.5 11.5 12 17 12 17 Z" opacity="0.6" />
           </>
         );
+      case 'trillion':
+        return (
+          <>
+            <path d="M12 3 Q 18 10 21 19 Q 12 21 3 19 Q 6 10 12 3 Z" />
+            <path d="M12 7 Q 16 12 17 16 Q 12 17.5 7 16 Q 8 12 12 7 Z" opacity="0.6" />
+          </>
+        );
+      case 'baguette':
+        return (
+          <>
+            <rect x="6" y="3" width="12" height="18" />
+            <rect x="8" y="5" width="8" height="14" opacity="0.6" />
+          </>
+        );
+      case 'triangle':
+        return (
+          <>
+            <polygon points="12,3 21,19 3,19" />
+            <polygon points="12,7 17,16 7,16" opacity="0.6" />
+          </>
+        );
       default:
         // Default to a generic gem shape if unrecognised
         return (

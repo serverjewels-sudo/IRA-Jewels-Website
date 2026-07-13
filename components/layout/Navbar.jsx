@@ -6,6 +6,7 @@ import { Search, User, ShoppingBag, Menu, X, ChevronDown } from "lucide-react";
 import { useCart } from "@/lib/CartContext";
 import { supabase } from "@/lib/supabase";
 import { usePathname } from "next/navigation";
+import { CATEGORIES } from "@/lib/constants";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,20 +34,7 @@ export default function Navbar() {
     }, 150);
   };
 
-  // Fixed categories and their temporary placeholder images
-  const CATEGORIES = [
-    { name: "Rings", slug: "rings", image: "https://images.unsplash.com/photo-1605100804763-247f679f419a?auto=format&fit=crop&q=80&w=800" },
-    { name: "Necklaces", slug: "necklaces", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" },
-    { name: "Bangles", slug: "bangles", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=800" },
-    { name: "Earrings", slug: "earrings", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800" },
-    { name: "Bracelets", slug: "bracelets", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=800" }, // Using bangles image temporarily
-    { name: "Pendants", slug: "pendants", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
-    { name: "Chains", slug: "chains", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
-    { name: "Mangalsutra", slug: "mangalsutra", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
-    { name: "Sets", slug: "sets", image: "https://images.unsplash.com/photo-1599643478514-4a888f1925b3?auto=format&fit=crop&q=80&w=800" }, // Using necklace image temporarily
-    { name: "Anklets", slug: "anklets", image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=800" }, // Using bangles image temporarily
-    { name: "Nose Pins", slug: "nose-pins", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800" }, // Using earrings image temporarily
-  ];
+  // Fixed categories now imported from lib/constants.js
 
   const METALS = ["Gold", "White Gold", "Rose Gold", "Silver", "Platinum"];
   const KARATS = ["9K", "10K", "14K", "18K", "22K"];

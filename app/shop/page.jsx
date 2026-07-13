@@ -9,6 +9,7 @@ import { SlidersHorizontal, X, ChevronDown, RotateCcw } from "lucide-react";
 
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
 import { calculateProductPrice } from "@/lib/priceUtils";
+import { SETTING_STYLES } from "@/lib/constants";
 
 export const dynamic = 'force-dynamic';
 
@@ -49,9 +50,11 @@ function ShopInner() {
   const metalParam = searchParams.get("metal");
   const karatParam = searchParams.get("karat");
   const collectionParam = searchParams.get("collection");
+  const settingStyleParam = searchParams.get("setting_style");
 
   const [products, setProducts] = useState([]);
   const [rate999, setRate999] = useState(null);
+  const [visibleSettingStyles, setVisibleSettingStyles] = useState([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -59,6 +62,7 @@ function ShopInner() {
   const [priceRange, setPriceRange] = useState(200000);
   const [selectedMetal, setSelectedMetal] = useState("All");
   const [selectedKarat, setSelectedKarat] = useState("All");
+  const [selectedSettingStyle, setSelectedSettingStyle] = useState("All");
   const [sortBy, setSortBy] = useState("Featured");
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
@@ -95,6 +99,16 @@ function ShopInner() {
       if (matched) setSelectedKarat(matched);
     }
   }, [karatParam]);
+
+  // Sync setting style query parameter
+  useEffect(() => {
+    if (settingStyleParam) {
+      const matched = SETTING_STYLES.find(
+        (s) => s.slug === settingStyleParam
+      );
+      if (matched) setSelectedSettingStyle(matched.name);
+    }
+  }, [settingStyleParam]);
 
   // Fetch collection ID if collection query parameter exists
   useEffect(() => {
@@ -133,12 +147,24 @@ function ShopInner() {
           .eq("id", 1)
           .maybeSingle();
 
-        const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
+        const settingsPromise = supabase
+          .from("homepage_settings")
+          .select("visible_setting_styles")
+          .eq("id", 1)
+          .maybeSingle();
+
+        const [productsRes, rateRes, settingsRes] = await Promise.all([productsPromise, ratePromise, settingsPromise]);
 
         if (rateRes.error) {
           console.error("Error fetching gold rate:", rateRes.error);
         } else if (rateRes.data) {
           setRate999(rateRes.data.rate_999);
+        }
+
+        if (settingsRes.error) {
+          console.error("Error fetching homepage settings:", settingsRes.error);
+        } else if (settingsRes.data) {
+          setVisibleSettingStyles(settingsRes.data.visible_setting_styles || []);
         }
 
         if (productsRes.error) {
@@ -167,7 +193,7 @@ function ShopInner() {
       setFilterLoading(false);
     }, 450);
     return () => clearTimeout(timer);
-  }, [selectedCategory, selectedMetal, selectedKarat, sortBy, selectedCollectionId]);
+  }, [selectedCategory, selectedMetal, selectedKarat, selectedSettingStyle, sortBy, selectedCollectionId]);
 
   const isLoading = dbLoading || filterLoading;
 
@@ -178,8 +204,15 @@ function ShopInner() {
     setPriceRange(200000);
     setSelectedMetal("All");
     setSelectedKarat("All");
+    setSelectedSettingStyle("All");
     setSortBy("Featured");
   };
+
+  const filteredSettingStyles = useMemo(() => {
+    return SETTING_STYLES.filter((style) =>
+      visibleSettingStyles.includes(style.slug) || visibleSettingStyles.includes(style.name)
+    );
+  }, [visibleSettingStyles]);
 
   // Filtered and sorted products memoized
   const filteredProducts = useMemo(() => {
@@ -205,6 +238,13 @@ function ShopInner() {
     if (selectedCategory !== "All") {
       result = result.filter(
         (p) => p.category && p.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Filter by Setting Style
+    if (selectedSettingStyle !== "All") {
+      result = result.filter(
+        (p) => p.setting_style && p.setting_style === selectedSettingStyle
       );
     }
 
@@ -234,7 +274,7 @@ function ShopInner() {
     }
 
     return result;
-  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, sortBy, rate999, selectedCollectionId]);
+  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, selectedSettingStyle, sortBy, rate999, selectedCollectionId]);
 
   // Content for filters to share between desktop sidebar and mobile drawer
   const renderFilters = () => (
@@ -330,6 +370,40 @@ function ShopInner() {
         </div>
       </div>
 
+      {/* Setting Style */}
+      {filteredSettingStyles.length > 0 && (
+        <div className="py-6 border-b border-[#2E3135]/10">
+          <h4 className="font-inter font-medium text-[13px] tracking-wider uppercase text-[#2E3135] mb-4">
+            Setting Style
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedSettingStyle("All")}
+              className={`px-3 py-1.5 rounded-full text-[10px] tracking-wider uppercase font-inter transition-all duration-300 ${
+                selectedSettingStyle === "All"
+                  ? "bg-[#CDB38B] text-white font-medium"
+                  : "bg-white text-[#2E3135] border border-[#E5E5E5]/60 hover:border-[#CDB38B] hover:text-[#CDB38B]"
+              }`}
+            >
+              All
+            </button>
+            {filteredSettingStyles.map((style) => (
+              <button
+                key={style.slug}
+                onClick={() => setSelectedSettingStyle(style.name)}
+                className={`px-3 py-1.5 rounded-full text-[10px] tracking-wider uppercase font-inter transition-all duration-300 ${
+                  selectedSettingStyle === style.name
+                    ? "bg-[#CDB38B] text-white font-medium"
+                    : "bg-white text-[#2E3135] border border-[#E5E5E5]/60 hover:border-[#CDB38B] hover:text-[#CDB38B]"
+                }`}
+              >
+                {style.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Sorting */}
       <div className="py-6">
         <h4 className="font-inter font-medium text-[13px] tracking-wider uppercase text-[#2E3135] mb-4">
@@ -377,7 +451,7 @@ function ShopInner() {
           <aside className="hidden min-[901px]:block flex-shrink-0 w-72 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24 max-h-[calc(100dvh-120px)] overflow-y-auto custom-scrollbar">
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#2E3135]/10">
               <span className="font-inter font-medium text-[14px] uppercase tracking-wider text-[#2E3135]">Filters</span>
-              {(selectedCategory !== "All" || selectedCollectionId !== null || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || sortBy !== "Featured") && (
+              {(selectedCategory !== "All" || selectedCollectionId !== null || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || selectedSettingStyle !== "All" || sortBy !== "Featured") && (
                 <button
                   onClick={handleResetFilters}
                   className="font-inter text-[10px] text-[#888888] hover:text-[#CDB38B] transition-colors uppercase tracking-wider flex items-center gap-1.5"

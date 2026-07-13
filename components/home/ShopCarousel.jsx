@@ -41,6 +41,22 @@ export default function ShopCarousel({ title, subtitle, items, filterKey }) {
     setCurrentIndex(cloneCount);
   }, [cloneCount]);
 
+  // Re-enable transitions after an instant reposition
+  useEffect(() => {
+    if (!isTransitioning) {
+      // Force a reflow so the browser applies the position change instantly
+      if (containerRef.current) {
+        // eslint-disable-next-line no-unused-expressions
+        containerRef.current.offsetHeight; 
+      }
+      
+      // Use requestAnimationFrame to re-enable transitions smoothly before the next frame
+      requestAnimationFrame(() => {
+        setIsTransitioning(true);
+      });
+    }
+  }, [isTransitioning]);
+
   if (!items || items.length === 0) return null;
 
   // Generate clones robustly even if items.length < cloneCount
@@ -81,21 +97,6 @@ export default function ShopCarousel({ title, subtitle, items, filterKey }) {
     }
   };
 
-  // Re-enable transitions after an instant reposition
-  useEffect(() => {
-    if (!isTransitioning) {
-      // Force a reflow so the browser applies the position change instantly
-      if (containerRef.current) {
-        // eslint-disable-next-line no-unused-expressions
-        containerRef.current.offsetHeight; 
-      }
-      
-      // Use requestAnimationFrame to re-enable transitions smoothly before the next frame
-      requestAnimationFrame(() => {
-        setIsTransitioning(true);
-      });
-    }
-  }, [isTransitioning]);
 
   // Touch handlers for swipe
   const minSwipeDistance = 50;

@@ -1,6 +1,6 @@
 export default function Banner() {
   return (
-    <section className="w-full bg-[#F3F1EC] py-20 px-6 sm:px-12 md:py-28 text-center flex items-center justify-center select-none">
+    <section className="w-full bg-[#F3F1EC] py-10 px-6 sm:px-12 md:py-14 text-center flex items-center justify-center select-none">
       <div className="max-w-[800px] mx-auto flex flex-col items-center">
         {/* Main Line */}
         <h2 className="font-serif font-normal text-[26px] sm:text-[30px] md:text-[32px] text-[#2E3135] leading-snug tracking-wide">

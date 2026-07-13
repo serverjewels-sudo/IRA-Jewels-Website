@@ -32,6 +32,13 @@ const categories = [
   "nose pins"
 ];
 
+const settingStyles = [
+  "3 Prong", "4 Prong", "5 Prong", "6 Prong", "8 Prong", "Bezel", "Pavé", "Flush", 
+  "Halo", "Double Halo", "Hidden Halo", "Basket", "Cathedral", "Knife Edge", 
+  "Split Shank", "Twisted Shank", "Euro Shank", "Tulip Setting", "Lotus Setting", 
+  "Crown Setting", "Micro Pavé", "Channel Set Solitaire", "Floating Ring"
+];
+
 const karats = ["9K", "10K", "14K", "18K", "22K"];
 
 const categoryPrefixMap = {
@@ -259,6 +266,7 @@ export default function ProductForm({ productId }) {
   // Form State
   const [name, setName] = useState("");
   const [category, setCategory] = useState("rings");
+  const [settingStyle, setSettingStyle] = useState("");
   const [sku, setSku] = useState("");
   const [styleNumber, setStyleNumber] = useState("");
   const [price, setPrice] = useState("");
@@ -440,6 +448,7 @@ export default function ProductForm({ productId }) {
           const p = await response.json();
           setName(p.name || "");
           setCategory(p.category || "rings");
+          setSettingStyle(p.setting_style || "");
           setSku(p.sku || "");
           setStyleNumber(p.style_number || "");
           setPrice(p.price !== undefined ? String(p.price) : "");
@@ -579,6 +588,7 @@ export default function ProductForm({ productId }) {
     const payload = {
       name,
       category,
+      setting_style: settingStyle || null,
       sku,
       style_number: styleNumber || null,
       price: finalPriceToSave,
@@ -763,6 +773,25 @@ export default function ProductForm({ productId }) {
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Setting Style */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Setting Style
+              </label>
+              <select
+                value={settingStyle}
+                onChange={(e) => setSettingStyle(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] bg-white rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all cursor-pointer capitalize"
+              >
+                <option value="">None</option>
+                {settingStyles.map((style) => (
+                  <option key={style} value={style}>
+                    {style}
                   </option>
                 ))}
               </select>

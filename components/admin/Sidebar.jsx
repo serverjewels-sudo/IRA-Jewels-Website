@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
-import { Package, PlusCircle, ShoppingBag, Coins, LogOut, X, Users } from "lucide-react";
+import { Package, PlusCircle, ShoppingBag, Coins, LogOut, X, Users, Layers } from "lucide-react";
 
 export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
@@ -39,6 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const isOrdersActive = pathname === "/admin/orders";
   const isGoldRateActive = pathname === "/admin/gold-rate";
   const isAdminsActive = pathname === "/admin/admins";
+  const isSettingStylesActive = pathname === "/admin/setting-styles";
 
   return (
     <>
@@ -163,6 +164,20 @@ export default function Sidebar({ isOpen, onClose }) {
             >
               <Users className="w-4 h-4 stroke-[1.5]" />
               Admins
+            </Link>
+
+            {/* Setting Styles Link */}
+            <Link
+              href="/admin/setting-styles"
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 py-3 px-6 text-[12px] font-medium tracking-[1.5px] uppercase font-inter transition-all duration-200 hover:text-[#CDB38B] ${
+                isSettingStylesActive
+                  ? "border-l-[3px] border-[#CDB38B] text-[#CDB38B] pl-[21px]"
+                  : "border-l-[3px] border-transparent text-white/70"
+              }`}
+            >
+              <Layers className="w-4 h-4 stroke-[1.5]" />
+              Setting Styles
             </Link>
           </nav>
         </div>

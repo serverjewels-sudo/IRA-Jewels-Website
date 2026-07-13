@@ -9,7 +9,8 @@ import { SlidersHorizontal, X, ChevronDown, RotateCcw } from "lucide-react";
 
 import { supabase, mapSupabaseProduct } from "@/lib/supabase";
 import { calculateProductPrice } from "@/lib/priceUtils";
-import { SETTING_STYLES } from "@/lib/constants";
+import { SETTING_STYLES, DIAMOND_SHAPES } from "@/lib/constants";
+import { StoneShapeIcon } from "@/components/ui/StoneShapeIcons";
 
 export const dynamic = 'force-dynamic';
 
@@ -51,10 +52,10 @@ function ShopInner() {
   const karatParam = searchParams.get("karat");
   const collectionParam = searchParams.get("collection");
   const settingStyleParam = searchParams.get("setting_style");
+  const shapeParam = searchParams.get("shape");
 
   const [products, setProducts] = useState([]);
   const [rate999, setRate999] = useState(null);
-  const [visibleSettingStyles, setVisibleSettingStyles] = useState([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -63,6 +64,7 @@ function ShopInner() {
   const [selectedMetal, setSelectedMetal] = useState("All");
   const [selectedKarat, setSelectedKarat] = useState("All");
   const [selectedSettingStyle, setSelectedSettingStyle] = useState("All");
+  const [selectedShape, setSelectedShape] = useState("All");
   const [sortBy, setSortBy] = useState("Featured");
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
@@ -110,6 +112,16 @@ function ShopInner() {
     }
   }, [settingStyleParam]);
 
+  // Sync diamond shape query parameter
+  useEffect(() => {
+    if (shapeParam) {
+      const matched = DIAMOND_SHAPES.find(
+        (s) => s.slug === shapeParam
+      );
+      if (matched) setSelectedShape(matched.name);
+    }
+  }, [shapeParam]);
+
   // Fetch collection ID if collection query parameter exists
   useEffect(() => {
     async function fetchCollectionId() {
@@ -146,27 +158,13 @@ function ShopInner() {
           .select("rate_999")
           .eq("id", 1)
           .maybeSingle();
-
-        const settingsPromise = supabase
-          .from("homepage_settings")
-          .select("visible_setting_styles")
-          .eq("id", 1)
-          .maybeSingle();
-
-        const [productsRes, rateRes, settingsRes] = await Promise.all([productsPromise, ratePromise, settingsPromise]);
+        const [productsRes, rateRes] = await Promise.all([productsPromise, ratePromise]);
 
         if (rateRes.error) {
           console.error("Error fetching gold rate:", rateRes.error);
         } else if (rateRes.data) {
           setRate999(rateRes.data.rate_999);
         }
-
-        if (settingsRes.error) {
-          console.error("Error fetching homepage settings:", settingsRes.error);
-        } else if (settingsRes.data) {
-          setVisibleSettingStyles(settingsRes.data.visible_setting_styles || []);
-        }
-
         if (productsRes.error) {
           console.error("Error fetching products from Supabase:", productsRes.error);
         } else if (productsRes.data) {
@@ -193,7 +191,7 @@ function ShopInner() {
       setFilterLoading(false);
     }, 450);
     return () => clearTimeout(timer);
-  }, [selectedCategory, selectedMetal, selectedKarat, selectedSettingStyle, sortBy, selectedCollectionId]);
+  }, [selectedCategory, selectedMetal, selectedKarat, selectedSettingStyle, selectedShape, sortBy, selectedCollectionId]);
 
   const isLoading = dbLoading || filterLoading;
 
@@ -205,14 +203,82 @@ function ShopInner() {
     setSelectedMetal("All");
     setSelectedKarat("All");
     setSelectedSettingStyle("All");
+    setSelectedShape("All");
     setSortBy("Featured");
   };
 
+  const activeSettingStyles = useMemo(() => {
+    const styles = new Set();
+    products.forEach(p => {
+      if (p.setting_style) styles.add(p.setting_style);
+    });
+    return styles;
+  }, [products]);
+
   const filteredSettingStyles = useMemo(() => {
     return SETTING_STYLES.filter((style) =>
-      visibleSettingStyles.includes(style.slug) || visibleSettingStyles.includes(style.name)
+      activeSettingStyles.has(style.slug) || activeSettingStyles.has(style.name)
     );
-  }, [visibleSettingStyles]);
+  }, [activeSettingStyles]);
+
+  const activeShapeIds = useMemo(() => {
+    const shapes = new Set();
+    products.forEach(p => {
+      if (p.colour_variants && Array.isArray(p.colour_variants)) {
+        p.colour_variants.forEach(v => {
+          if (v.shapes && Array.isArray(v.shapes)) {
+            v.shapes.forEach(s => {
+              if (s.shape_id) shapes.add(s.shape_id.toLowerCase().trim());
+            });
+          }
+        });
+      }
+    });
+    return shapes;
+  }, [products]);
+
+  const filteredDiamondShapesList = useMemo(() => {
+    return DIAMOND_SHAPES.filter(shape => activeShapeIds.has(shape.slug.toLowerCase()));
+  }, [activeShapeIds]);
+
+  const activeCategories = useMemo(() => {
+    const cats = new Set();
+    products.forEach(p => {
+      if (p.category) cats.add(p.category.toLowerCase());
+    });
+    return cats;
+  }, [products]);
+
+  const filteredCategoriesList = useMemo(() => {
+    return categories.filter(c => c === "All" || activeCategories.has(c.toLowerCase()));
+  }, [activeCategories]);
+
+  const activeMetalTypes = useMemo(() => {
+    const metals = new Set();
+    products.forEach(p => {
+      if (p.metalType) metals.add(p.metalType.toLowerCase());
+    });
+    return metals;
+  }, [products]);
+
+  const filteredMetalTypesList = useMemo(() => {
+    return metalTypes.filter(m => m === "All" || activeMetalTypes.has(m.toLowerCase()));
+  }, [activeMetalTypes]);
+
+  const activeKarats = useMemo(() => {
+    const kSet = new Set();
+    products.forEach(p => {
+      if (p.karat) kSet.add(p.karat.toLowerCase());
+      if (p.available_karats && Array.isArray(p.available_karats)) {
+        p.available_karats.forEach(k => kSet.add(k.toLowerCase()));
+      }
+    });
+    return kSet;
+  }, [products]);
+
+  const filteredKaratsList = useMemo(() => {
+    return karats.filter(k => k === "All" || activeKarats.has(k.toLowerCase()));
+  }, [activeKarats]);
 
   // Filtered and sorted products memoized
   const filteredProducts = useMemo(() => {
@@ -248,6 +314,19 @@ function ShopInner() {
       );
     }
 
+    // Filter by Diamond Shape
+    if (selectedShape !== "All") {
+      result = result.filter((p) => {
+        if (!p.colour_variants || !Array.isArray(p.colour_variants)) return false;
+        return p.colour_variants.some(v => 
+          v.shapes && Array.isArray(v.shapes) && v.shapes.some(s => {
+             const matchedShape = DIAMOND_SHAPES.find(ds => ds.name === selectedShape);
+             return matchedShape && s.shape_id.toLowerCase() === matchedShape.slug;
+          })
+        );
+      });
+    }
+
     // Filter by Price Range
     result = result.filter((p) => p.priceVal <= priceRange);
 
@@ -274,7 +353,7 @@ function ShopInner() {
     }
 
     return result;
-  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, selectedSettingStyle, sortBy, rate999, selectedCollectionId]);
+  }, [products, selectedCategory, priceRange, selectedMetal, selectedKarat, selectedSettingStyle, selectedShape, sortBy, rate999, selectedCollectionId]);
 
   // Content for filters to share between desktop sidebar and mobile drawer
   const renderFilters = () => (
@@ -285,7 +364,7 @@ function ShopInner() {
           Categories
         </h4>
         <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
+          {filteredCategoriesList.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -332,7 +411,7 @@ function ShopInner() {
           Metal Type
         </h4>
         <div className="flex flex-wrap gap-2">
-          {metalTypes.map((metal) => (
+          {filteredMetalTypesList.map((metal) => (
             <button
               key={metal}
               onClick={() => setSelectedMetal(metal)}
@@ -354,7 +433,7 @@ function ShopInner() {
           Karat
         </h4>
         <div className="flex flex-wrap gap-2">
-          {karats.map((k) => (
+          {filteredKaratsList.map((k) => (
             <button
               key={k}
               onClick={() => setSelectedKarat(k)}
@@ -404,6 +483,39 @@ function ShopInner() {
         </div>
       )}
 
+      {/* Diamond Shape */}
+      <div className="py-6 border-b border-[#2E3135]/10">
+        <h4 className="font-inter font-medium text-[13px] tracking-wider uppercase text-[#2E3135] mb-4">
+          Diamond Shape
+        </h4>
+        <div className="flex flex-wrap gap-2 items-center">
+          <button
+            onClick={() => setSelectedShape("All")}
+            className={`px-3 py-1.5 rounded-full text-[10px] tracking-wider uppercase font-inter transition-all duration-300 h-[34px] ${
+              selectedShape === "All"
+                ? "bg-[#CDB38B] text-white font-medium border-transparent"
+                : "bg-white text-[#2E3135] border border-[#E5E5E5]/60 hover:border-[#CDB38B] hover:text-[#CDB38B]"
+            }`}
+          >
+            All
+          </button>
+          {filteredDiamondShapesList.map((shape) => (
+            <button
+              key={shape.slug}
+              onClick={() => setSelectedShape(shape.name)}
+              title={shape.name}
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                selectedShape === shape.name
+                  ? "bg-[#2E3135] text-white border-transparent"
+                  : "bg-white border border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+              }`}
+            >
+              <StoneShapeIcon shapeId={shape.slug} className="w-5 h-5" />
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Sorting */}
       <div className="py-6">
         <h4 className="font-inter font-medium text-[13px] tracking-wider uppercase text-[#2E3135] mb-4">
@@ -451,7 +563,7 @@ function ShopInner() {
           <aside className="hidden min-[901px]:block flex-shrink-0 w-72 bg-[#F3F1EC] p-8 rounded-lg space-y-2 sticky top-24 max-h-[calc(100dvh-120px)] overflow-y-auto custom-scrollbar">
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#2E3135]/10">
               <span className="font-inter font-medium text-[14px] uppercase tracking-wider text-[#2E3135]">Filters</span>
-              {(selectedCategory !== "All" || selectedCollectionId !== null || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || selectedSettingStyle !== "All" || sortBy !== "Featured") && (
+              {(selectedCategory !== "All" || selectedCollectionId !== null || priceRange !== 200000 || selectedMetal !== "All" || selectedKarat !== "All" || selectedSettingStyle !== "All" || selectedShape !== "All" || sortBy !== "Featured") && (
                 <button
                   onClick={handleResetFilters}
                   className="font-inter text-[10px] text-[#888888] hover:text-[#CDB38B] transition-colors uppercase tracking-wider flex items-center gap-1.5"

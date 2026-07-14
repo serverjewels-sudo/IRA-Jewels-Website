@@ -803,13 +803,17 @@ export default function ProductDetailPage() {
                                 setActiveImageIndex(0)
                               }}
                               title={shapeItem.shape_id.charAt(0).toUpperCase() + shapeItem.shape_id.slice(1)}
-                              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                              className={`w-10 h-10 flex items-center justify-center transition-colors duration-300 ${
                                 selectedShape === shapeItem.shape_id
-                                  ? "bg-[#2E3135] text-white"
-                                  : "bg-white border border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                                  ? "text-[#CDB38B]"
+                                  : "text-[#2E3135] hover:text-[#CDB38B]"
                               }`}
                             >
-                              <StoneShapeIcon shapeId={shapeItem.shape_id} className="w-5 h-5" />
+                              <StoneShapeIcon 
+                                shapeId={shapeItem.shape_id} 
+                                className="w-9 h-9" 
+                                strokeWidth={selectedShape === shapeItem.shape_id ? 0.9 : 0.6} 
+                              />
                             </button>
                           ))}
                         </div>

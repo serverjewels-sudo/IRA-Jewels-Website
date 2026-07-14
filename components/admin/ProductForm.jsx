@@ -282,7 +282,7 @@ export default function ProductForm({ productId }) {
   const [stock, setStock] = useState("0");
   const [description, setDescription] = useState("");
   const [sizesStr, setSizesStr] = useState("");
-  const [coloursStr, setColoursStr] = useState("");
+  const [simpleColours, setSimpleColours] = useState([{ name: "gold", hex: "#E6CA97" }]);
   const [colourVariants, setColourVariants] = useState([]);
   const [diamondWeightVariants, setDiamondWeightVariants] = useState([]);
   const [images, setImages] = useState(["", "", "", ""]);
@@ -330,6 +330,20 @@ export default function ProductForm({ productId }) {
   };
 
   const isValidHex = (hex) => typeof hex === 'string' && /^#[0-9A-Fa-f]{6}$/i.test(hex);
+
+  const handleAddSimpleColour = () => {
+    setSimpleColours([...simpleColours, { name: "", hex: "#E5E5E5" }]);
+  };
+
+  const handleRemoveSimpleColour = (index) => {
+    setSimpleColours(simpleColours.filter((_, i) => i !== index));
+  };
+
+  const handleSimpleColourChange = (index, field, value) => {
+    const list = [...simpleColours];
+    list[index][field] = value;
+    setSimpleColours(list);
+  };
 
   const handleVariantChange = (index, field, value) => {
     const newVariants = [...colourVariants];
@@ -493,7 +507,22 @@ export default function ProductForm({ productId }) {
             setDiamondWeightVariants(p.diamond_weight_variants);
           }
           if (Array.isArray(p.colour_options)) {
-            setColoursStr(p.colour_options.join(", "));
+            const list = p.colour_options.map((opt) => {
+              if (typeof opt === 'string' && opt.includes('|')) {
+                const [name, hex] = opt.split('|');
+                return { name: name.trim(), hex: hex.trim() };
+              } else if (typeof opt === 'string') {
+                const lower = opt.trim().toLowerCase();
+                let defaultHex = "#E5E5E5";
+                if (lower === "white gold") defaultHex = "#F4F0EA";
+                if (lower === "yellow gold") defaultHex = "#E6CA97";
+                if (lower === "rose gold") defaultHex = "#E5A090";
+                if (lower === "gold") defaultHex = "#E6CA97";
+                return { name: opt.trim(), hex: defaultHex };
+              }
+              return null;
+            }).filter(Boolean);
+            setSimpleColours(list);
           }
           if (Array.isArray(p.colour_variants)) {
             setColourVariants(p.colour_variants);
@@ -568,6 +597,12 @@ export default function ProductForm({ productId }) {
       }
     } else {
       if (!images[0] || !images[0].trim()) missingFields.push("Main Image (Front View) is required");
+      if (simpleColours.some(c => !c.name || !c.name.trim())) {
+        missingFields.push("Colour Name is required for all colour options");
+      }
+      if (simpleColours.some(c => c.hex && !isValidHex(c.hex))) {
+        missingFields.push("A valid hex color (starting with #) is required for all colour options");
+      }
     }
 
     if (missingFields.length > 0) {
@@ -581,12 +616,17 @@ export default function ProductForm({ productId }) {
     const sizes = sizesStr
       ? sizesStr.split(",").map((s) => s.trim()).filter(Boolean)
       : [];
-    let colours = coloursStr
-      ? coloursStr.split(",").map((c) => c.trim()).filter(Boolean)
-      : [];
-    
+    let colours = [];
     if (colourVariants.length > 0) {
       colours = colourVariants.map(v => v.colour.trim()).filter(Boolean);
+    } else {
+      colours = simpleColours
+        .filter(c => c.name && c.name.trim())
+        .map(c => {
+          const name = c.name.trim();
+          const hex = c.hex ? c.hex.trim() : "#E5E5E5";
+          return `${name}|${hex}`;
+        });
     }
     
     // Keep empty strings to preserve image positions
@@ -1119,17 +1159,74 @@ export default function ProductForm({ productId }) {
 
             {/* Colour Options */}
             {colourVariants.length === 0 && (
-              <div className="flex flex-col space-y-1.5 md:col-span-2">
-                <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
-                  Colour Options (comma separated)
-                </label>
-                <input
-                  type="text"
-                  value={coloursStr}
-                  onChange={(e) => setColoursStr(e.target.value)}
-                  placeholder="e.g. White Gold, Yellow Gold, Rose Gold"
-                  className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
-                />
+              <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                      Colour Options
+                    </h3>
+                    <p className="font-inter text-[12px] text-[#888888] font-light">
+                      Add selectable colours and their swatch values (e.g. Gold with #E6CA97).
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddSimpleColour}
+                    className="px-4 py-2 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300 flex items-center justify-center whitespace-nowrap"
+                  >
+                    + Add Colour
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {simpleColours.map((item, index) => (
+                    <div key={index} className="flex flex-col md:flex-row md:items-end gap-4 p-4 border border-[#E5E5E5] rounded-md bg-[#FBFBFA]">
+                      <div className="flex-1 flex flex-col space-y-1.5">
+                        <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Colour Name *</label>
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => handleSimpleColourChange(index, "name", e.target.value)}
+                          placeholder="e.g. Gold"
+                          className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && !item.name ? "border-red-400" : "border-[#E5E5E5]"}`}
+                        />
+                      </div>
+                      
+                      <div className="flex flex-col space-y-1.5 md:w-64">
+                        <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Swatch Colour</label>
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            value={isValidHex(item.hex) ? item.hex : "#000000"}
+                            onChange={(e) => handleSimpleColourChange(index, "hex", e.target.value.toUpperCase())}
+                            className="w-10 h-10 px-1 py-1 border border-[#E5E5E5] rounded-md cursor-pointer flex-shrink-0"
+                          />
+                          <input 
+                            type="text"
+                            value={item.hex || ""}
+                            onChange={(e) => handleSimpleColourChange(index, "hex", e.target.value)}
+                            placeholder="#E6CA97"
+                            maxLength={7}
+                            className={`w-full px-4 py-2 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${item.hex && !isValidHex(item.hex) ? "border-red-400" : "border-[#E5E5E5]"}`}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSimpleColour(index)}
+                        className="text-red-500 hover:text-red-700 font-inter text-[11px] uppercase tracking-wider font-semibold py-2.5 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  {simpleColours.length === 0 && (
+                    <div className="text-center py-6 border border-dashed border-[#E5E5E5] rounded-md text-[#888888] font-inter text-[13px] font-light">
+                      No colours added. Click &quot;+ Add Colour&quot; to define options, or leave empty if colour selection is not required.
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

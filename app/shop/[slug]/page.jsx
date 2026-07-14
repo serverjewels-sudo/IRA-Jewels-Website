@@ -743,22 +743,45 @@ export default function ProductDetailPage() {
                         ) : (
                           <>
                             <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                              Select Tone
+                              Select Tone: {selectedColour}
                             </span>
-                            <div className="flex flex-wrap gap-2">
-                              {product.colour_options.map((col) => (
-                                <button
-                                  key={col}
-                                  onClick={() => setSelectedColour(col)}
-                                  className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
-                                    selectedColour === col
-                                      ? "bg-[#2E3135] border-[#2E3135] text-white"
-                                      : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
-                                  }`}
-                                >
-                                  {col}
-                                </button>
-                              ))}
+                            <div className="flex flex-wrap items-center gap-3">
+                              {product.colour_options.map((col) => {
+                                const hex = product.colour_swatches?.[col];
+                                if (hex) {
+                                  return (
+                                    <button
+                                      key={col}
+                                      onClick={() => setSelectedColour(col)}
+                                      aria-label={`Select ${col}`}
+                                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                        selectedColour === col
+                                          ? "ring-1 ring-offset-2 ring-[#2E3135]"
+                                          : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
+                                      }`}
+                                    >
+                                      <span 
+                                        className="w-full h-full rounded-full border border-black/10" 
+                                        style={{ backgroundColor: hex }}
+                                      />
+                                    </button>
+                                  );
+                                } else {
+                                  return (
+                                    <button
+                                      key={col}
+                                      onClick={() => setSelectedColour(col)}
+                                      className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
+                                        selectedColour === col
+                                          ? "bg-[#2E3135] border-[#2E3135] text-white"
+                                          : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                                      }`}
+                                    >
+                                      {col}
+                                    </button>
+                                  );
+                                }
+                              })}
                             </div>
                           </>
                         )}

@@ -73,7 +73,7 @@ export default function Hero() {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 md:px-16 lg:px-8 xl:px-12 pt-20 pb-16 md:pb-0">
         <div className="max-w-[540px]">
           {/* Headline */}
-          <h1 className="hero-headline font-serif italic font-light text-[52px] sm:text-[68px] md:text-[76px] lg:text-[84px] xl:text-[92px] text-[#2E3135] leading-[1.05] tracking-tight opacity-0">
+          <h1 className="hero-headline font-serif italic font-light text-[36px] min-[360px]:text-[40px] min-[390px]:text-[44px] min-[430px]:text-[52px] sm:text-[68px] md:text-[76px] lg:text-[84px] xl:text-[92px] text-[#2E3135] leading-[1.05] tracking-tight opacity-0">
             Every Piece,<br />
             a Promise.
           </h1>
@@ -108,37 +108,37 @@ export default function Hero() {
           </div>
 
           {/* Trust Badges */}
-          <div className="hero-trust flex flex-wrap items-center gap-x-6 gap-y-4 sm:gap-8 mt-12 md:mt-16 opacity-0">
+          <div className="hero-trust flex flex-wrap items-center justify-between min-[430px]:justify-start min-[430px]:gap-x-6 gap-y-4 sm:gap-8 mt-12 md:mt-16 opacity-0 w-full min-[430px]:w-auto">
             {/* Badge 1 */}
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
-                <Gem className="w-[18px] h-[18px] text-[#2E3135] stroke-[1.5]" />
+            <div className="flex items-center gap-1.5 min-[375px]:gap-2 min-[430px]:gap-3">
+              <div className="flex-shrink-0 w-7 h-7 min-[375px]:w-8 min-[375px]:h-8 min-[430px]:w-10 min-[430px]:h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
+                <Gem className="w-3 h-3 min-[375px]:w-3.5 min-[375px]:h-3.5 min-[430px]:w-[18px] min-[430px]:h-[18px] text-[#2E3135] stroke-[1.5]" />
               </div>
               <div className="flex flex-col">
-                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">IGI Certified</span>
-                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">Diamonds</span>
+                <span className="font-sans font-semibold text-[7px] min-[360px]:text-[8px] min-[430px]:text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">IGI Certified</span>
+                <span className="font-sans font-semibold text-[7px] min-[360px]:text-[8px] min-[430px]:text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">Diamonds</span>
               </div>
             </div>
 
             {/* Badge 2 */}
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
-                <ShieldCheck className="w-[18px] h-[18px] text-[#2E3135] stroke-[1.5]" />
+            <div className="flex items-center gap-1.5 min-[375px]:gap-2 min-[430px]:gap-3">
+              <div className="flex-shrink-0 w-7 h-7 min-[375px]:w-8 min-[375px]:h-8 min-[430px]:w-10 min-[430px]:h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
+                <ShieldCheck className="w-3 h-3 min-[375px]:w-3.5 min-[375px]:h-3.5 min-[430px]:w-[18px] min-[430px]:h-[18px] text-[#2E3135] stroke-[1.5]" />
               </div>
               <div className="flex flex-col">
-                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">Lifetime</span>
-                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">Service</span>
+                <span className="font-sans font-semibold text-[7px] min-[360px]:text-[8px] min-[430px]:text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">Lifetime</span>
+                <span className="font-sans font-semibold text-[7px] min-[360px]:text-[8px] min-[430px]:text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">Service</span>
               </div>
             </div>
 
             {/* Badge 3 */}
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
-                <Flower2 className="w-[18px] h-[18px] text-[#2E3135] stroke-[1.5]" />
+            <div className="flex items-center gap-1.5 min-[375px]:gap-2 min-[430px]:gap-3">
+              <div className="flex-shrink-0 w-7 h-7 min-[375px]:w-8 min-[375px]:h-8 min-[430px]:w-10 min-[430px]:h-10 rounded-full border border-[#2E3135]/40 flex items-center justify-center">
+                <Flower2 className="w-3 h-3 min-[375px]:w-3.5 min-[375px]:h-3.5 min-[430px]:w-[18px] min-[430px]:h-[18px] text-[#2E3135] stroke-[1.5]" />
               </div>
               <div className="flex flex-col">
-                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">Crafted</span>
-                <span className="font-sans font-semibold text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">in India</span>
+                <span className="font-sans font-semibold text-[7px] min-[360px]:text-[8px] min-[430px]:text-[10px] uppercase tracking-[0.1em] text-[#2E3135] leading-tight">Crafted</span>
+                <span className="font-sans font-semibold text-[7px] min-[360px]:text-[8px] min-[430px]:text-[10px] uppercase tracking-[0.1em] text-[#2E3135]/70 leading-tight">in India</span>
               </div>
             </div>
           </div>

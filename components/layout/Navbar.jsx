@@ -113,7 +113,7 @@ export default function Navbar() {
           
           {/* Left Side: Brand Logo */}
           <Link href="/" className="group flex flex-col items-center shrink-0">
-            <span className="font-serif text-[14px] min-[400px]:text-[22px] sm:text-[26px] md:text-[17px] lg:text-[21px] xl:text-[26px] font-normal tracking-[0.12em] min-[400px]:tracking-[0.25em] md:tracking-[0.12em] lg:tracking-[0.18em] xl:tracking-[0.25em] text-[#2E3135] uppercase transition-colors duration-300 group-hover:text-[#CDB38B]">
+            <span className="font-serif text-[22px] sm:text-[26px] md:text-[17px] lg:text-[21px] xl:text-[26px] font-normal tracking-[0.25em] md:tracking-[0.12em] lg:tracking-[0.18em] xl:tracking-[0.25em] text-[#2E3135] uppercase transition-colors duration-300 group-hover:text-[#CDB38B]">
               TATVAAN
             </span>
           </Link>

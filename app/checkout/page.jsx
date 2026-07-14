@@ -233,6 +233,7 @@ export default function CheckoutPage() {
           selectedColour: item.selectedColour || null,
           selectedShape: item.selectedShape || null,
           karat: item.karat || null,
+          selectedDiamondWeight: item.selectedDiamondWeight || null,
           hasEngraving: item.hasEngraving || false,
           engravingFont: item.engravingFont || null,
           engravingText: item.engravingText || null,
@@ -757,6 +758,7 @@ export default function CheckoutPage() {
                   item.selectedSize ? `Size: ${item.selectedSize}` : null,
                   item.selectedColour ? `Colour: ${item.selectedColour}` : null,
                   item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
+                  item.selectedDiamondWeight ? `Diamond: ${item.selectedDiamondWeight}` : null,
                   item.karat ? `Karat: ${item.karat}` : null
                 ]
                   .filter(Boolean)

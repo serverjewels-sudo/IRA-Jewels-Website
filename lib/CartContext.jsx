@@ -80,10 +80,10 @@ export const CartProvider = ({ children }) => {
   }, [items, isLoaded]);
 
   // Add to cart function
-  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null, selectedShape = null, hasEngraving = false, engravingFont = null, engravingText = null) => {
+  const addToCart = (product, selectedSize = null, selectedColour = null, selectedKarat = null, selectedShape = null, hasEngraving = false, engravingFont = null, engravingText = null, selectedDiamondWeight = null) => {
     // Construct a unique composite key for item variation
     const engravingPart = hasEngraving && engravingText ? `engrave-${engravingFont}-${engravingText.replace(/\s+/g, '-')}` : "no-engrave";
-    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}-${selectedShape || "default"}-${engravingPart}`;
+    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}-${selectedShape || "default"}-${selectedDiamondWeight || "default"}-${engravingPart}`;
     
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex((item) => item.productId === cartItemId);
@@ -111,13 +111,16 @@ export const CartProvider = ({ children }) => {
           hasEngraving: hasEngraving,
           engravingFont: engravingFont,
           engravingText: engravingText,
+          selectedDiamondWeight: selectedDiamondWeight,
           style_number: product.style_number,
           sku: product.sku,
           quantity: 1,
           
           // Raw pricing component fields:
           net_gold_weight: product.net_gold_weight,
-          diamond_net_amount: product.diamond_net_amount,
+          diamond_net_amount: selectedDiamondWeight && Array.isArray(product.diamond_weight_variants) 
+            ? (product.diamond_weight_variants.find(v => v.weight === selectedDiamondWeight)?.diamond_net_amount ?? product.diamond_net_amount)
+            : product.diamond_net_amount,
           making_net_amount: product.making_net_amount,
           other_net_amount: product.other_net_amount,
           gst_percentage: product.gst_percentage,

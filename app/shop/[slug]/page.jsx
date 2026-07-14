@@ -25,12 +25,14 @@ export default function ProductDetailPage() {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
   const [isSizeOpen, setIsSizeOpen] = useState(false)
   const [isKaratOpen, setIsKaratOpen] = useState(false)
+  const [isDiamondWeightOpen, setIsDiamondWeightOpen] = useState(false)
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
   const [selectedColour, setSelectedColour] = useState(null)
   const [selectedKarat, setSelectedKarat] = useState(null)
   const [selectedShape, setSelectedShape] = useState(null)
+  const [selectedDiamondWeight, setSelectedDiamondWeight] = useState(null)
   const [quantity, setQuantity] = useState(1)
 
   // Engraving state
@@ -45,6 +47,7 @@ export default function ProductDetailPage() {
   
   const sizeDropdownRef = useRef(null)
   const karatDropdownRef = useRef(null)
+  const diamondWeightDropdownRef = useRef(null)
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -54,6 +57,9 @@ export default function ProductDetailPage() {
       }
       if (karatDropdownRef.current && !karatDropdownRef.current.contains(event.target)) {
         setIsKaratOpen(false)
+      }
+      if (diamondWeightDropdownRef.current && !diamondWeightDropdownRef.current.contains(event.target)) {
+        setIsDiamondWeightOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -107,6 +113,9 @@ export default function ProductDetailPage() {
               setSelectedShape(fallbackProduct.colour_variants[0].shapes[0].shape_id)
             }
             setSelectedKarat(fallbackProduct.karat || null)
+            if (fallbackProduct.diamond_weight_variants && fallbackProduct.diamond_weight_variants.length > 0) {
+              setSelectedDiamondWeight(fallbackProduct.diamond_weight_variants[0].weight)
+            }
           } else {
             setProduct(null)
           }
@@ -120,6 +129,9 @@ export default function ProductDetailPage() {
             setSelectedShape(mapped.colour_variants[0].shapes[0].shape_id)
           }
           setSelectedKarat(mapped.karat || null)
+          if (mapped.diamond_weight_variants && mapped.diamond_weight_variants.length > 0) {
+            setSelectedDiamondWeight(mapped.diamond_weight_variants[0].weight)
+          }
         }
       } catch (err) {
         console.error('[ProductDetail] Unexpected fetch error:', err)
@@ -133,6 +145,9 @@ export default function ProductDetailPage() {
             setSelectedShape(fallbackProduct.colour_variants[0].shapes[0].shape_id)
           }
           setSelectedKarat(fallbackProduct.karat || null)
+          if (fallbackProduct.diamond_weight_variants && fallbackProduct.diamond_weight_variants.length > 0) {
+            setSelectedDiamondWeight(fallbackProduct.diamond_weight_variants[0].weight)
+          }
         } else {
           setProduct(null)
         }
@@ -253,7 +268,7 @@ export default function ProductDetailPage() {
 
     // Call addToCart multiple times if quantity > 1
     for (let i = 0; i < quantity; i++) {
-      addToCart(product, selectedSize, selectedColour, selectedKarat, selectedShape, hasEngraving === "Yes", engravingFont, engravingText)
+      addToCart(product, selectedSize, selectedColour, selectedKarat, selectedShape, hasEngraving === "Yes", engravingFont, engravingText, selectedDiamondWeight)
     }
 
     setCartStatus("ADDED TO CART ✓")
@@ -298,7 +313,12 @@ export default function ProductDetailPage() {
     )
   }
 
-  const overriddenProduct = product ? { ...product, karat: selectedKarat || product.karat } : null;
+  let overriddenDiamondAmount = product?.diamond_net_amount;
+  if (product && selectedDiamondWeight && Array.isArray(product.diamond_weight_variants)) {
+    const match = product.diamond_weight_variants.find(v => v.weight === selectedDiamondWeight);
+    if (match) overriddenDiamondAmount = match.diamond_net_amount;
+  }
+  const overriddenProduct = product ? { ...product, karat: selectedKarat || product.karat, diamond_net_amount: overriddenDiamondAmount } : null;
   const priceResult = calculateProductPrice(overriddenProduct, rate999);
   const { hasLivePrice, priceVal: displayPriceVal, price: displayPrice } = priceResult;
 
@@ -601,6 +621,31 @@ export default function ProductDetailPage() {
                             ))}
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {/* Diamond Weight Selector */}
+                    {product.diamond_weight_variants && product.diamond_weight_variants.length > 0 && (
+                      <div>
+                        <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                          Select Diamond Weight: {selectedDiamondWeight ? selectedDiamondWeight : ""}
+                        </span>
+                        <div className="flex flex-wrap gap-3">
+                          {product.diamond_weight_variants.map((v) => (
+                            <button
+                              key={v.weight}
+                              onClick={() => setSelectedDiamondWeight(v.weight)}
+                              title={v.weight}
+                              className={`min-w-[40px] h-10 px-2 rounded-full flex items-center justify-center font-inter text-[12px] transition-all duration-300 ${
+                                selectedDiamondWeight === v.weight
+                                  ? "bg-[#2E3135] text-white"
+                                  : "bg-white border border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                              }`}
+                            >
+                              {v.weight}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
 

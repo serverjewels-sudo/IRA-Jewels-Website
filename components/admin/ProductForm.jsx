@@ -276,7 +276,7 @@ export default function ProductForm({ productId }) {
   const [comparePrice, setComparePrice] = useState("");
   const [karat, setKarat] = useState("14K");
   const [availableKarats, setAvailableKarats] = useState(["14K"]);
-  const [metalType, setMetalType] = useState("yellow gold");
+  const [metalType, setMetalType] = useState("gold");
   const [stoneType, setStoneType] = useState("lab diamond");
   const [weight, setWeight] = useState("");
   const [stock, setStock] = useState("0");
@@ -886,7 +886,7 @@ export default function ProductForm({ productId }) {
                 type="text"
                 value={metalType}
                 onChange={(e) => setMetalType(e.target.value)}
-                placeholder="e.g. white gold"
+                placeholder="e.g. gold"
                 className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
               />
             </div>

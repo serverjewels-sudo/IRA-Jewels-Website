@@ -482,7 +482,7 @@ export default function ProductDetailPage() {
 
                 {/* Price Display */}
                 <div className="flex items-baseline gap-4 mb-2">
-                  <span className="font-serif text-2xl lg:text-3xl text-[#2E3135]">
+                  <span className="font-inter font-medium text-2xl lg:text-3xl text-[#2E3135]">
                     {displayPrice}
                   </span>
                   {isOnSale && (

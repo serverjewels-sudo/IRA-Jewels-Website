@@ -599,13 +599,13 @@ function ShopInner() {
 
             {/* PRODUCT GRID OR SKELETON OR EMPTY STATE */}
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-x-6 gap-y-10">
+              <div className="grid grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-x-6 gap-y-10">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-x-6 gap-y-10">
+              <div className="grid grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-x-6 gap-y-10">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} rate_999={rate999} />
                 ))}

@@ -1,6 +1,7 @@
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/lib/CartContext';
+import ScrollRestoration from '@/components/ScrollRestoration';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
       <body>
+        <ScrollRestoration />
         <CartProvider>
           {children}
         </CartProvider>

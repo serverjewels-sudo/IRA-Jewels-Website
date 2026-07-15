@@ -72,11 +72,21 @@ function ImageUploadBox({ label, index, currentUrl, setImages, isRequired, hasEr
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      setErrorMsg("Invalid file type. Only JPG, PNG, and WebP are allowed.");
+      alert("Invalid file type. Only JPG, PNG, and WebP are allowed.");
+      return;
+    }
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setErrorMsg("File too large. Maximum size is 5MB.");
+      alert("File too large. Maximum size is 5MB.");
+      return;
+    }
+
     setUploading(true);
     setErrorMsg("");
-
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -85,27 +95,40 @@ function ImageUploadBox({ label, index, currentUrl, setImages, isRequired, hasEr
       const response = await fetch("/api/admin/upload-image", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: formData,
+        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setImages((prev) => {
-          const newImages = [...prev];
-          newImages[index] = data.url;
-          return newImages;
-        });
-      } else {
+      if (!response.ok) {
         const errData = await response.json();
-        setErrorMsg(errData.error || "Upload failed");
-        alert(errData.error || "Upload failed");
+        throw new Error(errData.error || "Failed to get upload URL");
       }
+
+      const { path, token: uploadToken } = await response.json();
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .uploadToSignedUrl(path, uploadToken, file);
+
+      if (uploadError) {
+        throw new Error(uploadError.message || "Upload to storage failed");
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(path);
+
+      setImages((prev) => {
+        const newImages = [...prev];
+        newImages[index] = publicUrl;
+        return newImages;
+      });
     } catch (err) {
       console.error("Upload error:", err);
-      setErrorMsg("Network error");
-      alert("Network error");
+      setErrorMsg(err.message || "Network error");
+      alert(err.message || "Network error");
     } finally {
       setUploading(false);
     }
@@ -172,11 +195,21 @@ function VideoUploadBox({ label, currentUrl, setVideoUrl }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const validTypes = ["video/mp4"];
+    if (!validTypes.includes(file.type)) {
+      setErrorMsg("Invalid file type. Only MP4 is allowed.");
+      alert("Invalid file type. Only MP4 is allowed.");
+      return;
+    }
+    const maxSize = 25 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setErrorMsg("File too large. Maximum size is 25MB.");
+      alert("File too large. Maximum size is 25MB.");
+      return;
+    }
+
     setUploading(true);
     setErrorMsg("");
-
-    const formData = new FormData();
-    formData.append("file", file);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -185,23 +218,36 @@ function VideoUploadBox({ label, currentUrl, setVideoUrl }) {
       const response = await fetch("/api/admin/upload-video", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: formData,
+        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setVideoUrl(data.url);
-      } else {
+      if (!response.ok) {
         const errData = await response.json();
-        setErrorMsg(errData.error || "Upload failed");
-        alert(errData.error || "Upload failed");
+        throw new Error(errData.error || "Failed to get upload URL");
       }
+
+      const { path, token: uploadToken } = await response.json();
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-videos")
+        .uploadToSignedUrl(path, uploadToken, file);
+
+      if (uploadError) {
+        throw new Error(uploadError.message || "Upload to storage failed");
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("product-videos")
+        .getPublicUrl(path);
+
+      setVideoUrl(publicUrl);
     } catch (err) {
       console.error("Upload error:", err);
-      setErrorMsg("Network error");
-      alert("Network error");
+      setErrorMsg(err.message || "Network error");
+      alert(err.message || "Network error");
     } finally {
       setUploading(false);
     }

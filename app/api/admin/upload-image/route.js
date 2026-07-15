@@ -35,50 +35,35 @@ export async function POST(req) {
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get("file");
+    const body = await req.json();
+    const { fileName, fileType } = body;
 
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!fileName || !fileType) {
+      return NextResponse.json({ error: "Missing fileName or fileType" }, { status: 400 });
     }
 
     // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!validTypes.includes(file.type)) {
+    if (!validTypes.includes(fileType)) {
       return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, and WebP are allowed." }, { status: 400 });
     }
 
-    // Validate file size (5MB = 5 * 1024 * 1024 bytes)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return NextResponse.json({ error: "File too large. Maximum size is 5MB." }, { status: 400 });
-    }
-
     // Generate unique filename
-    const ext = file.name.split('.').pop();
+    const ext = fileName.split('.').pop();
     const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
 
-    // Upload to Supabase Storage
+    // Create Signed Upload URL from Supabase
     const { data, error } = await supabaseServiceRole
       .storage
       .from("product-images")
-      .upload(uniqueFilename, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+      .createSignedUploadUrl(uniqueFilename);
 
     if (error) {
       console.error("Supabase storage upload error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabaseServiceRole
-      .storage
-      .from("product-images")
-      .getPublicUrl(data.path);
-
-    return NextResponse.json({ url: publicUrl });
+    return NextResponse.json(data);
 
   } catch (err) {
     console.error("Image upload error:", err);

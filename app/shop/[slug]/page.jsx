@@ -46,6 +46,7 @@ export default function ProductDetailPage() {
   const [isEngravingOpen, setIsEngravingOpen] = useState(false)
   const [engravingFont, setEngravingFont] = useState("Garamond")
   const [engravingText, setEngravingText] = useState("")
+  const [confirmedEngraving, setConfirmedEngraving] = useState(false)
   
   // Wishlist state
   const [isWishlisted, setIsWishlisted] = useState(false)
@@ -71,13 +72,18 @@ export default function ProductDetailPage() {
       }
       if (engravingDropdownRef.current && !engravingDropdownRef.current.contains(event.target)) {
         setIsEngravingOpen(false)
+        if (!confirmedEngraving) {
+          setEngravingText("")
+          setEngravingFont("Garamond")
+          setHasEngraving("No")
+        }
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [])
+  }, [confirmedEngraving])
   
   // Fetch product from Supabase (or local fallback)
   useEffect(() => {
@@ -838,7 +844,11 @@ export default function ProductDetailPage() {
                           onChange={(e) => {
                             setHasEngraving(e.target.checked ? "Yes" : "No")
                             setIsEngravingOpen(e.target.checked)
-                            if (!e.target.checked) setEngravingText("")
+                            if (!e.target.checked) {
+                              setEngravingText("")
+                              setEngravingFont("Garamond")
+                              setConfirmedEngraving(false)
+                            }
                           }}
                           className="accent-[#2E3135]"
                         />
@@ -901,7 +911,16 @@ export default function ProductDetailPage() {
                               >
                                 {engravingText}
                               </div>
-                              <p className="font-inter text-[10px] text-[#888] mt-2">Text allowed up to 20 characters max</p>
+                              <p className="font-inter text-[10px] text-[#888] mt-2 mb-4">Text allowed up to 20 characters max</p>
+                              <button
+                                onClick={() => {
+                                  setConfirmedEngraving(true)
+                                  setIsEngravingOpen(false)
+                                }}
+                                className="w-full h-11 bg-[#2E3135] text-white font-inter font-medium text-[11px] tracking-[2px] uppercase hover:opacity-95 transition-opacity"
+                              >
+                                Confirm
+                              </button>
                             </div>
                           )}
                         </div>

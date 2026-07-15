@@ -10,6 +10,8 @@ import { CATEGORIES } from "@/lib/constants";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openMobileSection, setOpenMobileSection] = useState(null);
+  const [openSignatureSubsection, setOpenSignatureSubsection] = useState(null);
   const { totalCount } = useCart();
   const [accountLink, setAccountLink] = useState("/account/login");
   const pathname = usePathname();
@@ -373,14 +375,29 @@ export default function Navbar() {
                 
                 {/* Signature Mobile */}
                 <div className="space-y-2">
-                  <span className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase block">
-                    Signature
-                  </span>
-                  <div className="pl-3 flex flex-col space-y-4 border-l border-[#F3F1EC]">
+                  <button
+                    onClick={() => setOpenMobileSection(openMobileSection === 'signature' ? null : 'signature')}
+                    className="w-full flex items-center justify-between text-[11px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors uppercase block focus:outline-none"
+                  >
+                    <span>Signature</span>
+                    <ChevronDown 
+                      className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${openMobileSection === 'signature' ? 'rotate-180' : ''}`} 
+                    />
+                  </button>
+                  
+                  {openMobileSection === 'signature' && (
+                  <div className="pl-3 flex flex-col space-y-4 border-l border-[#F3F1EC] mt-2">
                     
                     {/* Collections */}
                     <div>
-                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Collection</span>
+                      <button
+                        onClick={() => setOpenSignatureSubsection(openSignatureSubsection === 'collection' ? null : 'collection')}
+                        className="w-full flex items-center justify-between text-[10px] font-medium tracking-widest text-[#2E3135]/60 hover:text-[#CDB38B] transition-colors uppercase mb-2 focus:outline-none"
+                      >
+                        <span>Shop by Collection</span>
+                        <ChevronDown className={`w-3 h-3 text-[#CDB38B] transition-transform duration-200 ${openSignatureSubsection === 'collection' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {openSignatureSubsection === 'collection' && (
                       <div className="flex flex-col space-y-2.5">
                         {collections.map(collection => (
                           <Link 
@@ -393,11 +410,19 @@ export default function Navbar() {
                           </Link>
                         ))}
                       </div>
+                      )}
                     </div>
 
                     {/* Categories */}
                     <div>
-                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Category</span>
+                      <button
+                        onClick={() => setOpenSignatureSubsection(openSignatureSubsection === 'category' ? null : 'category')}
+                        className="w-full flex items-center justify-between text-[10px] font-medium tracking-widest text-[#2E3135]/60 hover:text-[#CDB38B] transition-colors uppercase mb-2 focus:outline-none"
+                      >
+                        <span>Shop by Category</span>
+                        <ChevronDown className={`w-3 h-3 text-[#CDB38B] transition-transform duration-200 ${openSignatureSubsection === 'category' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {openSignatureSubsection === 'category' && (
                       <div className="flex flex-col space-y-2.5">
                         {CATEGORIES.map(category => (
                           <Link 
@@ -410,11 +435,19 @@ export default function Navbar() {
                           </Link>
                         ))}
                       </div>
+                      )}
                     </div>
 
                     {/* Metals */}
                     <div>
-                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Metal</span>
+                      <button
+                        onClick={() => setOpenSignatureSubsection(openSignatureSubsection === 'metal' ? null : 'metal')}
+                        className="w-full flex items-center justify-between text-[10px] font-medium tracking-widest text-[#2E3135]/60 hover:text-[#CDB38B] transition-colors uppercase mb-2 focus:outline-none"
+                      >
+                        <span>Shop by Metal</span>
+                        <ChevronDown className={`w-3 h-3 text-[#CDB38B] transition-transform duration-200 ${openSignatureSubsection === 'metal' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {openSignatureSubsection === 'metal' && (
                       <div className="flex flex-col space-y-2.5">
                         {METALS.map(metal => (
                           <Link 
@@ -427,11 +460,19 @@ export default function Navbar() {
                           </Link>
                         ))}
                       </div>
+                      )}
                     </div>
 
                     {/* Karats */}
                     <div>
-                      <span className="text-[10px] font-medium tracking-widest text-[#2E3135]/40 uppercase block mb-2">Shop by Karat</span>
+                      <button
+                        onClick={() => setOpenSignatureSubsection(openSignatureSubsection === 'karat' ? null : 'karat')}
+                        className="w-full flex items-center justify-between text-[10px] font-medium tracking-widest text-[#2E3135]/60 hover:text-[#CDB38B] transition-colors uppercase mb-2 focus:outline-none"
+                      >
+                        <span>Shop by Karat</span>
+                        <ChevronDown className={`w-3 h-3 text-[#CDB38B] transition-transform duration-200 ${openSignatureSubsection === 'karat' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {openSignatureSubsection === 'karat' && (
                       <div className="flex flex-col space-y-2.5">
                         {KARATS.map(karat => (
                           <Link 
@@ -444,9 +485,11 @@ export default function Navbar() {
                           </Link>
                         ))}
                       </div>
+                      )}
                     </div>
 
                   </div>
+                  )}
                 </div>
 
                 <Link 
@@ -458,10 +501,18 @@ export default function Navbar() {
                 </Link>
                 
                 <div className="space-y-2">
-                  <span className="text-[11px] font-semibold tracking-widest text-[#2E3135]/50 uppercase block">
-                    Collections
-                  </span>
-                  <div className="pl-3 flex flex-col space-y-2.5 border-l border-[#F3F1EC]">
+                  <button
+                    onClick={() => setOpenMobileSection(openMobileSection === 'collections' ? null : 'collections')}
+                    className="w-full flex items-center justify-between text-[11px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors uppercase block focus:outline-none"
+                  >
+                    <span>Collections</span>
+                    <ChevronDown 
+                      className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${openMobileSection === 'collections' ? 'rotate-180' : ''}`} 
+                    />
+                  </button>
+                  
+                  {openMobileSection === 'collections' && (
+                  <div className="pl-3 flex flex-col space-y-2.5 border-l border-[#F3F1EC] mt-2">
                     <Link 
                       href="/shop?category=rings" 
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -505,6 +556,7 @@ export default function Navbar() {
                       All Jewellery
                     </Link>
                   </div>
+                  )}
                 </div>
 
                 <Link 

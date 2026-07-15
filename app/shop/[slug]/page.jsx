@@ -497,7 +497,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Right Column: Product Info & Actions */}
-            <div className="lg:col-span-6 flex flex-col">
+            <div className="lg:col-span-6 flex flex-col min-w-0">
               <div>
                 {/* Category & Rating */}
                 <div className="flex justify-between items-center mb-4">
@@ -526,7 +526,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Product Name */}
-                <h1 className="font-serif text-3xl lg:text-4xl text-[#2E3135] font-light leading-tight mb-4">
+                <h1 className="font-serif text-3xl lg:text-4xl text-[#2E3135] font-light leading-tight mb-4 truncate lg:whitespace-normal">
                   {product.name}
                 </h1>
 

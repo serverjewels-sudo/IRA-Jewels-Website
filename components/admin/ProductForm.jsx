@@ -353,21 +353,36 @@ export default function ProductForm({ productId }) {
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
 
-  // Helper to query and generate SKU
   const generateSkuForCategory = async (cat) => {
     try {
       const prefix = getSkuPrefix(cat);
-      const { count, error } = await supabase
+      
+      // Query for the highest existing SKU number for this prefix
+      const { data, error } = await supabase
         .from("products")
-        .select("id", { count: "exact", head: true })
-        .ilike("sku", `${prefix}-%`);
+        .select("sku")
+        .ilike("sku", `${prefix}-%`)
+        .order("sku", { ascending: false })
+        .limit(1);
 
       if (error) {
-        console.error("Error fetching SKU count:", error);
+        console.error("Error fetching max SKU:", error);
         return `${prefix}-0001`;
       }
 
-      const nextNum = (count || 0) + 1;
+      let nextNum = 1;
+      if (data && data.length > 0 && data[0].sku) {
+        const lastSku = data[0].sku;
+        const parts = lastSku.split("-");
+        if (parts.length > 1) {
+          const numStr = parts[parts.length - 1];
+          const parsed = parseInt(numStr, 10);
+          if (!isNaN(parsed)) {
+            nextNum = parsed + 1;
+          }
+        }
+      }
+
       const formattedNum = String(nextNum).padStart(4, "0");
       return `${prefix}-${formattedNum}`;
     } catch (err) {

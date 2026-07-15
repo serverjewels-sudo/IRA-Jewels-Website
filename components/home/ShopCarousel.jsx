@@ -126,7 +126,7 @@ export default function ShopCarousel({ title, subtitle, items, filterKey }) {
   const itemWidthPercent = 100 / (Math.floor(visibleItems) === 1 ? 1 : visibleItems);
 
   return (
-    <section className="w-full bg-[#FFFFFF] py-16 px-6 sm:px-8 lg:px-12 md:py-20 border-t border-[#F3F1EC]">
+    <section className="w-full bg-[#FFFFFF] pt-10 pb-16 px-6 sm:px-8 lg:px-12 md:pt-12 md:pb-20 border-t border-[#F3F1EC]">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header */}

@@ -1,4 +1,22 @@
+"use client";
+
+import { useState } from "react";
+
 export default function Testimonials() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
   const testimonials = [
     {
       stars: "★★★★★",
@@ -20,6 +38,22 @@ export default function Testimonials() {
     },
   ];
 
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    
+    if (distance > minSwipeDistance) {
+      if (activeIndex < testimonials.length - 1) {
+        setActiveIndex(prev => prev + 1);
+      }
+    }
+    if (distance < -minSwipeDistance) {
+      if (activeIndex > 0) {
+        setActiveIndex(prev => prev - 1);
+      }
+    }
+  };
+
   return (
     <section id="testimonials" className="w-full bg-[#F3F1EC] py-20 px-6 sm:px-12 select-none">
       <div className="max-w-[1200px] mx-auto">
@@ -34,12 +68,19 @@ export default function Testimonials() {
           <div className="w-[60px] h-[1px] bg-[#CDB38B] mt-5"></div>
         </div>
 
-        {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Testimonials Grid / Mobile Swipe Container */}
+        <div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {testimonials.map((t, idx) => (
             <div
               key={idx}
-              className="bg-[#FFFFFF] rounded-[8px] p-8 flex flex-col justify-between shadow-[0_2px_16px_rgba(0,0,0,0.06)] border-none transition-transform duration-300 hover:-translate-y-1"
+              className={`bg-[#FFFFFF] rounded-[8px] p-8 flex-col justify-between shadow-[0_2px_16px_rgba(0,0,0,0.06)] border-none transition-transform duration-300 hover:-translate-y-1 ${
+                idx === activeIndex ? "flex" : "hidden md:flex"
+              }`}
             >
               <div>
                 {/* 5 gold stars */}
@@ -64,6 +105,20 @@ export default function Testimonials() {
                 </p>
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Mobile Dot Indicators */}
+        <div className="flex justify-center gap-2 mt-8 md:hidden">
+          {testimonials.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveIndex(idx)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                activeIndex === idx ? "bg-[#2E3135]" : "bg-[#2E3135]/20"
+              }`}
+              aria-label={`Go to review ${idx + 1}`}
+            />
           ))}
         </div>
       </div>

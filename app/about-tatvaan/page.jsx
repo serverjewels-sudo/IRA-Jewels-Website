@@ -28,7 +28,7 @@ export default function AboutTatvaanPage() {
             {/* Intro */}
             <div className="space-y-6">
               <h2 className="font-cormorant italic text-[24px] md:text-[28px] text-[#2E3135] text-center font-normal">
-                "Every Piece, A Promise."
+                &quot;Every Piece, A Promise.&quot;
               </h2>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light">
                 Some jewellery is simply worn. Some becomes part of your story. At Tatvaan, we create lab-grown diamond jewellery for a new generation—people who celebrate love, ambition, individuality, and every milestone along the way. A first achievement. A new beginning. A promise to someone special. A gift to yourself. Every moment has meaning, and every Tatvaan piece is designed to hold it. We bring together modern design, skilled craftsmanship, and the brilliance of lab-grown diamonds to create jewellery that feels personal, effortless, and made for real life. Because jewellery should not stay inside a locker. It should move with you, shine with you, and become part of who you are.
@@ -41,7 +41,7 @@ export default function AboutTatvaanPage() {
                 Our Story
               </h2>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light">
-                Tatvaan began with a simple thought: Diamond jewellery should feel more relevant to today. For a long time, diamonds were seen as something reserved for weddings, anniversaries, or rare occasions. But today's generation celebrates life differently. A new job deserves a celebration. A personal goal deserves a reward. A friendship deserves something meaningful. And sometimes, you do not need a reason at all. Tatvaan was created for people who want beautiful diamond jewellery that fits their style, values, and everyday life. Our name comes from the Sanskrit word Tatva, meaning the true essence. For us, the true essence of jewellery is not only how it looks. It is how it makes you feel. Confident. Expressive. Connected. Completely yourself.
+                Tatvaan began with a simple thought: Diamond jewellery should feel more relevant to today. For a long time, diamonds were seen as something reserved for weddings, anniversaries, or rare occasions. But today&apos;s generation celebrates life differently. A new job deserves a celebration. A personal goal deserves a reward. A friendship deserves something meaningful. And sometimes, you do not need a reason at all. Tatvaan was created for people who want beautiful diamond jewellery that fits their style, values, and everyday life. Our name comes from the Sanskrit word Tatva, meaning the true essence. For us, the true essence of jewellery is not only how it looks. It is how it makes you feel. Confident. Expressive. Connected. Completely yourself.
               </p>
             </div>
 

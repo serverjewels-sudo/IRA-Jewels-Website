@@ -125,7 +125,7 @@ export default function OurCraftPage() {
                 <li>Unique identification details</li>
               </ul>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light">
-                Certification helps you understand what you are purchasing and gives you greater confidence in your choice. Certification availability depends on the diamond's size, jewellery design and product category. The applicable details will be clearly mentioned on the product page and invoice.
+                Certification helps you understand what you are purchasing and gives you greater confidence in your choice. Certification availability depends on the diamond&apos;s size, jewellery design and product category. The applicable details will be clearly mentioned on the product page and invoice.
               </p>
             </div>
 
@@ -143,7 +143,7 @@ export default function OurCraftPage() {
                 We believe beautiful diamond jewellery should feel special, but never out of reach. Lab-grown diamonds allow us to create jewellery with remarkable brilliance, refined craftsmanship and thoughtful design at a more accessible price.
               </p>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light">
-                This means you can choose a piece that feels more personal, explore a larger diamond or celebrate more of life's meaningful moments—without compromising on beauty or quality.
+                This means you can choose a piece that feels more personal, explore a larger diamond or celebrate more of life&apos;s meaningful moments—without compromising on beauty or quality.
               </p>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light">
                 Tatvaan is not about making jewellery feel less precious. It is about making beautifully crafted diamond jewellery easier to own, wear and enjoy. Not only for weddings. Not only for anniversaries. But for every moment that matters to you.

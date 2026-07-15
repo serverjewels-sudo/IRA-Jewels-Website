@@ -53,10 +53,41 @@ export default function Hero() {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    let lastWidth = window.innerWidth;
+    let lastHeight = window.innerHeight;
+
+    const setHeroHeight = () => {
+      document.documentElement.style.setProperty('--hero-vh', `${window.innerHeight}px`);
+    };
+
+    // Set initial height
+    setHeroHeight();
+
+    const handleResize = () => {
+      const currentWidth = window.innerWidth;
+      const currentHeight = window.innerHeight;
+      
+      const widthChanged = currentWidth !== lastWidth;
+      const heightChangedSignificantly = Math.abs(currentHeight - lastHeight) > 150;
+
+      // Only update on genuine resize (like device rotation), not scroll-triggered address bar collapse
+      if (widthChanged || heightChangedSignificantly) {
+        setHeroHeight();
+        lastWidth = currentWidth;
+        lastHeight = currentHeight;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <section 
       ref={containerRef}
-      className="relative w-full min-h-svh flex items-end md:items-center overflow-hidden select-none"
+      className="relative w-full flex items-end md:items-center overflow-hidden select-none"
+      style={{ minHeight: 'var(--hero-vh, 100svh)' }}
     >
       {/* Background Image - Object Right ensures we never crop the model/jewelry on the right */}
       <img 

@@ -189,7 +189,13 @@ export default function Footer() {
               GSTIN: 24AAHCI5512M1ZH
             </div>
           </div>
-          <div className="flex space-x-6">
+          <div className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-3 mt-4 md:mt-0">
+            <Link href="/terms-and-conditions" className="text-[11px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300 uppercase tracking-widest">
+              Terms & Conditions
+            </Link>
+            <Link href="/return-refund-policy" className="text-[11px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300 uppercase tracking-widest">
+              Return & Refund Policy
+            </Link>
             <Link href="/privacy-policy" className="text-[11px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300 uppercase tracking-widest">
               Privacy Policy
             </Link>

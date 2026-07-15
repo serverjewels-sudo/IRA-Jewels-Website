@@ -589,10 +589,10 @@ export default function ProductDetailPage() {
                 {(product.size_options?.length > 0 || product.karat) && (
                   <div className={`grid grid-cols-1 ${(product.size_options?.length > 0 && product.karat) ? 'sm:grid-cols-2' : ''} gap-x-6 gap-y-6 mb-6`}>
                     
-                    {/* Size Selector */}
+                    {/* Size Selector Row - box and link as separate siblings */}
                     {product.size_options && product.size_options.length > 0 && (
-                      <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
-                        <div className="flex justify-between items-center gap-6">
+                      <div className="flex items-center gap-4">
+                        <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
                           <button
                             onClick={() => setIsSizeOpen(!isSizeOpen)}
                             className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
@@ -602,30 +602,30 @@ export default function ProductDetailPage() {
                               className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isSizeOpen ? 'rotate-180' : ''}`} 
                             />
                           </button>
-                          <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider">
-                            Size Guide
-                          </Link>
+                          {isSizeOpen && (
+                            <div className="absolute top-full left-0 mt-1 w-full min-w-full bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col py-1.5">
+                              {product.size_options.map((sz) => (
+                                <button
+                                  key={sz}
+                                  onClick={() => {
+                                    setSelectedSize(sz)
+                                    setIsSizeOpen(false)
+                                  }}
+                                  className={`text-left text-[12px] font-inter transition-colors focus:outline-none px-5 py-1.5 ${
+                                    selectedSize === sz
+                                      ? "text-[#CDB38B] font-medium bg-gray-50"
+                                      : "text-[#2E3135] hover:text-[#CDB38B] hover:bg-gray-50"
+                                  }`}
+                                >
+                                  {sz}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        {isSizeOpen && (
-                          <div className="absolute top-full left-0 mt-1 w-full min-w-full bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col py-1.5">
-                            {product.size_options.map((sz) => (
-                              <button
-                                key={sz}
-                                onClick={() => {
-                                  setSelectedSize(sz)
-                                  setIsSizeOpen(false)
-                                }}
-                                className={`text-left text-[12px] font-inter transition-colors focus:outline-none px-5 py-1.5 ${
-                                  selectedSize === sz
-                                    ? "text-[#CDB38B] font-medium bg-gray-50"
-                                    : "text-[#2E3135] hover:text-[#CDB38B] hover:bg-gray-50"
-                                }`}
-                              >
-                                {sz}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                        <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider">
+                          Size Guide
+                        </Link>
                       </div>
                     )}
 

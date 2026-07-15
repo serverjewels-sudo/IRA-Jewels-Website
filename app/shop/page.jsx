@@ -193,6 +193,18 @@ function ShopInner() {
     return () => clearTimeout(timer);
   }, [selectedCategory, selectedMetal, selectedKarat, selectedSettingStyle, selectedShape, sortBy, selectedCollectionId]);
 
+  // Handle body scroll lock for mobile drawer
+  useEffect(() => {
+    if (isMobileDrawerOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileDrawerOpen]);
+
   const isLoading = dbLoading || filterLoading;
 
   // Reset all filters back to default values

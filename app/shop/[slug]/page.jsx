@@ -498,7 +498,7 @@ export default function ProductDetailPage() {
 
             {/* Right Column: Product Info & Actions */}
             <div className="lg:col-span-6 flex flex-col min-w-0">
-              <div>
+              <div className="min-w-0">
                 {/* Category & Rating */}
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-[#CDB38B] font-inter font-medium text-[11px] tracking-[2.5px] uppercase">

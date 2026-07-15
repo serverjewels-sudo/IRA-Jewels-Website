@@ -173,14 +173,14 @@ export default function ProductCard({ product, rate_999 }) {
       </div>
 
       {/* Product Details Container */}
-      <div className="p-6 flex flex-col flex-grow relative pb-16">
+      <div className="p-6 flex flex-col flex-grow relative pb-16 min-w-0">
         {/* Category Tag */}
         <span className="font-inter font-medium text-[10px] tracking-[1.5px] uppercase text-[#CDB38B] mb-2 block">
           {product.category}
         </span>
 
         {/* Product Name */}
-        <h3 className="font-cormorant font-normal text-[19px] text-[#2E3135] leading-snug mb-3 hover:text-[#CDB38B] transition-colors duration-300">
+        <h3 className="font-cormorant font-normal text-[19px] text-[#2E3135] leading-snug mb-3 hover:text-[#CDB38B] transition-colors duration-300 truncate lg:whitespace-normal">
           <Link href={`/shop/${product.slug}`}>
             {product.name}
           </Link>

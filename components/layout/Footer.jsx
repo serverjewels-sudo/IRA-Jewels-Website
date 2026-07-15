@@ -6,6 +6,10 @@ import { ChevronDown } from "lucide-react";
 
 export default function Footer() {
   const [isShopFooterOpen, setIsShopFooterOpen] = useState(false);
+  const [isHelpFooterOpen, setIsHelpFooterOpen] = useState(false);
+  const [isLearnFooterOpen, setIsLearnFooterOpen] = useState(false);
+  const [isAboutFooterOpen, setIsAboutFooterOpen] = useState(false);
+  const [isConnectFooterOpen, setIsConnectFooterOpen] = useState(false);
 
   return (
     <footer className="w-full bg-[#FFFFFF] border-t border-[#F3F1EC] pt-16 pb-12 px-6">
@@ -74,10 +78,21 @@ export default function Footer() {
 
           {/* Column 2: Help */}
           <div>
-            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+            {/* Mobile Toggle Button */}
+            <button
+              onClick={() => setIsHelpFooterOpen(!isHelpFooterOpen)}
+              className="md:hidden w-full flex justify-between items-center font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold focus:outline-none"
+            >
+              <span>Help</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isHelpFooterOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Desktop Static Heading */}
+            <h3 className="hidden md:block font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
               Help
             </h3>
-            <ul className="space-y-3">
+            
+            <ul className={`space-y-3 ${isHelpFooterOpen ? 'block' : 'hidden'} md:block`}>
               <li>
                 <Link href="/track-order" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Track Order
@@ -108,10 +123,21 @@ export default function Footer() {
 
           {/* Column 3: Learn */}
           <div>
-            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+            {/* Mobile Toggle Button */}
+            <button
+              onClick={() => setIsLearnFooterOpen(!isLearnFooterOpen)}
+              className="md:hidden w-full flex justify-between items-center font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold focus:outline-none"
+            >
+              <span>Learn</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isLearnFooterOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Desktop Static Heading */}
+            <h3 className="hidden md:block font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
               Learn
             </h3>
-            <ul className="space-y-3">
+            
+            <ul className={`space-y-3 ${isLearnFooterOpen ? 'block' : 'hidden'} md:block`}>
               <li>
                 <Link href="/learn" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   About Lab Diamonds
@@ -132,10 +158,21 @@ export default function Footer() {
 
           {/* Column 4: About */}
           <div>
-            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+            {/* Mobile Toggle Button */}
+            <button
+              onClick={() => setIsAboutFooterOpen(!isAboutFooterOpen)}
+              className="md:hidden w-full flex justify-between items-center font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold focus:outline-none"
+            >
+              <span>About</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isAboutFooterOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Desktop Static Heading */}
+            <h3 className="hidden md:block font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
               About
             </h3>
-            <ul className="space-y-3">
+            
+            <ul className={`space-y-3 ${isAboutFooterOpen ? 'block' : 'hidden'} md:block`}>
               <li>
                 <Link href="/about#brand-mission" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Our Story
@@ -166,10 +203,21 @@ export default function Footer() {
 
           {/* Column 5: Connect */}
           <div>
-            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+            {/* Mobile Toggle Button */}
+            <button
+              onClick={() => setIsConnectFooterOpen(!isConnectFooterOpen)}
+              className="md:hidden w-full flex justify-between items-center font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold focus:outline-none"
+            >
+              <span>Connect</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isConnectFooterOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Desktop Static Heading */}
+            <h3 className="hidden md:block font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
               Connect
             </h3>
-            <ul className="space-y-3">
+            
+            <ul className={`space-y-3 ${isConnectFooterOpen ? 'block' : 'hidden'} md:block`}>
               <li>
                 <Link href="/connect" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Connect With Us

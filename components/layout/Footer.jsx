@@ -184,11 +184,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/about#craftsmanship" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Craftsmanship
-                </Link>
-              </li>
-              <li>
                 <Link href="/about#our-promise" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Our Promise
                 </Link>
@@ -196,6 +191,21 @@ export default function Footer() {
               <li>
                 <Link href="/about#founder-note" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Our Philosophy
+                </Link>
+              </li>
+              <li>
+                <Link href="/about-tatvaan" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  About Tatvaan
+                </Link>
+              </li>
+              <li>
+                <Link href="/our-craft" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  Our Craft
+                </Link>
+              </li>
+              <li>
+                <Link href="/why-tatvaan" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  Why Tatvaan
                 </Link>
               </li>
             </ul>

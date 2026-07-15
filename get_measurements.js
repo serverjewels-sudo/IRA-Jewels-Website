@@ -1,11 +1,14 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 
 (async () => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    headless: 'new'
+  });
   const page = await browser.newPage();
   
   await page.setViewport({ width: 1280, height: 800 });
-  await page.goto('http://localhost:3000/shop/solitaire-diamond-ring', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://127.0.0.1:3000/shop/solitaire-diamond-ring', { waitUntil: 'domcontentloaded' });
   await new Promise(r => setTimeout(r, 3000));
 
   const measurements = await page.evaluate(() => {
@@ -16,7 +19,7 @@ const puppeteer = require('puppeteer');
     // Karat Box
     let karatBox = divs.find(d => d.innerText && d.innerText.includes('KARAT:') && d.className.includes('w-fit'));
     // Engraving Box
-    let engravingBox = divs.find(d => d.innerText && d.innerText.includes('Engraving') && d.className.includes('w-fit'));
+    let engravingBox = divs.find(d => d.innerText && d.innerText.toUpperCase().includes('ENGRAVING') && d.className.includes('w-fit'));
     
     // Also get the link
     let link = Array.from(document.querySelectorAll('a')).find(a => a.innerText.includes('Size Guide'));
@@ -32,8 +35,9 @@ const puppeteer = require('puppeteer');
       sizeBoxHeight: getMetrics(sizeBox),
       karatBoxHeight: getMetrics(karatBox),
       engravingBoxHeight: getMetrics(engravingBox),
-      sizeGuideLinkHeight: getMetrics(link),
-      sizeBtnHeight: getMetrics(sizeBtn),
+      sizeBoxHtml: sizeBox ? sizeBox.outerHTML.substring(0, 150) : null,
+      karatBoxHtml: karatBox ? karatBox.outerHTML.substring(0, 150) : null,
+      engravingBoxHtml: engravingBox ? engravingBox.outerHTML.substring(0, 200) : null,
     };
   });
 

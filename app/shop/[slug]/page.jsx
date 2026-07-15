@@ -585,9 +585,9 @@ export default function ProductDetailPage() {
                   {product.description || "Indulge in absolute luxury. Meticulously handcrafted by master artisans, this piece features premium conflict-free lab-grown diamonds, delivering brilliance and ethical sophistication for everyday elegance."}
                 </p>
 
-                {/* Row 1: Size & Karat */}
-                {(product.size_options?.length > 0 || product.karat) && (
-                  <div className={`grid grid-cols-1 ${(product.size_options?.length > 0 && product.karat) ? 'sm:grid-cols-2' : ''} gap-x-6 gap-y-6 mb-6`}>
+                {/* Product Selectors */}
+                {((product.size_options?.length > 0) || product.karat || product.diamond_weight_variants?.length > 0 || product.colour_variants?.length > 0 || product.colour_options?.length > 0 || activeVariant?.shapes?.length > 0 || true) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6 mb-8">
                     
                     {/* Size Selector Row - box and link as separate siblings */}
                     {product.size_options && product.size_options.length > 0 && (
@@ -656,7 +656,7 @@ export default function ProductDetailPage() {
 
                     {/* Karat Selector */}
                     {product.karat && (
-                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
+                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit relative">
                         {product.available_karats && product.available_karats.length > 1 ? (
                           <>
                             <div className="flex justify-between items-center">
@@ -698,15 +698,7 @@ export default function ProductDetailPage() {
                         )}
                       </div>
                     )}
-                  </div>
-                )}
 
-                {/* Row 2: Tone & Shape */}
-                {((product.colour_variants?.length > 0 || product.colour_options?.length > 0) || (activeVariant?.shapes?.length > 0)) && (
-                  <div className={`grid grid-cols-1 ${
-                    ((product.colour_variants?.length > 0 || product.colour_options?.length > 0) && (activeVariant?.shapes?.length > 0)) ? 'sm:grid-cols-2' : ''
-                  } gap-x-6 gap-y-6 mb-8`}>
-                    
                     {/* Colour Selector */}
                     {((product.colour_variants && product.colour_variants.length > 0) || (product.colour_options && product.colour_options.length > 0)) && (
                       <div>
@@ -793,6 +785,90 @@ export default function ProductDetailPage() {
                       </div>
                     )}
 
+                    {/* Engraving Section */}
+                    <div ref={engravingDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit relative">
+                      {/* Yes/No Toggle */}
+                      <div className="flex items-center gap-6 py-1.5">
+                        <label htmlFor="engravingCheckbox" className="cursor-pointer font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
+                          Engraving
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="engravingCheckbox"
+                          checked={hasEngraving === "Yes"}
+                          onChange={(e) => {
+                            setHasEngraving(e.target.checked ? "Yes" : "No")
+                            setIsEngravingOpen(e.target.checked)
+                            if (!e.target.checked) setEngravingText("")
+                          }}
+                          className="accent-[#2E3135]"
+                        />
+                      </div>
+
+                      {/* Engraving Details */}
+                      {hasEngraving === "Yes" && isEngravingOpen && (
+                        <div className="absolute top-full left-0 mt-1 w-80 bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col p-4 space-y-4">
+                          <div>
+                            <label className="block font-inter font-medium text-[11px] tracking-wider uppercase text-[#2E3135] mb-2">
+                              Select Font
+                            </label>
+                            <div className="relative">
+                              <select 
+                                value={engravingFont}
+                                onChange={(e) => setEngravingFont(e.target.value)}
+                                className="w-full h-11 border border-[#E5E5E5] bg-white rounded-none focus:outline-none focus:border-[#CDB38B] px-3 font-inter text-[13px] text-[#2E3135] appearance-none"
+                              >
+                                <option value="Garamond">Garamond</option>
+                                <option value="Helvetica">Helvetica</option>
+                              </select>
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#2E3135]">
+                                <ChevronDown className="w-4 h-4 text-[#888]" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="flex justify-between items-end mb-2">
+                              <label className="block font-inter font-medium text-[11px] tracking-wider uppercase text-[#2E3135]">
+                                Engraving Text
+                              </label>
+                              <span className={`font-inter text-[11px] ${engravingText.length >= 20 ? 'text-[#DC2626]' : 'text-[#888]'}`}>
+                                {engravingText.length}/20
+                              </span>
+                            </div>
+                            <input 
+                              type="text"
+                              value={engravingText}
+                              onChange={(e) => {
+                                if (e.target.value.length <= 20) {
+                                  setEngravingText(e.target.value)
+                                }
+                              }}
+                              placeholder="e.g. Always & Forever"
+                              className="w-full h-11 border border-[#E5E5E5] bg-white rounded-none focus:outline-none focus:border-[#CDB38B] px-3 font-inter text-[14px] text-[#2E3135]"
+                            />
+                          </div>
+
+                          {engravingText && (
+                            <div className="mt-4 pt-4 border-t border-[#E5E5E5]/50 text-center">
+                              <p className="font-inter text-[10px] uppercase tracking-wider text-[#888] mb-3">Preview</p>
+                              <div 
+                                className="text-[#2E3135] py-2 px-4 bg-white border border-[#E5E5E5] inline-block min-w-[200px]"
+                                style={{ 
+                                  fontFamily: engravingFont === "Garamond" ? "'Cormorant Garamond', serif" : "Helvetica, Arial, sans-serif",
+                                  fontSize: engravingFont === "Garamond" ? "22px" : "18px",
+                                  fontStyle: engravingFont === "Garamond" ? "italic" : "normal"
+                                }}
+                              >
+                                {engravingText}
+                              </div>
+                              <p className="font-inter text-[10px] text-[#888] mt-2">Text allowed up to 20 characters max</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
                     {/* Shape Selector */}
                     {activeVariant && activeVariant.shapes && activeVariant.shapes.length > 0 && (
                       <div>
@@ -824,92 +900,9 @@ export default function ProductDetailPage() {
                         </div>
                       </div>
                     )}
+
                   </div>
                 )}
-
-                {/* Engraving Section */}
-                <div ref={engravingDropdownRef} className="mb-8 px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
-                  {/* Yes/No Toggle */}
-                  <div className="flex items-center gap-6 py-1.5">
-                    <label htmlFor="engravingCheckbox" className="cursor-pointer font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
-                      Engraving
-                    </label>
-                    <input
-                      type="checkbox"
-                      id="engravingCheckbox"
-                      checked={hasEngraving === "Yes"}
-                      onChange={(e) => {
-                        setHasEngraving(e.target.checked ? "Yes" : "No")
-                        setIsEngravingOpen(e.target.checked)
-                        if (!e.target.checked) setEngravingText("")
-                      }}
-                      className="accent-[#2E3135]"
-                    />
-                  </div>
-
-                  {/* Engraving Details */}
-                  {hasEngraving === "Yes" && isEngravingOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-80 bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col p-4 space-y-4">
-                      <div>
-                        <label className="block font-inter font-medium text-[11px] tracking-wider uppercase text-[#2E3135] mb-2">
-                          Select Font
-                        </label>
-                        <div className="relative">
-                          <select 
-                            value={engravingFont}
-                            onChange={(e) => setEngravingFont(e.target.value)}
-                            className="w-full h-11 border border-[#E5E5E5] bg-white rounded-none focus:outline-none focus:border-[#CDB38B] px-3 font-inter text-[13px] text-[#2E3135] appearance-none"
-                          >
-                            <option value="Garamond">Garamond</option>
-                            <option value="Helvetica">Helvetica</option>
-                          </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#2E3135]">
-                            <ChevronDown className="w-4 h-4 text-[#888]" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between items-end mb-2">
-                          <label className="block font-inter font-medium text-[11px] tracking-wider uppercase text-[#2E3135]">
-                            Engraving Text
-                          </label>
-                          <span className={`font-inter text-[11px] ${engravingText.length >= 20 ? 'text-[#DC2626]' : 'text-[#888]'}`}>
-                            {engravingText.length}/20
-                          </span>
-                        </div>
-                        <input 
-                          type="text"
-                          value={engravingText}
-                          onChange={(e) => {
-                            if (e.target.value.length <= 20) {
-                              setEngravingText(e.target.value)
-                            }
-                          }}
-                          placeholder="e.g. Always & Forever"
-                          className="w-full h-11 border border-[#E5E5E5] bg-white rounded-none focus:outline-none focus:border-[#CDB38B] px-3 font-inter text-[14px] text-[#2E3135]"
-                        />
-                      </div>
-
-                      {engravingText && (
-                        <div className="mt-4 pt-4 border-t border-[#E5E5E5]/50 text-center">
-                          <p className="font-inter text-[10px] uppercase tracking-wider text-[#888] mb-3">Preview</p>
-                          <div 
-                            className="text-[#2E3135] py-2 px-4 bg-white border border-[#E5E5E5] inline-block min-w-[200px]"
-                            style={{ 
-                              fontFamily: engravingFont === "Garamond" ? "'Cormorant Garamond', serif" : "Helvetica, Arial, sans-serif",
-                              fontSize: engravingFont === "Garamond" ? "22px" : "18px",
-                              fontStyle: engravingFont === "Garamond" ? "italic" : "normal"
-                            }}
-                          >
-                            {engravingText}
-                          </div>
-                          <p className="font-inter text-[10px] text-[#888] mt-2">Text allowed up to 20 characters max</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 {/* Quantity & Actions Stack */}
                 <div className="flex gap-4 mb-8">

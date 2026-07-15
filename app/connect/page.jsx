@@ -11,7 +11,7 @@ export default function ConnectPage() {
     {
       name: "Instagram",
       description: "Daily drops, styling ideas & behind the scenes",
-      link: "#",
+      link: "https://www.instagram.com/tatvaanjewels?igsh=dW5iczZ5eGhtZmxm",
       icon: (
         <svg className="w-8 h-8 text-[#CDB38B] transition-colors duration-300 group-hover:text-[#2E3135]" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
@@ -21,7 +21,7 @@ export default function ConnectPage() {
     {
       name: "Facebook",
       description: "Updates, offers and community conversations",
-      link: "#",
+      link: "https://www.facebook.com/share/1DC136rNr1/",
       icon: (
         <svg className="w-8 h-8 text-[#CDB38B] transition-colors duration-300 group-hover:text-[#2E3135]" viewBox="0 0 24 24" fill="currentColor">
           <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -31,7 +31,7 @@ export default function ConnectPage() {
     {
       name: "YouTube",
       description: "Watch our crafting process and diamond education",
-      link: "#",
+      link: "https://youtube.com/@tatvaanjewels?si=x417XQXVrgs9hdwp",
       icon: (
         <svg className="w-8 h-8 text-[#CDB38B] transition-colors duration-300 group-hover:text-[#2E3135]" viewBox="0 0 24 24" fill="currentColor">
           <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -41,10 +41,20 @@ export default function ConnectPage() {
     {
       name: "Pinterest",
       description: "Mood boards, styling guides and inspiration",
-      link: "#",
+      link: "https://pin.it/7gbKsoU5A",
       icon: (
         <svg className="w-8 h-8 text-[#CDB38B] transition-colors duration-300 group-hover:text-[#2E3135]" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12.24 2C6.98 2 2.75 6.22 2.75 11.49c0 4.04 2.5 7.51 6.06 8.92-.08-.75-.15-1.9.03-2.72l1.6-6.79s-.4-.82-.4-2.02c0-1.9 1.1-3.31 2.47-3.31 1.16 0 1.72.87 1.72 1.92 0 1.17-.74 2.92-1.13 4.54-.32 1.36.68 2.47 2.02 2.47 2.43 0 4.3-2.56 4.3-6.25 0-3.27-2.35-5.55-5.7-5.55-3.89 0-6.17 2.92-6.17 5.93 0 1.17.45 2.43 1.02 3.12.11.13.13.25.09.4l-.38 1.55c-.06.26-.2.32-.47.2-1.77-.82-2.88-3.41-2.88-5.49 0-4.47 3.25-8.58 9.37-8.58 4.92 0 8.74 3.51 8.74 8.19 0 4.89-3.08 8.83-7.36 8.83-1.44 0-2.79-.75-3.25-1.63l-.88 3.37c-.32 1.23-1.18 2.77-1.76 3.71A9.74 9.74 0 0 0 12.25 22c5.27 0 9.5-4.23 9.5-9.5C21.75 6.22 17.51 2 12.24 2z"/>
+        </svg>
+      )
+    },
+    {
+      name: "LinkedIn",
+      description: "Professional updates, career opportunities and industry insights",
+      link: "https://www.linkedin.com/in/tatvaan-jewels-251315422?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+      icon: (
+        <svg className="w-8 h-8 text-[#CDB38B] transition-colors duration-300 group-hover:text-[#2E3135]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
         </svg>
       )
     },

@@ -14,7 +14,7 @@ const articles = [
     title: "What Makes a Lab Diamond Real?",
     excerpt: "Lab-grown diamonds are chemically, physically and optically identical to mined diamonds. Here's what that means for you.",
     date: "June 15, 2026",
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&auto=format&fit=crop"
+    image: "https://labs.google/fx/api/og-image/shared/42ed3e14-b492-44c5-85ef-cb1d6562bc1f"
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const articles = [
     title: "How to Keep Your Gold Jewellery Shining Every Day",
     excerpt: "Simple habits that protect your pieces and maintain their brilliance for years to come.",
     date: "June 10, 2026",
-    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&auto=format&fit=crop"
+    image: "https://labs.google/fx/api/og-image/shared/1adedbf0-21b7-426e-b840-2623822ae3f6"
   },
   {
     id: 3,
@@ -30,15 +30,15 @@ const articles = [
     title: "Stacking Rings: The Art of Wearing More Than One",
     excerpt: "From minimalist to maximalist — how to stack rings across your fingers without it looking overdone.",
     date: "June 5, 2026",
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&auto=format&fit=crop"
+    image: "https://labs.google/fx/api/og-image/shared/495c938e-39ea-4c22-83dd-0893d2d8e8ba"
   },
   {
     id: 4,
-    category: "DIAMOND GUIDE",
+    category: "BUYING GUIDE",
     title: "The 4Cs Explained Simply — Cut, Colour, Clarity, Carat",
     excerpt: "Everything you need to know before buying a diamond, explained in plain language.",
     date: "May 28, 2026",
-    image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=800&auto=format&fit=crop"
+    image: "https://labs.google/fx/api/og-image/shared/e0411717-14c4-4e4b-b60e-60ed30bb526e"
   },
   {
     id: 5,
@@ -46,15 +46,15 @@ const articles = [
     title: "How Every TATVAAN Piece Is Made",
     excerpt: "From raw lab-grown diamond to finished jewellery — a look at our crafting process and quality standards.",
     date: "May 20, 2026",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&auto=format&fit=crop"
+    image: "https://labs.google/fx/api/og-image/shared/2b2b474c-4608-46ba-9fd5-bbf092cb9409"
   },
   {
     id: 6,
-    category: "STYLE GUIDE",
+    category: "GIFT GUIDE",
     title: "Gifting Fine Jewellery: A Complete Guide for Every Occasion",
     excerpt: "Anniversaries, birthdays, milestones — find the right piece for every moment that matters.",
     date: "May 12, 2026",
-    image: "https://images.unsplash.com/photo-1549439602-43ebca2327af?w=800&auto=format&fit=crop"
+    image: "https://labs.google/fx/api/og-image/shared/f6ebf556-93c6-4128-a9d9-af09a4254be6"
   }
 ];
 
@@ -116,9 +116,6 @@ export default function BlogPage() {
                     <div className="mt-auto pt-6 flex items-center justify-between border-t border-gray-50/50">
                       <span className="font-inter text-[12px] text-[#aaa]">
                         {article.date}
-                      </span>
-                      <span className="font-inter font-medium text-[11px] uppercase tracking-[1.5px] text-[#2E3135] group-hover:text-[#CDB38B] transition-colors duration-300">
-                        READ MORE →
                       </span>
                     </div>
                   </div>

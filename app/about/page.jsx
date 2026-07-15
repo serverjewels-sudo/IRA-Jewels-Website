@@ -31,7 +31,7 @@ export default function AboutPage() {
             {/* Left side: beautiful jewellery image */}
             <div className="w-full h-full relative aspect-square sm:aspect-[4/3] md:aspect-square overflow-hidden rounded-[8px]">
               <img
-                src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop"
+                src="https://labs.google/fx/api/og-image/shared/32fb1849-b810-46c3-b367-b4f5f20a2b4b"
                 alt="Fine lab-grown diamond jewellery"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />

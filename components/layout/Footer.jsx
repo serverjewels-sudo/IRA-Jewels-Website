@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 export default function Footer() {
+  const [isShopFooterOpen, setIsShopFooterOpen] = useState(false);
+
   return (
     <footer className="w-full bg-[#FFFFFF] border-t border-[#F3F1EC] pt-16 pb-12 px-6">
       <div className="max-w-7xl mx-auto">
@@ -18,10 +24,21 @@ export default function Footer() {
 
           {/* Column 1: Shop */}
           <div>
-            <h3 className="font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
+            {/* Mobile Toggle Button */}
+            <button
+              onClick={() => setIsShopFooterOpen(!isShopFooterOpen)}
+              className="md:hidden w-full flex justify-between items-center font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold focus:outline-none"
+            >
+              <span>Shop</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isShopFooterOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Desktop Static Heading */}
+            <h3 className="hidden md:block font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
               Shop
             </h3>
-            <ul className="space-y-3">
+            
+            <ul className={`space-y-3 ${isShopFooterOpen ? 'block' : 'hidden'} md:block`}>
               <li>
                 <Link href="/shop" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   All Jewellery

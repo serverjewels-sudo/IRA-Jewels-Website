@@ -7,7 +7,7 @@ import { useCart } from "@/lib/CartContext";
 import { supabase } from "@/lib/supabase";
 import { usePathname } from "next/navigation";
 import { CATEGORIES } from "@/lib/constants";
-
+import SearchOverlay from "@/components/layout/SearchOverlay";
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileSection, setOpenMobileSection] = useState(null);
@@ -19,6 +19,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   const [isSignatureOpen, setIsSignatureOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [collections, setCollections] = useState([]);
   const [previewData, setPreviewData] = useState({ imageUrl: '', label: '' });
   const closeTimeoutRef = useRef(null);
@@ -299,6 +300,7 @@ export default function Navbar() {
           {/* Right Side: Icons & Mobile Menu */}
           <div className="flex items-center space-x-3 sm:space-x-5 md:space-x-2 lg:space-x-4 xl:space-x-5 shrink-0">
             <button 
+              onClick={() => setIsSearchOpen(true)}
               className={`p-2 ${iconColor} hover:text-[#CDB38B] transition-colors duration-300`}
               aria-label="Search"
             >
@@ -608,6 +610,8 @@ export default function Navbar() {
             </div>
           </div>
       )}
+
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

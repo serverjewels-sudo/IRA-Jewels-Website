@@ -56,7 +56,7 @@ export default function Hero() {
   return (
     <section 
       ref={containerRef}
-      className="relative w-full min-h-dvh flex items-end md:items-center overflow-hidden select-none"
+      className="relative w-full min-h-svh flex items-end md:items-center overflow-hidden select-none"
     >
       {/* Background Image - Object Right ensures we never crop the model/jewelry on the right */}
       <img 

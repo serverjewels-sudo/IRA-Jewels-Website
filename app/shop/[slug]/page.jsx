@@ -374,7 +374,7 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product Details Section */}
-        <div className="max-w-[1280px] mx-auto px-6 py-12 lg:py-20">
+        <div className="max-w-[1280px] mx-auto px-6 py-6 lg:py-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12">
             
             {/* Left Column: Image Gallery */}

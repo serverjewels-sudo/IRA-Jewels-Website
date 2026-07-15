@@ -34,6 +34,12 @@ export default function ProductDetailPage() {
   const [selectedShape, setSelectedShape] = useState(null)
   const [selectedDiamondWeight, setSelectedDiamondWeight] = useState(null)
   const [quantity, setQuantity] = useState(1)
+  
+  // Touch states for swipe
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+  const minSwipeDistance = 50
+
 
   // Engraving state
   const [hasEngraving, setHasEngraving] = useState("No")
@@ -357,6 +363,34 @@ export default function ProductDetailPage() {
     ? [...product.available_karats].sort((a, b) => (parseInt(a.replace(/\D/g, '')) || 0) - (parseInt(b.replace(/\D/g, '')) || 0))
     : [];
 
+  // Touch handlers for image swipe
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    
+    if (distance > minSwipeDistance) {
+      // swipe left -> next image
+      if (activeImageIndex < mediaItems.length - 1) {
+        setActiveImageIndex(prev => prev + 1);
+      }
+    }
+    if (distance < -minSwipeDistance) {
+      // swipe right -> prev image
+      if (activeImageIndex > 0) {
+        setActiveImageIndex(prev => prev - 1);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
       <Navbar />
@@ -379,7 +413,12 @@ export default function ProductDetailPage() {
             
             {/* Left Column: Image Gallery */}
             <div className="lg:col-span-6 flex flex-col">
-              <div className="w-full lg:max-w-[540px] aspect-square bg-white border border-[#F3F1EC] overflow-hidden relative group">
+              <div 
+                className="w-full lg:max-w-[540px] aspect-square bg-white border border-[#F3F1EC] overflow-hidden relative group"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 {isOnSale && (
                   <span className="absolute top-4 left-4 z-10 bg-[#CDB38B] text-white font-inter font-semibold text-[10px] tracking-wider uppercase px-3 py-1.5 shadow-sm">
                     {discountPercent}% OFF

@@ -37,6 +37,7 @@ export default function ProductDetailPage() {
 
   // Engraving state
   const [hasEngraving, setHasEngraving] = useState("No")
+  const [isEngravingOpen, setIsEngravingOpen] = useState(false)
   const [engravingFont, setEngravingFont] = useState("Garamond")
   const [engravingText, setEngravingText] = useState("")
   
@@ -48,6 +49,7 @@ export default function ProductDetailPage() {
   const sizeDropdownRef = useRef(null)
   const karatDropdownRef = useRef(null)
   const diamondWeightDropdownRef = useRef(null)
+  const engravingDropdownRef = useRef(null)
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -60,6 +62,9 @@ export default function ProductDetailPage() {
       }
       if (diamondWeightDropdownRef.current && !diamondWeightDropdownRef.current.contains(event.target)) {
         setIsDiamondWeightOpen(false)
+      }
+      if (engravingDropdownRef.current && !engravingDropdownRef.current.contains(event.target)) {
+        setIsEngravingOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -823,43 +828,28 @@ export default function ProductDetailPage() {
                 )}
 
                 {/* Engraving Section */}
-                <div className="mb-8 px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit">
-                  <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-4 block">
-                    Personalization (Optional)
-                  </span>
-                  
+                <div ref={engravingDropdownRef} className="mb-8 px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
                   {/* Yes/No Toggle */}
-                  <div className={`flex gap-4 ${hasEngraving === "Yes" ? "mb-4" : "mb-0"}`}>
-                    <label className="flex items-center gap-2 cursor-pointer font-inter text-[13px] text-[#2E3135]">
-                      <input 
-                        type="radio" 
-                        name="engravingOption" 
-                        value="No" 
-                        checked={hasEngraving === "No"} 
-                        onChange={(e) => {
-                          setHasEngraving(e.target.value)
-                          setEngravingText("")
-                        }}
-                        className="accent-[#2E3135]"
-                      />
-                      No Engraving
+                  <div className="flex items-center gap-6 py-1.5">
+                    <label htmlFor="engravingCheckbox" className="cursor-pointer font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
+                      Engraving
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer font-inter text-[13px] text-[#2E3135]">
-                      <input 
-                        type="radio" 
-                        name="engravingOption" 
-                        value="Yes" 
-                        checked={hasEngraving === "Yes"} 
-                        onChange={(e) => setHasEngraving(e.target.value)}
-                        className="accent-[#2E3135]"
-                      />
-                      Add Engraving
-                    </label>
+                    <input
+                      type="checkbox"
+                      id="engravingCheckbox"
+                      checked={hasEngraving === "Yes"}
+                      onChange={(e) => {
+                        setHasEngraving(e.target.checked ? "Yes" : "No")
+                        setIsEngravingOpen(e.target.checked)
+                        if (!e.target.checked) setEngravingText("")
+                      }}
+                      className="accent-[#2E3135]"
+                    />
                   </div>
 
                   {/* Engraving Details */}
-                  {hasEngraving === "Yes" && (
-                    <div className="space-y-4 pt-2 border-t border-[#E5E5E5]/50">
+                  {hasEngraving === "Yes" && isEngravingOpen && (
+                    <div className="absolute top-full left-0 mt-1 w-80 bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col p-4 space-y-4">
                       <div>
                         <label className="block font-inter font-medium text-[11px] tracking-wider uppercase text-[#2E3135] mb-2">
                           Select Font

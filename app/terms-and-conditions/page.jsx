@@ -6,12 +6,6 @@ export const metadata = {
   description: "Terms and conditions for using TATVAAN website and services.",
 };
 
-const PendingBadge = ({ text }) => (
-  <span className="inline-block bg-[#FEF3C7] text-[#92400E] border border-[#F59E0B] text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded ml-2 align-middle">
-    [PENDING &mdash; {text}]
-  </span>
-);
-
 export default function TermsAndConditionsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -25,7 +19,7 @@ export default function TermsAndConditionsPage() {
               Terms & Conditions
             </h1>
             <p className="font-inter text-[14px] md:text-[15px] text-[#CDB38B] tracking-[0.05em] font-light mt-3">
-              Last Updated: <PendingBadge text="CLIENT TO PROVIDE DATE" />
+              Last Updated: 01/07/2026
             </p>
           </div>
         </section>
@@ -38,7 +32,7 @@ export default function TermsAndConditionsPage() {
                 These Website Terms of Use and Sale govern access to and use of www.tatvaan.com and purchases made through the website.
               </p>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
-                Tatvaan Jewels is owned and operated by the legal entity identified in Section 25. In these Terms, &quot;Tatvaan&quot;, &quot;we&quot;, &quot;our&quot; and &quot;us&quot; refer to that entity, and &quot;customer&quot;, &quot;you&quot; and &quot;your&quot; refer to a person accessing the website or purchasing from us.
+                Tatvaan Jewels is owned and operated by Ira Jewels Pvt Ltd, operating under the brand name TATVAAN (details in Section 24). In these Terms, &quot;Tatvaan&quot;, &quot;we&quot;, &quot;our&quot; and &quot;us&quot; refer to that entity, and &quot;customer&quot;, &quot;you&quot; and &quot;your&quot; refer to a person accessing the website or purchasing from us.
               </p>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
                 By accessing or using the website, creating an account or placing an order, you agree to these Terms and the policies incorporated into them, including the Privacy Policy, Shipping and Delivery Policy, Return and Refund Policy, Exchange and Buyback Policy, Warranty and Service Policy, and any product-specific or promotional terms disclosed before purchase.
@@ -381,37 +375,16 @@ export default function TermsAndConditionsPage() {
               </p>
             </div>
 
-            {/* 22. Grievance Redressal */}
+            {/* 22. Governing Law, Consumer Rights and General Provisions */}
             <div className="border-t border-[#F3F1EC] pt-8">
               <h2 className="font-cormorant text-[28px] md:text-[32px] text-[#2E3135] font-normal mb-4">
-                22. Grievance Redressal
-              </h2>
-              <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
-                For a complaint relating to an order, product, payment, refund or website service, contact:
-              </p>
-              <ul className="space-y-3 font-inter text-[15px] text-[#555] font-light list-disc pl-5 leading-[1.8] mb-4">
-                <li><strong className="text-[#2E3135] font-medium">Grievance Officer:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
-                <li><strong className="text-[#2E3135] font-medium">Designation:</strong> Grievance Officer</li>
-                <li><strong className="text-[#2E3135] font-medium">Email:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
-                <li><strong className="text-[#2E3135] font-medium">Telephone:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
-                <li><strong className="text-[#2E3135] font-medium">Address:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
-                <li><strong className="text-[#2E3135] font-medium">Working Hours:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
-              </ul>
-              <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light">
-                Tatvaan will acknowledge a consumer complaint within 48 hours and endeavour to redress it within one month from receipt, as required by applicable law. A complaint should receive a reference or ticket number through which its status can be followed. Customers should provide their order number, registered contact details and a clear description of the issue.
-              </p>
-            </div>
-
-            {/* 23. Governing Law, Consumer Rights and General Provisions */}
-            <div className="border-t border-[#F3F1EC] pt-8">
-              <h2 className="font-cormorant text-[28px] md:text-[32px] text-[#2E3135] font-normal mb-4">
-                23. Governing Law, Consumer Rights and General Provisions
+                22. Governing Law, Consumer Rights and General Provisions
               </h2>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
                 These Terms are governed by the laws of India. The parties should first attempt to resolve a dispute through good-faith communication.
               </p>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
-                Subject to applicable consumer-protection law and the customer&apos;s right to approach a competent Consumer Commission or another legally available forum, courts at Surat, Gujarat <PendingBadge text="client to confirm" /> will have jurisdiction.
+                Subject to applicable consumer-protection law and the customer&apos;s right to approach a competent Consumer Commission or another legally available forum, courts at Bhavnagar, Gujarat will have jurisdiction.
               </p>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
                 If any provision of these Terms is found unlawful or unenforceable, the remaining provisions will continue to apply. A failure or delay by Tatvaan in enforcing a provision does not waive its right to enforce that or another provision later.
@@ -421,10 +394,10 @@ export default function TermsAndConditionsPage() {
               </p>
             </div>
 
-            {/* 24. Changes to These Terms */}
+            {/* 23. Changes to These Terms */}
             <div className="border-t border-[#F3F1EC] pt-8">
               <h2 className="font-cormorant text-[28px] md:text-[32px] text-[#2E3135] font-normal mb-4">
-                24. Changes to These Terms
+                23. Changes to These Terms
               </h2>
               <p className="font-inter text-[15px] text-[#555] leading-[1.8] font-light mb-4">
                 Tatvaan may update these Terms for future use of the website and future orders. The version applicable to an order will ordinarily be the version displayed when that order was placed.
@@ -434,20 +407,20 @@ export default function TermsAndConditionsPage() {
               </p>
             </div>
 
-            {/* 25. Contact Details */}
+            {/* 24. Contact Details */}
             <div className="border-t border-[#F3F1EC] pt-8">
               <h2 className="font-cormorant text-[28px] md:text-[32px] text-[#2E3135] font-normal mb-4">
-                25. Contact Details
+                24. Contact Details
               </h2>
               <ul className="space-y-3 font-inter text-[15px] text-[#555] font-light list-disc pl-5 leading-[1.8]">
                 <li><strong className="text-[#2E3135] font-medium">Tatvaan Jewels</strong></li>
-                <li><strong className="text-[#2E3135] font-medium">Legal Entity:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
-                <li><strong className="text-[#2E3135] font-medium">Registered Address:</strong> Princess Plaza, Mini Bazar, 9th Floor 905, Surat, Gujarat <PendingBadge text="client to confirm this matches exact legal registered address" /></li>
+                <li><strong className="text-[#2E3135] font-medium">Legal Entity:</strong> Ira Jewels Pvt Ltd</li>
+                <li><strong className="text-[#2E3135] font-medium">Registered Address:</strong> 3rd Floor, P 2557, 301, 302, 303, Sumantra Complex, Opp. Ram Mandir, Bhavnagar, Gujarat, 364002</li>
                 <li><strong className="text-[#2E3135] font-medium">Customer Care:</strong> 9023454014</li>
                 <li><strong className="text-[#2E3135] font-medium">Email:</strong> Irajewels849@gmail.com</li>
                 <li><strong className="text-[#2E3135] font-medium">Website:</strong> www.tatvaan.com</li>
                 <li><strong className="text-[#2E3135] font-medium">GSTIN:</strong> 24AAHCI5512M1ZH</li>
-                <li><strong className="text-[#2E3135] font-medium">CIN/LLPIN/Registration Number:</strong> <PendingBadge text="CLIENT TO PROVIDE" /></li>
+                <li><strong className="text-[#2E3135] font-medium">CIN/Registration Number:</strong> U32111GJ2024PTC149063</li>
               </ul>
             </div>
 

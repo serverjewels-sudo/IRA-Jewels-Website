@@ -287,6 +287,13 @@ export default function CheckoutPage() {
           throw new Error("No order data returned from Supabase");
         }
 
+        // Send order confirmation and alert emails (fire and forget)
+        fetch("/api/send-order-emails", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderData: newOrder[0] }),
+        }).catch(err => console.error("Error triggering COD emails:", err));
+
         // On success: clear cart and redirect
         setIsSuccess(true);
         clearCart();

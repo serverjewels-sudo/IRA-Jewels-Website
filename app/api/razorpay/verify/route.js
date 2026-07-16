@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { supabaseServiceRole, supabase } from "@/lib/supabase";
+import { sendOrderEmails } from "@/lib/emailUtils";
 
 export async function POST(request) {
   try {
@@ -35,6 +36,9 @@ export async function POST(request) {
     if (!newOrder || newOrder.length === 0) {
       return NextResponse.json({ error: "No order data returned" }, { status: 500 });
     }
+
+    // Send emails asynchronously (fire and forget)
+    sendOrderEmails(newOrder[0]).catch(err => console.error("Error triggering Razorpay emails:", err));
 
     return NextResponse.json({ success: true, order: newOrder[0] }, { status: 200 });
   } catch (error) {

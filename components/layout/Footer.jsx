@@ -108,11 +108,7 @@ export default function Footer() {
                   Care Instructions
                 </Link>
               </li>
-              <li>
-                <Link href="/custom-order" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Custom Order
-                </Link>
-              </li>
+
               <li>
                 <Link href="/contact" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Contact Us

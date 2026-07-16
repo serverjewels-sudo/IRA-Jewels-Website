@@ -280,6 +280,12 @@ export default function Navbar() {
                 Offers
               </Link>
               <Link 
+                href="/custom-order" 
+                className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
+              >
+                CUSTOM
+              </Link>
+              <Link 
                 href="/blog" 
                 className="text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors duration-300 uppercase"
               >
@@ -569,6 +575,14 @@ export default function Navbar() {
                   className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
                 >
                   Offers
+                </Link>
+                
+                <Link 
+                  href="/custom-order" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-[13px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] uppercase"
+                >
+                  CUSTOM
                 </Link>
                 
                 <Link 

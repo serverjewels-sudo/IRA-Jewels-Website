@@ -143,8 +143,8 @@ export default function PrivacyPolicyPage() {
               <ul className="mt-4 space-y-2 font-inter text-[15px] text-[#555] font-light leading-[1.8]">
                 <li>
                   <strong className="text-[#2E3135] font-medium">Email:</strong>{" "}
-                  <a href="mailto:Irajewels849@gmail.com" className="text-[#CDB38B] hover:underline">
-                    Irajewels849@gmail.com
+                  <a href="mailto:verifytatvaan@gmail.com" className="text-[#CDB38B] hover:underline">
+                    verifytatvaan@gmail.com
                   </a>
                 </li>
                 <li>

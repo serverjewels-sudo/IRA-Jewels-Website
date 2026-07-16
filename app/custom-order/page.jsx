@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { Check } from "lucide-react";
+import { Check, Image as ImageIcon, X, UploadCloud } from "lucide-react";
 import Link from "next/link";
 
 export default function CustomOrderPage() {
@@ -24,6 +24,41 @@ export default function CustomOrderPage() {
   const [submitted, setSubmitted] = useState(false);
   const [successName, setSuccessName] = useState("");
   const [successPhone, setSuccessPhone] = useState("");
+  
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const handleFileChange = (e) => {
+    setUploadError("");
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File size exceeds 5MB limit.");
+      return;
+    }
+
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      setUploadError("Invalid file type. Only JPG, PNG, and WebP are allowed.");
+      return;
+    }
+
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFilePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    setUploadError("");
+  };
 
   useEffect(() => {
     document.title = "Custom Order | TATVAAN";
@@ -34,7 +69,7 @@ export default function CustomOrderPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (
       formData.fullName.trim() &&
@@ -44,10 +79,58 @@ export default function CustomOrderPage() {
       formData.budget &&
       formData.vision.trim()
     ) {
+      setIsSubmitting(true);
+      
+      let imageUrl = "";
+
+      if (selectedFile) {
+        try {
+          const res = await fetch("/api/upload-custom-order-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              fileName: selectedFile.name, 
+              fileType: selectedFile.type,
+              fileSize: selectedFile.size
+            })
+          });
+          const signedData = await res.json();
+          
+          if (!res.ok) {
+            throw new Error(signedData.error || "Failed to get upload URL");
+          }
+
+          const { signedUrl, path } = signedData;
+
+          const uploadRes = await fetch(signedUrl, {
+            method: "PUT",
+            headers: { "Content-Type": selectedFile.type },
+            body: selectedFile
+          });
+
+          if (!uploadRes.ok) {
+            throw new Error("Failed to upload image to storage");
+          }
+
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          imageUrl = `${supabaseUrl}/storage/v1/object/public/custom-order-references/${path}`;
+        } catch (error) {
+          console.error("Image upload error:", error);
+          setUploadError("Image upload failed. Submitting request without image.");
+        }
+      }
+
+      await fetch('/api/custom-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, imageUrl })
+      }).catch(err => console.error("Error sending custom order form:", err));
+
       setSuccessName(formData.fullName.trim());
       setSuccessPhone(formData.phone.trim());
       setSubmitted(true);
-      // Reset form data
+      setIsSubmitting(false);
+
       setFormData({
         fullName: "",
         phone: "",
@@ -61,6 +144,9 @@ export default function CustomOrderPage() {
         vision: "",
         heardAboutUs: ""
       });
+      setSelectedFile(null);
+      setFilePreview(null);
+      setUploadError("");
     }
   };
 
@@ -366,6 +452,55 @@ export default function CustomOrderPage() {
                   />
                 </div>
 
+                {/* Row 7.5 — File Upload */}
+                <div>
+                  <label className="block font-inter font-medium text-[13px] text-[#2E3135] uppercase tracking-[1.5px] mb-2">
+                    Reference Image <span className="text-[#555] lowercase tracking-normal font-normal">(optional)</span>
+                  </label>
+                  <p className="text-[12px] font-inter text-[#555555] mb-3">
+                    Max size: 5MB. Formats: JPG, PNG, WebP.
+                  </p>
+                  
+                  {!selectedFile ? (
+                    <div className="relative border-2 border-dashed border-[#2E3135]/20 bg-[#F9F8F6] p-6 text-center hover:bg-[#F3F1EC] transition-colors cursor-pointer flex flex-col items-center justify-center">
+                      <input
+                        type="file"
+                        accept="image/jpeg, image/png, image/webp"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        title="Upload reference image"
+                      />
+                      <UploadCloud className="w-8 h-8 text-[#CDB38B] mb-2" />
+                      <span className="font-inter text-[13px] text-[#2E3135]">Click or drag to upload</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-4 border border-[#2E3135]/20 p-3 bg-white">
+                      {filePreview ? (
+                        <img src={filePreview} alt="Preview" className="w-16 h-16 object-cover border border-[#F3F1EC]" />
+                      ) : (
+                        <div className="w-16 h-16 bg-[#F3F1EC] flex items-center justify-center">
+                          <ImageIcon className="w-6 h-6 text-[#2E3135]/40" />
+                        </div>
+                      )}
+                      <div className="flex-grow overflow-hidden">
+                        <p className="font-inter text-[13px] text-[#2E3135] truncate">{selectedFile.name}</p>
+                        <p className="font-inter text-[11px] text-[#555555]">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeFile}
+                        className="p-2 hover:bg-[#F3F1EC] text-[#2E3135] transition-colors"
+                        title="Remove image"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  {uploadError && (
+                    <p className="text-red-500 text-[12px] font-inter mt-2">{uploadError}</p>
+                  )}
+                </div>
+
                 {/* Row 8 — full width */}
                 <div>
                   <label htmlFor="heardAboutUs" className="block font-inter font-medium text-[13px] text-[#2E3135] uppercase tracking-[1.5px] mb-2">
@@ -399,9 +534,20 @@ export default function CustomOrderPage() {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full bg-[#2E3135] text-white py-[16px] text-[13px] font-inter font-medium tracking-[1.5px] uppercase hover:bg-[#CDB38B] transition-colors duration-300 cursor-pointer"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#2E3135] text-white py-[16px] text-[13px] font-inter font-medium tracking-[1.5px] uppercase hover:bg-[#CDB38B] transition-colors duration-300 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    SUBMIT CUSTOM REQUEST
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        SUBMITTING...
+                      </>
+                    ) : (
+                      "SUBMIT CUSTOM REQUEST"
+                    )}
                   </button>
                 </div>
               </form>

@@ -417,7 +417,7 @@ export default function TermsAndConditionsPage() {
                 <li><strong className="text-[#2E3135] font-medium">Legal Entity:</strong> Ira Jewels Pvt Ltd</li>
                 <li><strong className="text-[#2E3135] font-medium">Registered Address:</strong> 3rd Floor, P 2557, 301, 302, 303, Sumantra Complex, Opp. Ram Mandir, Bhavnagar, Gujarat, 364002</li>
                 <li><strong className="text-[#2E3135] font-medium">Customer Care:</strong> 9023454014</li>
-                <li><strong className="text-[#2E3135] font-medium">Email:</strong> Irajewels849@gmail.com</li>
+                <li><strong className="text-[#2E3135] font-medium">Email:</strong> verifytatvaan@gmail.com</li>
                 <li><strong className="text-[#2E3135] font-medium">Website:</strong> www.tatvaan.com</li>
                 <li><strong className="text-[#2E3135] font-medium">GSTIN:</strong> 24AAHCI5512M1ZH</li>
                 <li><strong className="text-[#2E3135] font-medium">CIN/Registration Number:</strong> U32111GJ2024PTC149063</li>

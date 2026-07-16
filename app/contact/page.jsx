@@ -18,6 +18,15 @@ export default function ContactPage() {
     e.preventDefault();
     // Double check that all fields are filled before submitting
     if (formData.name.trim() && formData.email.trim() && formData.phone.trim() && formData.message.trim()) {
+      // Fire and forget the API request to send the email
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      }).catch(err => console.error("Error submitting contact form:", err));
+
       setSubmitted(true);
       setFormData({ name: "", email: "", phone: "", message: "" });
     }
@@ -83,8 +92,8 @@ export default function ContactPage() {
               
               <div className="flex items-center gap-3.5 text-[14px] font-inter text-[#2E3135]">
                 <Mail className="w-5 h-5 text-[#CDB38B] shrink-0" />
-                <a href="mailto:Irajewels849@gmail.com" className="hover:text-[#CDB38B] transition-colors">
-                  Irajewels849@gmail.com
+                <a href="mailto:verifytatvaan@gmail.com" className="hover:text-[#CDB38B] transition-colors">
+                  verifytatvaan@gmail.com
                 </a>
               </div>
               

@@ -135,7 +135,7 @@ export default function Navbar() {
                 <button 
                   className={`text-[12px] md:text-[10px] lg:text-[12px] font-medium tracking-widest md:tracking-wider lg:tracking-widest ${isSignatureOpen ? 'text-[#CDB38B]' : 'text-[#2E3135]'} hover:text-[#CDB38B] transition-colors duration-300 uppercase flex items-center gap-1`}
                 >
-                  Signature
+                  Jewellery
                   <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isSignatureOpen ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -389,7 +389,7 @@ export default function Navbar() {
                     onClick={() => setOpenMobileSection(openMobileSection === 'signature' ? null : 'signature')}
                     className="w-full flex items-center justify-between text-[11px] font-semibold tracking-widest text-[#2E3135] hover:text-[#CDB38B] transition-colors uppercase block focus:outline-none"
                   >
-                    <span>Signature</span>
+                    <span>Jewellery</span>
                     <ChevronDown 
                       className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${openMobileSection === 'signature' ? 'rotate-180' : ''}`} 
                     />

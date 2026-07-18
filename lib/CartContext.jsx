@@ -114,6 +114,10 @@ export const CartProvider = ({ children }) => {
           selectedDiamondWeight: selectedDiamondWeight,
           style_number: product.style_number,
           sku: product.sku,
+          category: product.category,
+          weight_grams: product.weight_grams,
+          metal_type: product.metal_type,
+          stone_type: product.stone_type,
           quantity: 1,
           
           // Raw pricing component fields:

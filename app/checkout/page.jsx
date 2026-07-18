@@ -239,6 +239,10 @@ export default function CheckoutPage() {
           engravingText: item.engravingText || null,
           style_number: item.style_number || null,
           sku: item.sku || null,
+          category: item.category || null,
+          weight_grams: item.weight_grams || null,
+          metal_type: item.metal_type || null,
+          stone_type: item.stone_type || null,
         };
       });
 

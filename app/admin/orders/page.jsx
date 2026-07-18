@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { computeManufacturingSku } from "@/lib/skuUtils";
 
 export const dynamic = 'force-dynamic';
 
@@ -253,7 +254,7 @@ export default function AdminOrdersPage() {
                                 {items.length > 0 ? items.map((item, idx) => {
                                   const specs = [
                                     { label: 'Style', value: item.style_number },
-                                    { label: 'SKU', value: item.sku },
+                                    { label: 'SKU', value: computeManufacturingSku(item) },
                                     { label: 'Size', value: item.selectedSize },
                                     { label: 'Colour', value: item.selectedColour },
                                     { label: 'Shape', value: item.selectedShape ? item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1) : null },
@@ -296,7 +297,7 @@ export default function AdminOrdersPage() {
                                               <div className="mt-2 text-[12px] font-inter text-[#888888] space-y-1 border-l-2 border-[#F3F1EC] pl-3">
                                                 {specs.map((spec, specIdx) => (
                                                   <div key={specIdx} className="flex">
-                                                    <span className="w-16 font-medium text-[#2E3135]">{spec.label}:</span>
+                                                    <span className="w-20 font-medium text-[#2E3135]">{spec.label}:</span>
                                                     <span>{spec.value}</span>
                                                   </div>
                                                 ))}

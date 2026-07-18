@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
 import { computeManufacturingSku } from "@/lib/skuUtils";
 
 export const dynamic = 'force-dynamic';
@@ -130,6 +130,57 @@ export default function AdminOrdersPage() {
     });
   };
 
+  const formatWhatsAppNumber = (phone) => {
+    if (!phone) return "";
+    const cleaned = String(phone).replace(/\D/g, "");
+    if (cleaned.length === 10) return "91" + cleaned;
+    if (cleaned.length === 11 && cleaned.startsWith("0")) return "91" + cleaned.substring(1);
+    if (cleaned.length === 12 && cleaned.startsWith("91")) return cleaned;
+    return cleaned;
+  };
+
+  const generateWhatsAppLink = (order) => {
+    const phone = formatWhatsAppNumber(order.customer_phone);
+    if (!phone) return "#";
+    
+    let itemsList = "No items";
+    if (Array.isArray(order.items) && order.items.length > 0) {
+      itemsList = "Items:\n" + order.items.map((item, index) => {
+        const lines = [`${index + 1}. ${item.name} x${item.quantity}`];
+        if (item.selectedSize) lines.push(`   Size: ${item.selectedSize}`);
+        if (item.karat) lines.push(`   Karat: ${item.karat}`);
+        if (item.selectedColour) lines.push(`   Colour: ${item.selectedColour}`);
+        if (item.selectedShape) {
+          const shape = item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1);
+          lines.push(`   Shape: ${shape}`);
+        }
+        if (item.selectedDiamondWeight) lines.push(`   Diamond Weight: ${item.selectedDiamondWeight}`);
+        
+        const isEngravingActive = item.hasEngraving === true || item.hasEngraving === "Yes";
+        if (isEngravingActive && item.engravingFont && item.engravingText) {
+          lines.push(`   Engraving: ${item.engravingFont} - "${item.engravingText}"`);
+        }
+        
+        return lines.join("\n");
+      }).join("\n\n");
+    } else {
+      itemsList = "Items: No items";
+    }
+      
+    const message = `Hello ${order.customer_name || 'Customer'}, thank you for your order from TATVAAN! 🎉
+
+Order Number: ${order.order_number}
+
+${itemsList}
+
+Total: ₹${Number(order.total).toLocaleString("en-IN")}
+Payment: ${order.payment_status || order.payment_method || 'Pending'}
+
+We're preparing your order with care. Thank you for choosing TATVAAN!`;
+
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  };
+
   return (
     <div className="space-y-8">
       {/* Header section */}
@@ -230,17 +281,32 @@ export default function AdminOrdersPage() {
                           </span>
                         </td>
                         <td className="p-5 text-center">
-                          <select
-                            value={order.status || "placed"}
-                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                            className="bg-white border border-[#E0E0E0] rounded px-2.5 py-1.5 font-inter text-[12px] text-[#2E3135] focus:outline-none focus:border-[#2E3135] cursor-pointer"
-                          >
-                            <option value="placed">Placed</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
+                          <div className="flex flex-col items-center gap-2">
+                            <select
+                              value={order.status || "placed"}
+                              onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                              className="bg-white border border-[#E0E0E0] rounded px-2.5 py-1.5 font-inter text-[12px] text-[#2E3135] focus:outline-none focus:border-[#2E3135] cursor-pointer w-[110px]"
+                            >
+                              <option value="placed">Placed</option>
+                              <option value="confirmed">Confirmed</option>
+                              <option value="shipped">Shipped</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                            
+                            {order.customer_phone && (
+                              <a
+                                href={generateWhatsAppLink(order)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1.5 bg-[#25D366] text-white px-2.5 py-1.5 rounded text-[11px] font-inter font-medium tracking-wide hover:bg-[#20ba56] transition-colors w-[110px] justify-center"
+                                title="Send WhatsApp"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                WhatsApp
+                              </a>
+                            )}
+                          </div>
                         </td>
                       </tr>
                       

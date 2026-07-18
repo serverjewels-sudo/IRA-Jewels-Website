@@ -146,9 +146,7 @@ export default function ProductDetailPage() {
             setSelectedShape(mapped.colour_variants[0].shapes[0].shape_id)
           }
           setSelectedKarat(mapped.karat || null)
-          if (mapped.diamond_weight_variants && mapped.diamond_weight_variants.length > 0) {
-            setSelectedDiamondWeight(mapped.diamond_weight_variants[0].weight)
-          }
+          // diamond_weight is now auto-selected via useEffect based on selectedShape
         }
       } catch (err) {
         console.error('[ProductDetail] Unexpected fetch error:', err)
@@ -162,9 +160,7 @@ export default function ProductDetailPage() {
             setSelectedShape(fallbackProduct.colour_variants[0].shapes[0].shape_id)
           }
           setSelectedKarat(fallbackProduct.karat || null)
-          if (fallbackProduct.diamond_weight_variants && fallbackProduct.diamond_weight_variants.length > 0) {
-            setSelectedDiamondWeight(fallbackProduct.diamond_weight_variants[0].weight)
-          }
+          // diamond_weight is now auto-selected via useEffect based on selectedShape
         } else {
           setProduct(null)
         }
@@ -244,6 +240,23 @@ export default function ProductDetailPage() {
       document.title = `${product.name} | TATVAAN`
     }
   }, [product])
+
+  // Auto-select available diamond weight when shape changes
+  useEffect(() => {
+    if (product?.diamond_price_matrix && selectedShape) {
+      const availableWeights = product.diamond_price_matrix.filter(v => v.shape_id === selectedShape);
+      if (availableWeights.length > 0) {
+        setSelectedDiamondWeight(current => {
+          if (!availableWeights.some(v => v.weight === current)) {
+            return availableWeights[0].weight;
+          }
+          return current;
+        });
+      } else {
+        setSelectedDiamondWeight(null);
+      }
+    }
+  }, [selectedShape, product?.diamond_price_matrix]);
 
   // Quantity helpers
   const increaseQty = () => setQuantity(prev => prev + 1)
@@ -331,11 +344,27 @@ export default function ProductDetailPage() {
   }
 
   let overriddenDiamondAmount = product?.diamond_net_amount;
-  if (product && selectedDiamondWeight && Array.isArray(product.diamond_weight_variants)) {
-    const match = product.diamond_weight_variants.find(v => v.weight === selectedDiamondWeight);
-    if (match) overriddenDiamondAmount = match.diamond_net_amount;
+  if (product && selectedShape && selectedDiamondWeight && Array.isArray(product.diamond_price_matrix)) {
+    const match = product.diamond_price_matrix.find(v => v.shape_id === selectedShape && v.weight === selectedDiamondWeight);
+    if (match && match.diamond_net_amount !== undefined) {
+      overriddenDiamondAmount = match.diamond_net_amount;
+    }
   }
-  const overriddenProduct = product ? { ...product, karat: selectedKarat || product.karat, diamond_net_amount: overriddenDiamondAmount } : null;
+  
+  let overriddenNetGoldWeight = product?.net_gold_weight;
+  if (product && selectedSize && Array.isArray(product.size_weight_variants)) {
+    const match = product.size_weight_variants.find(v => v.size === selectedSize);
+    if (match && match.net_gold_weight !== undefined) {
+      overriddenNetGoldWeight = match.net_gold_weight;
+    }
+  }
+
+  const overriddenProduct = product ? { 
+    ...product, 
+    karat: selectedKarat || product.karat, 
+    diamond_net_amount: overriddenDiamondAmount,
+    net_gold_weight: overriddenNetGoldWeight
+  } : null;
   const priceResult = calculateProductPrice(overriddenProduct, rate999);
   const { hasLivePrice, priceVal: displayPriceVal, price: displayPrice } = priceResult;
 
@@ -675,13 +704,13 @@ export default function ProductDetailPage() {
                     )}
 
                     {/* Diamond Weight Selector */}
-                    {product.diamond_weight_variants && product.diamond_weight_variants.length > 0 && (
+                    {product.diamond_price_matrix && selectedShape && product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).length > 0 && (
                       <div className="order-4 sm:order-2">
                         <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
                           Select Diamond Weight: {selectedDiamondWeight ? selectedDiamondWeight : ""}
                         </span>
                         <div className="flex flex-wrap gap-3">
-                          {product.diamond_weight_variants.map((v) => (
+                          {product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).map((v) => (
                             <button
                               key={v.weight}
                               onClick={() => setSelectedDiamondWeight(v.weight)}

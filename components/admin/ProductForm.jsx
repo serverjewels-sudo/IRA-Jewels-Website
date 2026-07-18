@@ -330,7 +330,8 @@ export default function ProductForm({ productId }) {
   const [sizesStr, setSizesStr] = useState("");
   const [simpleColours, setSimpleColours] = useState([{ name: "gold", hex: "#E6CA97" }]);
   const [colourVariants, setColourVariants] = useState([]);
-  const [diamondWeightVariants, setDiamondWeightVariants] = useState([]);
+  const [diamondPriceMatrix, setDiamondPriceMatrix] = useState([]);
+  const [sizeWeightVariants, setSizeWeightVariants] = useState([]);
   const [images, setImages] = useState(["", "", "", ""]);
   const [videoUrl, setVideoUrl] = useState("");
   
@@ -361,18 +362,32 @@ export default function ProductForm({ productId }) {
     setColourVariants(colourVariants.filter((_, i) => i !== index));
   };
 
-  const handleAddDiamondWeight = () => {
-    setDiamondWeightVariants([...diamondWeightVariants, { weight: "", diamond_net_amount: 0 }]);
+  const handleAddDiamondPrice = () => {
+    setDiamondPriceMatrix([...diamondPriceMatrix, { shape_id: "round", weight: "", diamond_net_amount: "" }]);
   };
 
-  const handleRemoveDiamondWeight = (index) => {
-    setDiamondWeightVariants(diamondWeightVariants.filter((_, i) => i !== index));
+  const handleRemoveDiamondPrice = (index) => {
+    setDiamondPriceMatrix(diamondPriceMatrix.filter((_, i) => i !== index));
   };
 
-  const handleDiamondWeightChange = (index, field, value) => {
-    const newVariants = [...diamondWeightVariants];
+  const handleDiamondPriceChange = (index, field, value) => {
+    const newMatrix = [...diamondPriceMatrix];
+    newMatrix[index][field] = value;
+    setDiamondPriceMatrix(newMatrix);
+  };
+
+  const handleAddSizeWeight = () => {
+    setSizeWeightVariants([...sizeWeightVariants, { size: "", net_gold_weight: "" }]);
+  };
+
+  const handleRemoveSizeWeight = (index) => {
+    setSizeWeightVariants(sizeWeightVariants.filter((_, i) => i !== index));
+  };
+
+  const handleSizeWeightChange = (index, field, value) => {
+    const newVariants = [...sizeWeightVariants];
     newVariants[index][field] = value;
-    setDiamondWeightVariants(newVariants);
+    setSizeWeightVariants(newVariants);
   };
 
   const isValidHex = (hex) => typeof hex === 'string' && /^#[0-9A-Fa-f]{6}$/i.test(hex);
@@ -564,8 +579,11 @@ export default function ProductForm({ productId }) {
           if (Array.isArray(p.size_options)) {
             setSizesStr(p.size_options.join(", "));
           }
-          if (Array.isArray(p.diamond_weight_variants)) {
-            setDiamondWeightVariants(p.diamond_weight_variants);
+          if (Array.isArray(p.diamond_price_matrix)) {
+            setDiamondPriceMatrix(p.diamond_price_matrix);
+          }
+          if (Array.isArray(p.size_weight_variants)) {
+            setSizeWeightVariants(p.size_weight_variants);
           }
           if (Array.isArray(p.colour_options)) {
             const list = p.colour_options.map((opt) => {
@@ -635,12 +653,24 @@ export default function ProductForm({ productId }) {
     if (!diamondNetAmount || diamondNetAmount.trim() === "") missingFields.push("Diamond Net Amount is required");
     if (!gstPercentage || gstPercentage.trim() === "") missingFields.push("GST % is required");
     
-    if (diamondWeightVariants.length > 0) {
-      if (diamondWeightVariants.some(v => !v.weight || !v.weight.trim())) {
-        missingFields.push("Weight name is required for all Diamond Weight Options");
+    if (diamondPriceMatrix.length > 0) {
+      if (diamondPriceMatrix.some(v => !v.shape_id || !v.shape_id.trim())) {
+        missingFields.push("Shape is required for all Diamond Price Matrix Options");
       }
-      if (diamondWeightVariants.some(v => v.diamond_net_amount === "" || v.diamond_net_amount === undefined || v.diamond_net_amount === null)) {
-        missingFields.push("Diamond Net Amount is required for all Diamond Weight Options");
+      if (diamondPriceMatrix.some(v => !v.weight || !v.weight.trim())) {
+        missingFields.push("Weight is required for all Diamond Price Matrix Options");
+      }
+      if (diamondPriceMatrix.some(v => v.diamond_net_amount === "" || v.diamond_net_amount === undefined || v.diamond_net_amount === null)) {
+        missingFields.push("Diamond Net Amount is required for all Diamond Price Matrix Options");
+      }
+    }
+
+    if (sizeWeightVariants.length > 0) {
+      if (sizeWeightVariants.some(v => !v.size || !v.size.trim())) {
+        missingFields.push("Size name is required for all Size Weight Options");
+      }
+      if (sizeWeightVariants.some(v => v.net_gold_weight === "" || v.net_gold_weight === undefined || v.net_gold_weight === null)) {
+        missingFields.push("Net Gold Weight is required for all Size Weight Options");
       }
     }
 
@@ -734,7 +764,8 @@ export default function ProductForm({ productId }) {
       size_options: sizes,
       colour_options: colours,
       colour_variants: colourVariants,
-      diamond_weight_variants: diamondWeightVariants,
+      diamond_price_matrix: diamondPriceMatrix,
+      size_weight_variants: sizeWeightVariants,
       images: imagesPayload,
       is_featured: isFeatured,
       is_active: isActive,
@@ -1158,46 +1189,58 @@ export default function ProductForm({ productId }) {
               />
             </div>
 
-            {/* Diamond Weight Variants */}
+            {/* Diamond Price Matrix */}
             <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
-                    Diamond Weight Options
+                    Diamond Price by Shape & Weight
                   </h3>
                   <p className="font-inter text-[12px] text-[#888888] font-light">
-                    Add selectable diamond weights and their specific diamond net amount overrides.
+                    Add specific prices for combinations of stone shape and weight.
                   </p>
                 </div>
                 <button
                   type="button"
-                  onClick={handleAddDiamondWeight}
+                  onClick={handleAddDiamondPrice}
                   className="px-4 py-2 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300 flex items-center justify-center whitespace-nowrap"
                 >
                   + Add Option
                 </button>
               </div>
 
-              {diamondWeightVariants.map((variant, index) => (
+              {diamondPriceMatrix.map((variant, index) => (
                 <div key={index} className="mb-4 p-4 border border-[#E5E5E5] rounded-md bg-[#FBFBFA] space-y-4">
                   <div className="flex justify-between items-start">
                     <h4 className="font-inter text-[13px] font-semibold uppercase tracking-wider text-[#2E3135]">Option {index + 1}</h4>
                     <button
                       type="button"
-                      onClick={() => handleRemoveDiamondWeight(index)}
+                      onClick={() => handleRemoveDiamondPrice(index)}
                       className="text-red-500 hover:text-red-700 font-inter text-[11px] uppercase tracking-wider font-semibold transition-colors"
                     >
                       Remove
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Shape *</label>
+                      <select
+                        value={variant.shape_id}
+                        onChange={(e) => handleDiamondPriceChange(index, "shape_id", e.target.value)}
+                        className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all bg-white"
+                      >
+                        {['round', 'princess', 'oval', 'cushion', 'emerald', 'pear', 'marquise', 'radiant', 'asscher', 'heart', 'trillion', 'baguette', 'triangle'].map(s => (
+                          <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="flex flex-col space-y-1.5">
                       <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Weight *</label>
                       <input
                         type="text"
                         value={variant.weight}
-                        onChange={(e) => handleDiamondWeightChange(index, "weight", e.target.value)}
+                        onChange={(e) => handleDiamondPriceChange(index, "weight", e.target.value)}
                         placeholder="e.g. 1ct"
                         className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && !variant.weight ? "border-red-400" : "border-[#E5E5E5]"}`}
                       />
@@ -1208,9 +1251,70 @@ export default function ProductForm({ productId }) {
                         type="number"
                         min="0"
                         value={variant.diamond_net_amount}
-                        onChange={(e) => handleDiamondWeightChange(index, "diamond_net_amount", e.target.value ? parseFloat(e.target.value) : "")}
-                        placeholder="e.g. 25000"
+                        onChange={(e) => handleDiamondPriceChange(index, "diamond_net_amount", e.target.value ? parseFloat(e.target.value) : "")}
+                        placeholder="e.g. 15000"
                         className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && (variant.diamond_net_amount === "" || variant.diamond_net_amount === undefined || variant.diamond_net_amount === null) ? "border-red-400" : "border-[#E5E5E5]"}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Size Weight Variants */}
+            <div className="md:col-span-2 border-t border-[#2E3135]/10 pt-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="font-serif font-normal text-[18px] tracking-wide text-[#2E3135] uppercase mb-1">
+                    Size Weight Options
+                  </h3>
+                  <p className="font-inter text-[12px] text-[#888888] font-light">
+                    Add specific net gold weights for each size. Overrides the base Net Gold Weight.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddSizeWeight}
+                  className="px-4 py-2 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[11px] font-semibold tracking-[1.5px] uppercase rounded transition-all duration-300 flex items-center justify-center whitespace-nowrap"
+                >
+                  + Add Option
+                </button>
+              </div>
+
+              {sizeWeightVariants.map((variant, index) => (
+                <div key={index} className="mb-4 p-4 border border-[#E5E5E5] rounded-md bg-[#FBFBFA] space-y-4">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-inter text-[13px] font-semibold uppercase tracking-wider text-[#2E3135]">Option {index + 1}</h4>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSizeWeight(index)}
+                      className="text-red-500 hover:text-red-700 font-inter text-[11px] uppercase tracking-wider font-semibold transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Size *</label>
+                      <input
+                        type="text"
+                        value={variant.size}
+                        onChange={(e) => handleSizeWeightChange(index, "size", e.target.value)}
+                        placeholder="e.g. 6"
+                        className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && !variant.size ? "border-red-400" : "border-[#E5E5E5]"}`}
+                      />
+                    </div>
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Net Gold Weight (grams) *</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        min="0"
+                        value={variant.net_gold_weight}
+                        onChange={(e) => handleSizeWeightChange(index, "net_gold_weight", e.target.value ? parseFloat(e.target.value) : "")}
+                        placeholder="e.g. 3.2"
+                        className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && (variant.net_gold_weight === "" || variant.net_gold_weight === undefined || variant.net_gold_weight === null) ? "border-red-400" : "border-[#E5E5E5]"}`}
                       />
                     </div>
                   </div>

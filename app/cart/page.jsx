@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X, Plus, Minus, ShieldCheck, Truck } from "lucide-react";
+import { X, Plus, Minus, ShieldCheck, Truck, ChevronDown } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useCart } from "@/lib/CartContext";
@@ -25,6 +25,16 @@ export default function CartPage() {
   };
   const [mounted, setMounted] = useState(false);
   const [rate999, setRate999] = useState(null);
+  const [expandedItems, setExpandedItems] = useState(new Set());
+
+  const toggleExpand = (productId) => {
+    setExpandedItems(prev => {
+      const next = new Set(prev);
+      if (next.has(productId)) next.delete(productId);
+      else next.add(productId);
+      return next;
+    });
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -110,14 +120,16 @@ export default function CartPage() {
             <div className="w-full lg:w-[65%] space-y-6">
               <div className="border-t border-[#F3F1EC]">
                 {cartItemsWithPrice.map((item) => {
-                  const variationText = [
-                    item.selectedSize ? `Size: ${item.selectedSize}` : null,
-                    item.selectedColour ? `Colour: ${item.selectedColour}` : null,
-                    item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
-                    item.karat ? `Karat: ${item.karat}` : null
-                  ]
-                    .filter(Boolean)
-                    .join("  •  ");
+                  const specs = [
+                    { label: 'Size', value: item.selectedSize },
+                    { label: 'Colour', value: item.selectedColour },
+                    { label: 'Shape', value: item.selectedShape ? item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1) : null },
+                    { label: 'Karat', value: item.karat },
+                    { label: 'Diamond', value: item.selectedDiamondWeight }
+                  ].filter(s => s.value);
+                  
+                  const hasVariations = specs.length > 0 || (item.hasEngraving && item.hasEngraving !== "No");
+                  const isExpanded = expandedItems.has(item.productId);
 
                   return (
                     <div
@@ -143,11 +155,39 @@ export default function CartPage() {
                             </Link>
                           </h3>
 
-                          {/* Variation (Size/Colour) */}
-                          {variationText && (
-                            <p className="font-inter font-light text-[13px] text-[#888888] mb-2">
-                              {variationText}
-                            </p>
+                          {/* Variation Details Toggle */}
+                          {hasVariations && (
+                            <div className="mb-2">
+                              <button
+                                onClick={() => toggleExpand(item.productId)}
+                                className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1 focus:outline-none"
+                              >
+                                <span>View Details</span>
+                                <ChevronDown 
+                                  className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+                                />
+                              </button>
+                              
+                              {isExpanded && (
+                                <div className="mt-2 text-[12px] font-inter text-[#888888] space-y-1 border-l-2 border-[#F3F1EC] pl-3">
+                                  {specs.map((spec, idx) => (
+                                    <div key={idx} className="flex">
+                                      <span className="w-16 font-medium text-[#2E3135]">{spec.label}:</span>
+                                      <span>{spec.value}</span>
+                                    </div>
+                                  ))}
+                                  
+                                  {item.hasEngraving && item.hasEngraving !== "No" && (
+                                    <div className="mt-3 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-3 py-2 rounded">
+                                      <span className="font-inter font-semibold text-[11px] uppercase tracking-wider block mb-1">Personalization</span>
+                                      <span className="font-inter text-[12px]">
+                                        Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[14px]' : ''}>&quot;{item.engravingText}&quot;</strong>
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
 

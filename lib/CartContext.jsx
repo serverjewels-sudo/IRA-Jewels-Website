@@ -117,9 +117,11 @@ export const CartProvider = ({ children }) => {
           quantity: 1,
           
           // Raw pricing component fields:
-          net_gold_weight: product.net_gold_weight,
-          diamond_net_amount: selectedDiamondWeight && Array.isArray(product.diamond_weight_variants) 
-            ? (product.diamond_weight_variants.find(v => v.weight === selectedDiamondWeight)?.diamond_net_amount ?? product.diamond_net_amount)
+          net_gold_weight: selectedSize && Array.isArray(product.size_weight_variants)
+            ? (product.size_weight_variants.find(v => v.size === selectedSize)?.net_gold_weight ?? product.net_gold_weight)
+            : product.net_gold_weight,
+          diamond_net_amount: selectedShape && selectedDiamondWeight && Array.isArray(product.diamond_price_matrix) 
+            ? (product.diamond_price_matrix.find(v => v.shape_id === selectedShape && v.weight === selectedDiamondWeight)?.diamond_net_amount ?? product.diamond_net_amount)
             : product.diamond_net_amount,
           making_net_amount: product.making_net_amount,
           other_net_amount: product.other_net_amount,

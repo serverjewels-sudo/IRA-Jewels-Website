@@ -11,6 +11,19 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrderIds, setExpandedOrderIds] = useState(new Set());
+  const [expandedOrderItems, setExpandedOrderItems] = useState(new Set());
+
+  const toggleOrderItemExpand = (itemKey) => {
+    setExpandedOrderItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemKey)) {
+        next.delete(itemKey);
+      } else {
+        next.add(itemKey);
+      }
+      return next;
+    });
+  };
 
   async function fetchOrders() {
     try {
@@ -238,15 +251,19 @@ export default function AdminOrdersPage() {
                               <h4 className="font-inter font-medium text-[11px] tracking-[1.5px] text-[#888] uppercase mb-4">Order Items</h4>
                               <div className="space-y-4">
                                 {items.length > 0 ? items.map((item, idx) => {
-                                  const variationDetails = [
-                                    item.style_number ? `Style: ${item.style_number}` : null,
-                                    item.sku ? `SKU: ${item.sku}` : null,
-                                    item.selectedSize ? `Size: ${item.selectedSize}` : null,
-                                    item.selectedColour ? `Colour: ${item.selectedColour}` : null,
-                                    item.selectedShape ? `Shape: ${item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1)}` : null,
-                                    item.selectedDiamondWeight ? `Diamond: ${item.selectedDiamondWeight}` : null,
-                                    item.karat ? `Karat: ${item.karat}` : null
-                                  ].filter(Boolean).join(" • ");
+                                  const specs = [
+                                    { label: 'Style', value: item.style_number },
+                                    { label: 'SKU', value: item.sku },
+                                    { label: 'Size', value: item.selectedSize },
+                                    { label: 'Colour', value: item.selectedColour },
+                                    { label: 'Shape', value: item.selectedShape ? item.selectedShape.charAt(0).toUpperCase() + item.selectedShape.slice(1) : null },
+                                    { label: 'Karat', value: item.karat },
+                                    { label: 'Diamond', value: item.selectedDiamondWeight }
+                                  ].filter(s => s.value);
+
+                                  const hasVariations = specs.length > 0 || (item.hasEngraving && item.hasEngraving !== "No");
+                                  const itemKey = `${order.id}-${idx}`;
+                                  const isItemExpanded = expandedOrderItems.has(itemKey);
 
                                   return (
                                     <div key={idx} className="flex gap-4 items-start bg-white p-4 border border-[#E0E0E0] rounded-md shadow-sm">
@@ -262,15 +279,38 @@ export default function AdminOrdersPage() {
                                             {item.quantity} x ₹{Number(item.price).toLocaleString("en-IN")}
                                           </span>
                                         </div>
-                                        {variationDetails && (
-                                          <p className="font-inter text-[12px] text-[#888] mt-1">{variationDetails}</p>
-                                        )}
-                                        {item.hasEngraving && (
-                                          <div className="mt-3 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-3 py-2 rounded">
-                                            <span className="font-inter font-semibold text-[11px] uppercase tracking-wider block mb-1">Personalization</span>
-                                            <span className="font-inter text-[13px]">
-                                              Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[15px]' : ''}>&quot;{item.engravingText}&quot;</strong>
-                                            </span>
+                                        
+                                        {hasVariations && (
+                                          <div className="mt-2">
+                                            <button
+                                              onClick={() => toggleOrderItemExpand(itemKey)}
+                                              className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1 focus:outline-none"
+                                            >
+                                              <span>View Details</span>
+                                              <ChevronDown 
+                                                className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isItemExpanded ? 'rotate-180' : ''}`} 
+                                              />
+                                            </button>
+                                            
+                                            {isItemExpanded && (
+                                              <div className="mt-2 text-[12px] font-inter text-[#888888] space-y-1 border-l-2 border-[#F3F1EC] pl-3">
+                                                {specs.map((spec, specIdx) => (
+                                                  <div key={specIdx} className="flex">
+                                                    <span className="w-16 font-medium text-[#2E3135]">{spec.label}:</span>
+                                                    <span>{spec.value}</span>
+                                                  </div>
+                                                ))}
+                                                
+                                                {item.hasEngraving && item.hasEngraving !== "No" && (
+                                                  <div className="mt-3 inline-block bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] px-3 py-2 rounded">
+                                                    <span className="font-inter font-semibold text-[11px] uppercase tracking-wider block mb-1">Personalization</span>
+                                                    <span className="font-inter text-[13px]">
+                                                      Font: <strong>{item.engravingFont}</strong> — Text: <strong style={{fontFamily: item.engravingFont === 'Garamond' ? "'Cormorant Garamond', serif" : "inherit"}} className={item.engravingFont === 'Garamond' ? 'italic text-[15px]' : ''}>&quot;{item.engravingText}&quot;</strong>
+                                                    </span>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
                                           </div>
                                         )}
                                       </div>

@@ -106,7 +106,7 @@ export default function ContactPage() {
             {/* Section 4: WhatsApp Button */}
             <div>
               <a
-                href="https://wa.me/919023454014?text=Hello%20IRA%20Jewels%2C%20I%20have%20an%20enquiry"
+                href="https://wa.me/919023454014?text=Hello%20TATVAAN%2C%20I%20have%20an%20enquiry"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-[#25D366] text-white py-[14px] text-[13px] font-inter font-medium tracking-[1.5px] uppercase hover:bg-[#20ba56] transition-colors rounded-none"

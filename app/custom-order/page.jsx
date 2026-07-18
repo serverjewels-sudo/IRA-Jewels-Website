@@ -200,7 +200,7 @@ export default function CustomOrderPage() {
 
                 <div className="w-full space-y-4">
                   <a
-                    href="https://wa.me/919023454014?text=Hi%20IRA%20Jewels%2C%20I%20just%20submitted%20a%20custom%20order%20request"
+                    href="https://wa.me/919023454014?text=Hi%20TATVAAN%2C%20I%20just%20submitted%20a%20custom%20order%20request"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full text-center bg-[#25D366] hover:bg-[#20ba56] text-white py-[16px] text-[13px] font-inter font-medium tracking-[1.5px] uppercase transition-colors"

@@ -1069,6 +1069,12 @@ export default function ProductDetailPage() {
                   Specifications
                 </h3>
                 <div className="border border-[#E5E5E5] text-xs font-inter divide-y divide-[#E5E5E5]">
+                  {product.category && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">Category</span>
+                      <span className="text-[#2E3135] font-medium capitalize">{product.category}</span>
+                    </div>
+                  )}
                   {(selectedColour || product.metalType || product.metal) && (
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Metal & Color</span>
@@ -1081,16 +1087,48 @@ export default function ProductDetailPage() {
                       <span className="text-[#2E3135] font-medium">{selectedKarat || product.karat}</span>
                     </div>
                   )}
-                  {product.weight && (
+                  {selectedSize && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">Size</span>
+                      <span className="text-[#2E3135] font-medium">{selectedSize}</span>
+                    </div>
+                  )}
+                  {selectedShape && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">Stone Shape</span>
+                      <span className="text-[#2E3135] font-medium capitalize">{selectedShape}</span>
+                    </div>
+                  )}
+                  {selectedDiamondWeight && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">Diamond Weight</span>
+                      <span className="text-[#2E3135] font-medium">{selectedDiamondWeight}</span>
+                    </div>
+                  )}
+                  {product.setting_style && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">Setting Style</span>
+                      <span className="text-[#2E3135] font-medium capitalize">{product.setting_style}</span>
+                    </div>
+                  )}
+                  {overriddenNetGoldWeight && (
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Total Weight</span>
-                      <span className="text-[#2E3135] font-medium">{product.weight}</span>
+                      <span className="text-[#2E3135] font-medium">
+                        {parseFloat((((selectedDiamondWeight ? parseFloat(selectedDiamondWeight) : 0) + (product.other_diamond_weight || 0)) * 0.2 + overriddenNetGoldWeight).toFixed(2))}g
+                      </span>
                     </div>
                   )}
                   {product.stoneType && (
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Stone Details</span>
                       <span className="text-[#2E3135] font-medium">{product.stoneType}</span>
+                    </div>
+                  )}
+                  {hasEngraving === "Yes" && engravingText && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">Engraving</span>
+                      <span className="text-[#2E3135] font-medium">{engravingFont} &mdash; '{engravingText}'</span>
                     </div>
                   )}
                   <div className="grid grid-cols-2 p-3">

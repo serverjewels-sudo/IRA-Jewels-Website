@@ -83,13 +83,13 @@ export default function Footer() {
               onClick={() => setIsHelpFooterOpen(!isHelpFooterOpen)}
               className="md:hidden w-full flex justify-between items-center font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold focus:outline-none"
             >
-              <span>Help</span>
+              <span>Customer Care</span>
               <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isHelpFooterOpen ? 'rotate-180' : ''}`} />
             </button>
             
             {/* Desktop Static Heading */}
             <h3 className="hidden md:block font-serif text-[13px] tracking-widest text-[#2E3135] uppercase mb-5 font-semibold">
-              Help
+              Customer Care
             </h3>
             
             <ul className={`space-y-3 ${isHelpFooterOpen ? 'block' : 'hidden'} md:block`}>
@@ -112,6 +112,11 @@ export default function Footer() {
               <li>
                 <Link href="/contact" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
+                  FAQ's
                 </Link>
               </li>
             </ul>

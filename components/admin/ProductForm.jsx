@@ -475,6 +475,7 @@ export default function ProductForm({ productId }) {
   const [diamondNetAmount, setDiamondNetAmount] = useState("0");
   const [makingNetAmount, setMakingNetAmount] = useState("0");
   const [otherNetAmount, setOtherNetAmount] = useState("0");
+  const [otherDiamondWeight, setOtherDiamondWeight] = useState("0");
   const [gstPercentage, setGstPercentage] = useState("");
 
   // Reference rates fetched from DB
@@ -574,6 +575,7 @@ export default function ProductForm({ productId }) {
           setDiamondNetAmount(p.diamond_net_amount !== undefined && p.diamond_net_amount !== null ? String(p.diamond_net_amount) : "0");
           setMakingNetAmount(p.making_net_amount !== undefined && p.making_net_amount !== null ? String(p.making_net_amount) : "0");
           setOtherNetAmount(p.other_net_amount !== undefined && p.other_net_amount !== null ? String(p.other_net_amount) : "0");
+          setOtherDiamondWeight(p.other_diamond_weight !== undefined && p.other_diamond_weight !== null ? String(p.other_diamond_weight) : "0");
           setGstPercentage(p.gst_percentage !== undefined && p.gst_percentage !== null ? String(p.gst_percentage) : "");
           
           if (Array.isArray(p.size_options)) {
@@ -773,6 +775,7 @@ export default function ProductForm({ productId }) {
       diamond_net_amount: diamondNetAmount ? parseFloat(diamondNetAmount) : 0,
       making_net_amount: makingNetAmount ? parseFloat(makingNetAmount) : 0,
       other_net_amount: otherNetAmount ? parseFloat(otherNetAmount) : 0,
+      other_diamond_weight: otherDiamondWeight ? parseFloat(otherDiamondWeight) : 0,
       gst_percentage: gstPercentage ? parseFloat(gstPercentage) : null,
       video_url: videoUrlPayload,
       collection_ids: selectedCollectionIds,
@@ -1144,6 +1147,22 @@ export default function ProductForm({ productId }) {
                 value={otherNetAmount}
                 onChange={(e) => setOtherNetAmount(e.target.value)}
                 placeholder="e.g. 0"
+                className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
+              />
+            </div>
+
+            {/* Other Diamond Weight */}
+            <div className="flex flex-col space-y-1.5">
+              <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">
+                Other Diamond Weight (ct)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={otherDiamondWeight}
+                onChange={(e) => setOtherDiamondWeight(e.target.value)}
+                placeholder="e.g. 0.5"
                 className="w-full px-4 py-2.5 border border-[#E5E5E5] rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all"
               />
             </div>

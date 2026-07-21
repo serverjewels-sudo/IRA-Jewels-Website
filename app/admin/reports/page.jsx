@@ -12,6 +12,8 @@ export const dynamic = 'force-dynamic';
 export default function AdminReportsPage() {
   const [activeTab, setActiveTab] = useState("product"); // "product" | "order"
   
+  const [reportsEnabled, setReportsEnabled] = useState(null); // null = checking, true = active, false = restricted
+
   // Data
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
@@ -69,8 +71,37 @@ export default function AdminReportsPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    async function checkFeatureFlag() {
+      try {
+        const { data, error } = await supabase
+          .from("feature_flags")
+          .select("reports_enabled")
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error checking reports feature flag:", error);
+          setReportsEnabled(false);
+        } else if (data) {
+          setReportsEnabled(!!data.reports_enabled);
+        } else {
+          setReportsEnabled(false);
+        }
+      } catch (err) {
+        console.error("Unexpected error checking reports feature flag:", err);
+        setReportsEnabled(false);
+      }
+    }
+    checkFeatureFlag();
   }, []);
+
+  useEffect(() => {
+    if (reportsEnabled === true) {
+      fetchData();
+    } else if (reportsEnabled === false) {
+      setLoading(false);
+    }
+  }, [reportsEnabled]);
 
   const handleApplyFilters = () => {
     setAppliedFilters({
@@ -408,6 +439,26 @@ export default function AdminReportsPage() {
     const filename = `TATVAAN-${title.replace(" ", "-")}-${dateStr}.xlsx`;
     XLSX.writeFile(wb, filename);
   };
+
+  if (reportsEnabled === null) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 rounded-full border-2 border-t-[#CDB38B] border-r-transparent border-b-transparent border-l-transparent animate-spin mb-4"></div>
+        <p className="font-inter text-[13px] text-[#888888] font-light uppercase tracking-wider">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (reportsEnabled === false) {
+    return (
+      <div className="bg-white rounded-lg border border-[#2E3135]/5 p-12 text-center shadow-sm max-w-lg mx-auto my-12">
+        <h2 className="font-serif text-[24px] text-[#2E3135] mb-2 uppercase tracking-wide">Access Restricted</h2>
+        <p className="font-inter font-light text-[14px] text-[#888888]">
+          This feature is not currently available.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

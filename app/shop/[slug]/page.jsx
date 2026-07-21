@@ -26,6 +26,7 @@ export default function ProductDetailPage() {
   const [isSizeOpen, setIsSizeOpen] = useState(false)
   const [isKaratOpen, setIsKaratOpen] = useState(false)
   const [isDiamondWeightOpen, setIsDiamondWeightOpen] = useState(false)
+  const [isSpecificationsOpen, setIsSpecificationsOpen] = useState(false)
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
@@ -1095,9 +1096,16 @@ export default function ProductDetailPage() {
 
               {/* Specifications Table */}
               <div className="mt-6">
-                <h3 className="font-inter font-medium text-[12px] tracking-[1.5px] uppercase text-[#2E3135] mb-4">
-                  Specifications
-                </h3>
+                <button
+                  onClick={() => setIsSpecificationsOpen(!isSpecificationsOpen)}
+                  className="flex items-center gap-1.5 text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
+                >
+                  <span>Specifications</span>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 ${isSpecificationsOpen ? 'rotate-180' : ''}`} 
+                  />
+                </button>
+                {isSpecificationsOpen && (
                 <div className="border border-[#E5E5E5] text-xs font-inter divide-y divide-[#E5E5E5]">
                   {product.category && (
                     <div className="grid grid-cols-2 p-3">
@@ -1166,6 +1174,7 @@ export default function ProductDetailPage() {
                     <span className="text-[#2E3135] font-medium">IGI Certified</span>
                   </div>
                 </div>
+                )}
               </div>
 
             </div>

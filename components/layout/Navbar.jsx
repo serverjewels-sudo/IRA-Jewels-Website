@@ -8,6 +8,8 @@ import { supabase } from "@/lib/supabase";
 import { usePathname } from "next/navigation";
 import { CATEGORIES } from "@/lib/constants";
 import SearchOverlay from "@/components/layout/SearchOverlay";
+import AnnouncementBanner from "@/components/layout/AnnouncementBanner";
+
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileSection, setOpenMobileSection] = useState(null);
@@ -113,8 +115,9 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`${navPosition} top-0 z-50 w-full transition-all duration-300 ${navBackground}`}>
-        <div className="w-full px-4 sm:px-6 md:px-4 lg:px-8 h-20 flex items-center justify-between">
+      <header className={`${navPosition} top-0 z-50 w-full transition-all duration-300`}>
+        <AnnouncementBanner />
+        <div className={`w-full px-4 sm:px-6 md:px-4 lg:px-8 h-20 flex items-center justify-between transition-colors duration-300 ${navBackground}`}>
           
           {/* Left Side: Brand Logo */}
           <Link href="/" className="group flex flex-col items-center shrink-0">

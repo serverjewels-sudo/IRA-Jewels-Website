@@ -78,6 +78,12 @@ export default function CheckoutPage() {
   const [submitError, setSubmitError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Promo Code State
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [promoError, setPromoError] = useState("");
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     async function fetchRate() {
@@ -104,12 +110,7 @@ export default function CheckoutPage() {
     }
   }, [mounted, isLoaded, activeItems, router, isSuccess]);
 
-  // Cleanup buyNowItem when navigating away
-  useEffect(() => {
-    return () => {
-      clearBuyNowItem();
-    };
-  }, []);
+
 
   // Auth protection: redirect to login if not logged in
   useEffect(() => {
@@ -126,22 +127,101 @@ export default function CheckoutPage() {
     }
   }, [mounted, router]);
 
-  // Live-calculate product prices based on current gold rate
+  const formatPrice = (amount) => {
+    return "₹" + Number(amount).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+  };
+
+  const handleApplyPromo = async () => {
+    setPromoError("");
+    if (!promoInput.trim()) return;
+    
+    setIsApplyingPromo(true);
+    try {
+      const { data, error } = await supabase
+        .from("promo_codes")
+        .select("*")
+        .eq("code", promoInput.trim().toUpperCase())
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (error || !data) {
+        setPromoError("Invalid or inactive promo code.");
+        setIsApplyingPromo(false);
+        return;
+      }
+
+      const now = new Date();
+      if (data.start_date && now < new Date(data.start_date)) {
+        setPromoError("This promo code is not active yet.");
+        setIsApplyingPromo(false);
+        return;
+      }
+      if (data.end_date) {
+        const end = new Date(data.end_date);
+        end.setHours(23, 59, 59, 999);
+        if (now > end) {
+          setPromoError("This promo code has expired.");
+          setIsApplyingPromo(false);
+          return;
+        }
+      }
+
+      const hasApplicableItem = activeItems.some((item) => 
+        item.collection_ids?.includes(data.collection_id)
+      );
+
+      if (!hasApplicableItem) {
+        setPromoError("This code doesn't apply to any items in your cart.");
+        setIsApplyingPromo(false);
+        return;
+      }
+
+      setAppliedPromo(data);
+      setPromoInput("");
+    } catch (err) {
+      setPromoError("Something went wrong. Please try again.");
+    }
+    setIsApplyingPromo(false);
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    setPromoError("");
+  };
+
+  // Live-calculate product prices based on current gold rate and applied promo
   const cartItemsWithPrice = activeItems.map((item) => {
     const calculated = calculateProductPrice(item, rate999);
+    
+    let finalPriceVal = calculated.priceVal;
+    let finalSubtotal = calculated.subtotal;
+    let finalGstAmount = calculated.gstAmount;
+    let originalPrice = null;
+    let discountAmount = 0;
+
+    if (appliedPromo && item.collection_ids?.includes(appliedPromo.collection_id)) {
+      const discountPreTax = calculated.subtotal * (1 - appliedPromo.discount_percentage / 100);
+      const discountGst = discountPreTax * ((parseFloat(item.gst_percentage) || 3) / 100);
+      finalPriceVal = discountPreTax + discountGst;
+      finalSubtotal = discountPreTax;
+      finalGstAmount = discountGst;
+      originalPrice = calculated.priceVal;
+      discountAmount = calculated.priceVal - finalPriceVal;
+    }
+
     return {
       ...item,
-      livePriceVal: calculated.priceVal,
-      livePriceStr: calculated.price,
+      livePriceVal: finalPriceVal,
+      livePriceStr: formatPrice(finalPriceVal),
+      liveOriginalPriceVal: originalPrice,
+      liveDiscountAmount: discountAmount,
+      livePreTax: finalSubtotal,
+      liveGst: finalGstAmount,
     };
   });
 
   const subtotal = cartItemsWithPrice.reduce((sum, item) => sum + item.livePriceVal * item.quantity, 0);
-
-
-  const formatPrice = (amount) => {
-    return "₹" + Number(amount).toLocaleString("en-IN");
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -229,15 +309,34 @@ export default function CheckoutPage() {
 
       const orderItems = activeItems.map((item) => {
         const calculated = calculateProductPrice(item, freshRate);
+        
+        let finalPriceVal = calculated.priceVal;
+        let finalSubtotal = calculated.subtotal;
+        let finalGstAmount = calculated.gstAmount;
+        let originalPrice = null;
+        let discountAmount = 0;
+
+        if (appliedPromo && item.collection_ids?.includes(appliedPromo.collection_id)) {
+          const discountPreTax = calculated.subtotal * (1 - appliedPromo.discount_percentage / 100);
+          const discountGst = discountPreTax * ((parseFloat(item.gst_percentage) || 3) / 100);
+          finalPriceVal = discountPreTax + discountGst;
+          finalSubtotal = discountPreTax;
+          finalGstAmount = discountGst;
+          originalPrice = calculated.priceVal;
+          discountAmount = calculated.priceVal - finalPriceVal;
+        }
+
         return {
           product_id: item.id,
           name: item.name,
-          price: calculated.priceVal, // freshly calculated price
+          price: finalPriceVal, // freshly calculated price
+          original_price: originalPrice,
+          discount_amount: discountAmount,
           quantity: item.quantity,
           image: item.image,
           gst_percentage: parseFloat(item.gst_percentage) || 3,
-          gst_amount: calculated.gstAmount,
-          pre_tax_price: calculated.subtotal,
+          gst_amount: finalGstAmount,
+          pre_tax_price: finalSubtotal,
           selectedSize: item.selectedSize || null,
           selectedColour: item.selectedColour || null,
           selectedShape: item.selectedShape || null,
@@ -258,6 +357,7 @@ export default function CheckoutPage() {
       const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const preTaxSubtotal = orderItems.reduce((sum, item) => sum + (item.pre_tax_price * item.quantity), 0);
       const totalGstAmount = orderItems.reduce((sum, item) => sum + (item.gst_amount * item.quantity), 0);
+      const totalDiscountAmount = orderItems.reduce((sum, item) => sum + (item.discount_amount || 0) * item.quantity, 0);
       const shippingCost = deliveryPref === "express" ? 199 : 0;
       const finalTotal = subtotal + shippingCost;
 
@@ -288,6 +388,8 @@ export default function CheckoutPage() {
               payment_status: "cod_pending",
               shipping_address: shippingAddress,
               status: "placed",
+              promo_code_used: appliedPromo?.code || null,
+              total_discount_amount: totalDiscountAmount,
             },
           ])
           .select();
@@ -359,6 +461,8 @@ export default function CheckoutPage() {
                     status: "placed",
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
+                    promo_code_used: appliedPromo?.code || null,
+                    total_discount_amount: totalDiscountAmount,
                   },
                 }),
               });
@@ -813,12 +917,73 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                     {/* Price */}
-                    <span className="font-inter font-medium text-[14px] text-[#2E3135] text-right">
-                      {formatPrice(item.livePriceVal * item.quantity)}
-                    </span>
+                    <div className="flex flex-col items-end">
+                      {item.liveOriginalPriceVal ? (
+                        <>
+                          <span className="font-inter font-medium text-[14px] text-[#E53E3E] text-right">
+                            {formatPrice(item.livePriceVal * item.quantity)}
+                          </span>
+                          <span className="font-inter font-light text-[12px] text-[#888888] line-through text-right">
+                            {formatPrice(item.liveOriginalPriceVal * item.quantity)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="font-inter font-medium text-[14px] text-[#2E3135] text-right">
+                          {formatPrice(item.livePriceVal * item.quantity)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
+            </div>
+
+            {/* Promo Code Section */}
+            <div className="mb-6 pb-6 border-b border-[#E8E6E1]">
+              <h3 className="font-inter font-medium text-[12px] tracking-[1.5px] uppercase text-[#2E3135] mb-3">
+                HAVE A PROMO CODE?
+              </h3>
+              
+              {appliedPromo ? (
+                <div className="bg-[#E8F5E9] border border-[#A5D6A7] rounded p-3 flex justify-between items-center">
+                  <div>
+                    <span className="font-inter font-medium text-[13px] text-[#2E7D32]">
+                      {appliedPromo.code} applied!
+                    </span>
+                    <span className="block font-inter font-light text-[11px] text-[#4CAF50] mt-0.5">
+                      {appliedPromo.discount_percentage}% off eligible items
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemovePromo}
+                    className="text-[#2E7D32] hover:text-[#1B5E20] font-inter font-medium text-[12px] underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value)}
+                    placeholder="Enter code"
+                    className={`flex-grow h-10 border ${promoError ? "border-[#E53E3E]" : "border-[#E0E0E0]"} rounded px-3 font-inter text-[13px] uppercase focus:outline-none focus:border-[#2E3135]`}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyPromo}
+                    disabled={isApplyingPromo || !promoInput.trim()}
+                    className="h-10 px-4 bg-[#2E3135] text-white font-inter font-medium text-[12px] tracking-[1px] rounded hover:bg-[#CDB38B] disabled:bg-[#888888] transition-colors"
+                  >
+                    {isApplyingPromo ? "..." : "APPLY"}
+                  </button>
+                </div>
+              )}
+              {promoError && (
+                <p className="mt-2 font-inter text-[11px] text-[#E53E3E]">{promoError}</p>
+              )}
             </div>
 
             {/* Summary lines */}

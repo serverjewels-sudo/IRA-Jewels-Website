@@ -11,11 +11,16 @@ import { supabase } from "@/lib/supabase";
 import { calculateProductPrice } from "@/lib/priceUtils";
 
 export default function CartPage() {
-  const { items, totalCount, updateQuantity, removeFromCart } = useCart();
+  const { items, totalCount, updateQuantity, removeFromCart, clearBuyNowItem } = useCart();
   const router = useRouter();
 
   const handleCheckoutClick = async (e) => {
     e.preventDefault();
+    
+    // EXPLICIT FIX: If user proceeds from normal cart, completely wipe any leftover Buy Now item
+    // so it doesn't hijack the checkout session.
+    clearBuyNowItem();
+
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       router.push("/checkout");

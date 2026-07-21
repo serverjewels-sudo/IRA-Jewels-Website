@@ -582,7 +582,16 @@ export default function ProductForm({ productId }) {
             setSizesStr(p.size_options.join(", "));
           }
           if (Array.isArray(p.diamond_price_matrix)) {
-            setDiamondPriceMatrix(p.diamond_price_matrix);
+            const normalizedMatrix = p.diamond_price_matrix.map(opt => {
+              if (opt.weight) {
+                const num = parseFloat(String(opt.weight).replace(/[^\d.]/g, ''));
+                if (!isNaN(num)) {
+                  return { ...opt, weight: `${num.toFixed(2)}ct` };
+                }
+              }
+              return opt;
+            });
+            setDiamondPriceMatrix(normalizedMatrix);
           }
           if (Array.isArray(p.size_weight_variants)) {
             setSizeWeightVariants(p.size_weight_variants);
@@ -659,7 +668,7 @@ export default function ProductForm({ productId }) {
       if (diamondPriceMatrix.some(v => !v.shape_id || !v.shape_id.trim())) {
         missingFields.push("Shape is required for all Diamond Price Matrix Options");
       }
-      if (diamondPriceMatrix.some(v => !v.weight || !v.weight.trim())) {
+      if (diamondPriceMatrix.some(v => !v.weight || !String(v.weight).trim())) {
         missingFields.push("Weight is required for all Diamond Price Matrix Options");
       }
       if (diamondPriceMatrix.some(v => v.diamond_net_amount === "" || v.diamond_net_amount === undefined || v.diamond_net_amount === null)) {
@@ -766,7 +775,13 @@ export default function ProductForm({ productId }) {
       size_options: sizes,
       colour_options: colours,
       colour_variants: colourVariants,
-      diamond_price_matrix: diamondPriceMatrix,
+      diamond_price_matrix: diamondPriceMatrix.map(v => {
+        const num = parseFloat(String(v.weight).replace(/[^\d.]/g, ''));
+        return {
+          ...v,
+          weight: !isNaN(num) ? `${num.toFixed(2)}ct` : v.weight
+        };
+      }),
       size_weight_variants: sizeWeightVariants,
       images: imagesPayload,
       is_featured: isFeatured,
@@ -1256,13 +1271,17 @@ export default function ProductForm({ productId }) {
                     </div>
                     <div className="flex flex-col space-y-1.5">
                       <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Weight *</label>
-                      <input
-                        type="text"
-                        value={variant.weight}
-                        onChange={(e) => handleDiamondPriceChange(index, "weight", e.target.value)}
-                        placeholder="e.g. 1ct"
-                        className={`w-full px-4 py-2.5 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && !variant.weight ? "border-red-400" : "border-[#E5E5E5]"}`}
-                      />
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={variant.weight ? String(variant.weight).replace(/[^\d.]/g, '') : ''}
+                          onChange={(e) => handleDiamondPriceChange(index, "weight", e.target.value)}
+                          placeholder="e.g. 1.00"
+                          className={`w-full px-4 py-2.5 pr-8 border rounded-md font-inter text-[13px] focus:outline-none focus:border-[#CDB38B] transition-all ${validated && !variant.weight ? "border-red-400" : "border-[#E5E5E5]"}`}
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 font-inter text-[13px] text-[#888888] pointer-events-none">ct</span>
+                      </div>
                     </div>
                     <div className="flex flex-col space-y-1.5">
                       <label className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase">Diamond Price (₹) *</label>

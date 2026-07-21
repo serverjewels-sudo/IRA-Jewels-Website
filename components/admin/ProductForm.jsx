@@ -746,11 +746,22 @@ export default function ProductForm({ productId }) {
       }
     }
 
+    // Auto-sync representative base fields from variants if present
+    let finalNetGoldWeight = netGoldWeight ? parseFloat(netGoldWeight) : null;
+    let finalDiamondNetAmount = diamondNetAmount ? parseFloat(diamondNetAmount) : 0;
+
+    if (sizeWeightVariants && sizeWeightVariants.length > 0) {
+      finalNetGoldWeight = parseFloat(sizeWeightVariants[0].net_gold_weight) || finalNetGoldWeight;
+    }
+    if (diamondPriceMatrix && diamondPriceMatrix.length > 0) {
+      finalDiamondNetAmount = parseFloat(diamondPriceMatrix[0].diamond_net_amount) || finalDiamondNetAmount;
+    }
+
     // Always use the live-calculated price for the database price field
     const calculated = calculateProductPrice({
-      net_gold_weight: parseFloat(netGoldWeight),
+      net_gold_weight: finalNetGoldWeight,
       karat,
-      diamond_net_amount: parseFloat(diamondNetAmount) || 0,
+      diamond_net_amount: finalDiamondNetAmount,
       making_net_amount: parseFloat(makingNetAmount) || 0,
       other_net_amount: parseFloat(otherNetAmount) || 0,
       gst_percentage: parseFloat(gstPercentage) || 0,
@@ -786,8 +797,8 @@ export default function ProductForm({ productId }) {
       images: imagesPayload,
       is_featured: isFeatured,
       is_active: isActive,
-      net_gold_weight: netGoldWeight ? parseFloat(netGoldWeight) : null,
-      diamond_net_amount: diamondNetAmount ? parseFloat(diamondNetAmount) : 0,
+      net_gold_weight: finalNetGoldWeight,
+      diamond_net_amount: finalDiamondNetAmount,
       making_net_amount: makingNetAmount ? parseFloat(makingNetAmount) : 0,
       other_net_amount: otherNetAmount ? parseFloat(otherNetAmount) : 0,
       other_diamond_weight: otherDiamondWeight ? parseFloat(otherDiamondWeight) : 0,

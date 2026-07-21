@@ -175,26 +175,6 @@ export default function Footer() {
             
             <ul className={`space-y-3 ${isAboutFooterOpen ? 'block' : 'hidden'} md:block`}>
               <li>
-                <Link href="/about#brand-mission" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Our Story
-                </Link>
-              </li>
-              <li>
-                <Link href="/about#our-diamonds" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Our Diamonds
-                </Link>
-              </li>
-              <li>
-                <Link href="/about#our-promise" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Our Promise
-                </Link>
-              </li>
-              <li>
-                <Link href="/about#founder-note" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  Our Philosophy
-                </Link>
-              </li>
-              <li>
                 <Link href="/about-tatvaan" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
                   About Tatvaan
                 </Link>

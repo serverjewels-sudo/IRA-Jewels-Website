@@ -718,7 +718,7 @@ export default function ProductDetailPage() {
                     {product.diamond_price_matrix && selectedShape && product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).length > 0 && (
                       <div className="order-4 sm:order-2">
                         <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                          Select Diamond Weight: {selectedDiamondWeight ? selectedDiamondWeight : ""}
+                          Select Diamond Carat: {selectedDiamondWeight ? selectedDiamondWeight : ""}
                         </span>
                         <div className="flex flex-wrap gap-3">
                           {product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).map((v) => (
@@ -749,7 +749,7 @@ export default function ProductDetailPage() {
                                 onClick={() => setIsKaratOpen(!isKaratOpen)}
                                 className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
                               >
-                                <span>SELECT KARAT: {selectedKarat || product.karat || "CHOOSE A KARAT"}</span>
+                                <span>SELECT GOLD PURITY: {selectedKarat || product.karat || "CHOOSE GOLD PURITY"}</span>
                                 <ChevronDown 
                                   className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isKaratOpen ? 'rotate-180' : ''}`} 
                                 />
@@ -778,7 +778,7 @@ export default function ProductDetailPage() {
                           </>
                         ) : (
                           <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] flex items-center h-[34px]">
-                            KARAT: {product.karat}
+                            GOLD PURITY: {product.karat}
                           </span>
                         )}
                       </div>
@@ -790,7 +790,7 @@ export default function ProductDetailPage() {
                         {product.colour_variants && product.colour_variants.length > 0 ? (
                           <>
                             <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                              Select Tone: {selectedColour}
+                              Select Gold Color: {selectedColour}
                             </span>
                             <div className="flex flex-wrap gap-3">
                               {product.colour_variants.map((variant) => (
@@ -825,7 +825,7 @@ export default function ProductDetailPage() {
                         ) : (
                           <>
                             <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                              Select Tone: {selectedColour}
+                              Select Gold Color: {selectedColour}
                             </span>
                             <div className="flex flex-wrap items-center gap-3">
                               {product.colour_options.map((col) => {
@@ -971,7 +971,7 @@ export default function ProductDetailPage() {
                     {activeVariant && activeVariant.shapes && activeVariant.shapes.length > 0 && (
                       <div className="order-3 sm:order-6">
                         <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                          Select Stone Shape: {selectedShape ? selectedShape.charAt(0).toUpperCase() + selectedShape.slice(1) : ""}
+                          Select Diamond Shape: {selectedShape ? selectedShape.charAt(0).toUpperCase() + selectedShape.slice(1) : ""}
                         </span>
                         <div className="flex flex-wrap gap-3">
                           {activeVariant.shapes.map((shapeItem) => (
@@ -1107,13 +1107,13 @@ export default function ProductDetailPage() {
                   )}
                   {(selectedColour || product.metalType || product.metal) && (
                     <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Metal & Color</span>
+                      <span className="text-[#888] uppercase tracking-wider">Gold Color</span>
                       <span className="text-[#2E3135] font-medium">{selectedColour || product.metalType || product.metal}</span>
                     </div>
                   )}
                   {(selectedKarat || product.karat) && (
                     <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Purity</span>
+                      <span className="text-[#888] uppercase tracking-wider">Gold Purity</span>
                       <span className="text-[#2E3135] font-medium">{selectedKarat || product.karat}</span>
                     </div>
                   )}
@@ -1125,13 +1125,13 @@ export default function ProductDetailPage() {
                   )}
                   {selectedShape && (
                     <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Stone Shape</span>
+                      <span className="text-[#888] uppercase tracking-wider">Diamond Shape</span>
                       <span className="text-[#2E3135] font-medium capitalize">{selectedShape}</span>
                     </div>
                   )}
                   {selectedDiamondWeight && (
                     <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Diamond Weight</span>
+                      <span className="text-[#888] uppercase tracking-wider">Diamond Carat</span>
                       <span className="text-[#2E3135] font-medium">{selectedDiamondWeight}</span>
                     </div>
                   )}

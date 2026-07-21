@@ -95,11 +95,11 @@ export async function POST(req) {
     let baseSlug = body.slug;
     if (!baseSlug && body.name) {
       baseSlug = body.name
+        .trim()
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim();
+        .replace(/-+/g, "-");
     }
     if (baseSlug) {
       body.slug = await generateUniqueSlug(baseSlug);
@@ -142,11 +142,11 @@ export async function PUT(req) {
     let baseSlug = updateData.slug;
     if (!baseSlug && updateData.name) {
       baseSlug = updateData.name
+        .trim()
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim();
+        .replace(/-+/g, "-");
     }
     if (baseSlug) {
       updateData.slug = await generateUniqueSlug(baseSlug, id);

@@ -116,7 +116,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/faq" className="text-[13px] font-inter font-light text-[#2E3135]/70 hover:text-[#CDB38B] transition-colors duration-300">
-                  FAQ's
+                  FAQ&apos;s
                 </Link>
               </li>
             </ul>

@@ -1128,7 +1128,7 @@ export default function ProductDetailPage() {
                   {hasEngraving === "Yes" && engravingText && (
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Engraving</span>
-                      <span className="text-[#2E3135] font-medium">{engravingFont} &mdash; '{engravingText}'</span>
+                      <span className="text-[#2E3135] font-medium">{engravingFont} &mdash; &apos;{engravingText}&apos;</span>
                     </div>
                   )}
                   <div className="grid grid-cols-2 p-3">

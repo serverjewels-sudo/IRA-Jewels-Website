@@ -51,11 +51,13 @@ const INDIAN_STATES = [
 ];
 
 export default function CheckoutPage() {
-  const { items, isLoaded, clearCart } = useCart();
+  const { items, isLoaded, clearCart, buyNowItem, clearBuyNowItem } = useCart();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [rate999, setRate999] = useState(null);
+
+  const activeItems = buyNowItem ? [buyNowItem] : items;
 
   // Form Field States
   const [formData, setFormData] = useState({
@@ -97,10 +99,17 @@ export default function CheckoutPage() {
 
   // Empty cart protection: redirect to cart if empty
   useEffect(() => {
-    if (mounted && isLoaded && items.length === 0 && !isSuccess) {
+    if (mounted && isLoaded && activeItems.length === 0 && !isSuccess) {
       router.push("/cart");
     }
-  }, [mounted, isLoaded, items, router, isSuccess]);
+  }, [mounted, isLoaded, activeItems, router, isSuccess]);
+
+  // Cleanup buyNowItem when navigating away
+  useEffect(() => {
+    return () => {
+      clearBuyNowItem();
+    };
+  }, []);
 
   // Auth protection: redirect to login if not logged in
   useEffect(() => {
@@ -118,7 +127,7 @@ export default function CheckoutPage() {
   }, [mounted, router]);
 
   // Live-calculate product prices based on current gold rate
-  const cartItemsWithPrice = items.map((item) => {
+  const cartItemsWithPrice = activeItems.map((item) => {
     const calculated = calculateProductPrice(item, rate999);
     return {
       ...item,
@@ -218,7 +227,7 @@ export default function CheckoutPage() {
       const datePart = String(Date.now()).slice(-6);
       const orderNumber = `TATVAAN-${year}-${datePart}`;
 
-      const orderItems = items.map((item) => {
+      const orderItems = activeItems.map((item) => {
         const calculated = calculateProductPrice(item, freshRate);
         return {
           product_id: item.id,
@@ -300,7 +309,8 @@ export default function CheckoutPage() {
 
         // On success: clear cart and redirect
         setIsSuccess(true);
-        clearCart();
+        if (!buyNowItem) clearCart();
+        clearBuyNowItem();
         router.push(`/order-confirmed/${newOrder[0].id}`);
       } else {
         // Razorpay Flow
@@ -360,7 +370,8 @@ export default function CheckoutPage() {
               }
 
               setIsSuccess(true);
-              clearCart();
+              if (!buyNowItem) clearCart();
+              clearBuyNowItem();
               router.push(`/order-confirmed/${verifyData.order.id}`);
             } catch (err) {
               console.error("Verification error:", err);
@@ -400,7 +411,7 @@ export default function CheckoutPage() {
   };
 
   // Prevent hydration mismatch or premature display while redirecting empty cart or verifying auth
-  if (!mounted || !isLoaded || authLoading || (items.length === 0 && !isSuccess)) {
+  if (!mounted || !isLoaded || authLoading || (activeItems.length === 0 && !isSuccess)) {
     return (
       <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
         <Navbar />

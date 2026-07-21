@@ -244,7 +244,7 @@ export default function ProductCard({ product, rate_999 }) {
                 : "bg-[#2E3135] text-[#FFFFFF] hover:bg-[#CDB38B]"
             }`}
           >
-            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+            {isOutOfStock ? "Out of Stock" : "Add to Bag"}
           </button>
         </div>
       </div>

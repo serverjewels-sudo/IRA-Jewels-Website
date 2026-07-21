@@ -16,6 +16,7 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
+  const [buyNowItem, setBuyNowItem] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [goldRate, setGoldRate] = useState(null);
   const fetchPromiseRef = useRef(null);
@@ -134,11 +135,56 @@ export const CartProvider = ({ children }) => {
           
           // Legacy / fallback fields:
           price: product.price,
-          priceVal: product.priceVal,
+      priceVal: product.priceVal,
         },
       ];
     });
   };
+
+  // Buy Now function
+  const buyNow = (product, selectedSize = null, selectedColour = null, selectedKarat = null, selectedShape = null, hasEngraving = false, engravingFont = null, engravingText = null, selectedDiamondWeight = null, quantity = 1) => {
+    const engravingPart = hasEngraving && engravingText ? `engrave-${engravingFont}-${engravingText.replace(/\s+/g, '-')}` : "no-engrave";
+    const cartItemId = `${product.id}-${selectedSize || "default"}-${selectedColour || "default"}-${selectedKarat || product.karat || "default"}-${selectedShape || "default"}-${selectedDiamondWeight || "default"}-${engravingPart}-buynow`;
+    
+    const image = product.images?.[0] || product.image;
+    setBuyNowItem({
+      productId: cartItemId,
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      image: image,
+      selectedSize: selectedSize,
+      selectedColour: selectedColour,
+      selectedShape: selectedShape,
+      hasEngraving: hasEngraving,
+      engravingFont: engravingFont,
+      engravingText: engravingText,
+      selectedDiamondWeight: selectedDiamondWeight,
+      style_number: product.style_number,
+      sku: product.sku,
+      category: product.category,
+      weight_grams: product.weight_grams,
+      metal_type: product.metal_type,
+      stone_type: product.stone_type,
+      quantity: quantity,
+      
+      net_gold_weight: selectedSize && Array.isArray(product.size_weight_variants)
+        ? (product.size_weight_variants.find(v => v.size === selectedSize)?.net_gold_weight ?? product.net_gold_weight)
+        : product.net_gold_weight,
+      diamond_net_amount: selectedShape && selectedDiamondWeight && Array.isArray(product.diamond_price_matrix) 
+        ? (product.diamond_price_matrix.find(v => v.shape_id === selectedShape && v.weight === selectedDiamondWeight)?.diamond_net_amount ?? product.diamond_net_amount)
+        : product.diamond_net_amount,
+      making_net_amount: product.making_net_amount,
+      other_net_amount: product.other_net_amount,
+      gst_percentage: product.gst_percentage,
+      karat: selectedKarat || product.karat,
+      
+      price: product.price,
+      priceVal: product.priceVal,
+    });
+  };
+
+  const clearBuyNowItem = () => setBuyNowItem(null);
 
   // Remove from cart
   const removeFromCart = (productId) => {
@@ -174,6 +220,9 @@ export const CartProvider = ({ children }) => {
         totalCount,
         totalPrice,
         addToCart,
+        buyNow,
+        buyNowItem,
+        clearBuyNowItem,
         removeFromCart,
         updateQuantity,
         clearCart,

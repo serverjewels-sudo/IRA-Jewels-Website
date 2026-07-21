@@ -16,7 +16,7 @@ import { StoneShapeIcon } from '@/components/ui/StoneShapeIcons'
 export default function ProductDetailPage() {
   const { slug } = useParams()
   const router = useRouter()
-  const { addToCart } = useCart()
+  const { addToCart, buyNow } = useCart()
 
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -50,7 +50,7 @@ export default function ProductDetailPage() {
   
   // Wishlist state
   const [isWishlisted, setIsWishlisted] = useState(false)
-  const [cartStatus, setCartStatus] = useState("ADD TO CART")
+  const [cartStatus, setCartStatus] = useState("ADD TO BAG")
   const [reviewsStats, setReviewsStats] = useState({ count: 0, average: 0 })
   
   const sizeDropdownRef = useRef(null)
@@ -301,10 +301,21 @@ export default function ProductDetailPage() {
       addToCart(product, selectedSize, selectedColour, selectedKarat, selectedShape, hasEngraving === "Yes", engravingFont, engravingText, selectedDiamondWeight)
     }
 
-    setCartStatus("ADDED TO CART ✓")
+    setCartStatus("ADDED TO BAG ✓")
     setTimeout(() => {
-      setCartStatus("ADD TO CART")
+      setCartStatus("ADD TO BAG")
     }, 2000)
+  }
+
+  // Buy Now handler
+  const handleBuyNow = () => {
+    if (!product) return
+
+    // Call buyNow with quantity
+    buyNow(product, selectedSize, selectedColour, selectedKarat, selectedShape, hasEngraving === "Yes", engravingFont, engravingText, selectedDiamondWeight, quantity)
+    
+    // Redirect to checkout
+    router.push('/checkout')
   }
 
   if (loading) {
@@ -992,58 +1003,77 @@ export default function ProductDetailPage() {
                 )}
 
                 {/* Quantity & Actions Stack */}
-                <div className="flex gap-4 mb-8">
-                  {/* Quantity Counter */}
-                  <div className="flex items-center border border-[#E5E5E5] h-[52px]">
-                    <button 
-                      onClick={decreaseQty} 
-                      className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
-                      aria-label="Decrease quantity"
+                <div className="flex flex-wrap gap-3 sm:gap-4 mb-8">
+                  {/* Top row for small screens: Quantity + Wishlist */}
+                  <div className="flex gap-3 sm:gap-4 flex-shrink-0 w-full sm:w-auto">
+                    {/* Quantity Counter */}
+                    <div className="flex items-center border border-[#E5E5E5] h-[52px] flex-1 sm:flex-none">
+                      <button 
+                        onClick={decreaseQty} 
+                        className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus className="w-3.5 h-3.5 text-[#2E3135]" />
+                      </button>
+                      <span className="flex-1 sm:w-10 text-center font-inter text-sm font-medium">
+                        {quantity}
+                      </span>
+                      <button 
+                        onClick={increaseQty} 
+                        className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-[#2E3135]" />
+                      </button>
+                    </div>
+
+                    {/* Wishlist Button */}
+                    <button
+                      onClick={toggleWishlist}
+                      className={`w-[52px] h-[52px] flex-shrink-0 border flex items-center justify-center transition-all duration-300 ${
+                        isWishlisted
+                          ? "bg-[#CDB38B] border-[#CDB38B] hover:bg-[#CDB38B]/90"
+                          : "bg-white border-[#E5E5E5] hover:bg-[#FBFBFA]"
+                      }`}
+                      aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                     >
-                      <Minus className="w-3.5 h-3.5 text-[#2E3135]" />
-                    </button>
-                    <span className="w-10 text-center font-inter text-sm font-medium">
-                      {quantity}
-                    </span>
-                    <button 
-                      onClick={increaseQty} 
-                      className="w-12 h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
-                      aria-label="Increase quantity"
-                    >
-                      <Plus className="w-3.5 h-3.5 text-[#2E3135]" />
+                      <Heart
+                        className={`w-5 h-5 transition-colors duration-300 ${
+                          isWishlisted ? "fill-[#2E3135] stroke-[#2E3135]" : "stroke-[#2E3135] fill-none"
+                        }`}
+                      />
                     </button>
                   </div>
 
-                  {/* Add to Cart */}
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={cartStatus.startsWith("ADDED") || (product.stock_quantity ?? product.stock ?? 0) === 0}
-                    className={`flex-grow h-[52px] font-inter font-medium text-[12px] tracking-[2px] uppercase transition-all duration-300 flex items-center justify-center gap-2 ${
-                      (product.stock_quantity ?? product.stock ?? 0) === 0
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "bg-[#2E3135] text-white hover:opacity-95 active:scale-[0.99] disabled:opacity-100"
-                    }`}
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    {(product.stock_quantity ?? product.stock ?? 0) === 0 ? "Out of Stock" : cartStatus}
-                  </button>
-
-                  {/* Wishlist Button */}
-                  <button
-                    onClick={toggleWishlist}
-                    className={`w-[52px] h-[52px] border flex items-center justify-center transition-all duration-300 ${
-                      isWishlisted
-                        ? "bg-[#CDB38B] border-[#CDB38B] hover:bg-[#CDB38B]/90"
-                        : "bg-white border-[#E5E5E5] hover:bg-[#FBFBFA]"
-                    }`}
-                    aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                  >
-                    <Heart
-                      className={`w-5 h-5 transition-colors duration-300 ${
-                        isWishlisted ? "fill-[#2E3135] stroke-[#2E3135]" : "stroke-[#2E3135] fill-none"
+                  {/* Main Action Buttons */}
+                  <div className="flex gap-3 sm:gap-4 flex-1 min-w-[200px]">
+                    {/* Add to Bag */}
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={cartStatus.startsWith("ADDED") || (product.stock_quantity ?? product.stock ?? 0) === 0}
+                      className={`flex-1 h-[52px] font-inter font-medium text-[11px] lg:text-[12px] tracking-[1px] lg:tracking-[2px] uppercase transition-all duration-300 flex items-center justify-center gap-1 lg:gap-2 ${
+                        (product.stock_quantity ?? product.stock ?? 0) === 0
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "bg-[#2E3135] text-white hover:opacity-95 active:scale-[0.99] disabled:opacity-100"
                       }`}
-                    />
-                  </button>
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5 lg:w-4 lg:h-4 hidden sm:block" />
+                      <span className="truncate">{(product.stock_quantity ?? product.stock ?? 0) === 0 ? "Out of Stock" : cartStatus}</span>
+                    </button>
+
+                    {/* Buy Now */}
+                    <button
+                      onClick={handleBuyNow}
+                      disabled={(product.stock_quantity ?? product.stock ?? 0) === 0}
+                      className={`flex-1 h-[52px] font-inter font-medium text-[11px] lg:text-[12px] tracking-[1px] lg:tracking-[2px] uppercase transition-all duration-300 flex items-center justify-center gap-2 ${
+                        (product.stock_quantity ?? product.stock ?? 0) === 0
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "bg-[#CDB38B] text-white hover:opacity-95 active:scale-[0.99]"
+                      }`}
+                    >
+                      <span className="truncate">Buy Now</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Trust Services Badges */}

@@ -11,13 +11,13 @@ export default function AddToCartButton({ product }) {
   const [selectedColour, setSelectedColour] = useState(product?.colour_options?.[0] || null);
   const [isSizeOpen, setIsSizeOpen] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [cartStatus, setCartStatus] = useState("ADD TO CART");
+  const [cartStatus, setCartStatus] = useState("ADD TO BAG");
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColour);
-    setCartStatus("ADDED TO CART ✓");
+    setCartStatus("ADDED TO BAG ✓");
     setTimeout(() => {
-      setCartStatus("ADD TO CART");
+      setCartStatus("ADD TO BAG");
     }, 2000);
   };
 

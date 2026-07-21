@@ -673,11 +673,12 @@ export default function ProductDetailPage() {
 
                 {/* Product Selectors */}
                 {((product.size_options?.length > 0) || product.karat || product.diamond_weight_variants?.length > 0 || product.colour_variants?.length > 0 || product.colour_options?.length > 0 || activeVariant?.shapes?.length > 0 || true) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6 mb-8">
-                    
-                    {/* Size Selector Row - box and link as separate siblings */}
+                  <div className="flex flex-col gap-y-6 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-0 mb-8">
+                    {/* LEFT COLUMN */}
+                    <div className="contents sm:flex sm:flex-col sm:gap-y-6">
+                      {/* Size Selector Row - box and link as separate siblings */}
                     {product.size_options && product.size_options.length > 0 && (
-                      <div className="flex items-center gap-4 order-5 sm:order-1">
+                      <div className="flex items-center gap-4 self-start order-5 sm:order-none">
                         <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
                           <button
                             onClick={() => setIsSizeOpen(!isSizeOpen)}
@@ -715,34 +716,9 @@ export default function ProductDetailPage() {
                       </div>
                     )}
 
-                    {/* Diamond Weight Selector */}
-                    {product.diamond_price_matrix && selectedShape && product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).length > 0 && (
-                      <div className="order-4 sm:order-2">
-                        <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                          Select Diamond Carat: {selectedDiamondWeight ? selectedDiamondWeight : ""}
-                        </span>
-                        <div className="flex flex-wrap gap-3">
-                          {product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).map((v) => (
-                            <button
-                              key={v.weight}
-                              onClick={() => setSelectedDiamondWeight(v.weight)}
-                              title={v.weight}
-                              className={`min-w-[40px] h-10 px-2 rounded-full flex items-center justify-center font-inter text-[12px] transition-all duration-300 ${
-                                selectedDiamondWeight === v.weight
-                                  ? "bg-[#2E3135] text-white"
-                                  : "bg-white border border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
-                              }`}
-                            >
-                              {v.weight}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Karat Selector */}
+                                          {/* Karat Selector */}
                     {product.karat && (
-                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit relative order-2 sm:order-3">
+                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit self-start relative order-2 sm:order-none">
                         {product.available_karats && product.available_karats.length > 1 ? (
                           <>
                             <div className="flex justify-between items-center">
@@ -785,94 +761,8 @@ export default function ProductDetailPage() {
                       </div>
                     )}
 
-                    {/* Colour Selector */}
-                    {((product.colour_variants && product.colour_variants.length > 0) || (product.colour_options && product.colour_options.length > 0)) && (
-                      <div className="order-1 sm:order-4">
-                        {product.colour_variants && product.colour_variants.length > 0 ? (
-                          <>
-                            <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                              Select Gold Color: {selectedColour}
-                            </span>
-                            <div className="flex flex-wrap gap-3">
-                              {product.colour_variants.map((variant) => (
-                                <button
-                                  key={variant.colour}
-                                  onClick={() => {
-                                    setSelectedColour(variant.colour)
-                                    if (variant.shapes && variant.shapes.length > 0) {
-                                      if (!variant.shapes.some(s => s.shape_id === selectedShape)) {
-                                        setSelectedShape(variant.shapes[0].shape_id);
-                                      }
-                                    } else {
-                                      setSelectedShape(null);
-                                    }
-                                    setActiveImageIndex(0)
-                                  }}
-                                  aria-label={`Select ${variant.colour}`}
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                                    selectedColour === variant.colour
-                                      ? "ring-1 ring-offset-2 ring-[#2E3135]"
-                                      : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
-                                  }`}
-                                >
-                                  <span 
-                                    className="w-full h-full rounded-full border border-black/10" 
-                                    style={{ backgroundColor: variant.swatch_hex || '#e5e5e5' }}
-                                  />
-                                </button>
-                              ))}
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
-                              Select Gold Color: {selectedColour}
-                            </span>
-                            <div className="flex flex-wrap items-center gap-3">
-                              {product.colour_options.map((col) => {
-                                const hex = product.colour_swatches?.[col];
-                                if (hex) {
-                                  return (
-                                    <button
-                                      key={col}
-                                      onClick={() => setSelectedColour(col)}
-                                      aria-label={`Select ${col}`}
-                                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                                        selectedColour === col
-                                          ? "ring-1 ring-offset-2 ring-[#2E3135]"
-                                          : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
-                                      }`}
-                                    >
-                                      <span 
-                                        className="w-full h-full rounded-full border border-black/10" 
-                                        style={{ backgroundColor: hex }}
-                                      />
-                                    </button>
-                                  );
-                                } else {
-                                  return (
-                                    <button
-                                      key={col}
-                                      onClick={() => setSelectedColour(col)}
-                                      className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
-                                        selectedColour === col
-                                          ? "bg-[#2E3135] border-[#2E3135] text-white"
-                                          : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
-                                      }`}
-                                    >
-                                      {col}
-                                    </button>
-                                  );
-                                }
-                              })}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Engraving Section */}
-                    <div ref={engravingDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit relative order-6 sm:order-5">
+                                          {/* Engraving Section */}
+                    <div ref={engravingDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit self-start relative order-6 sm:order-none">
                       {/* Yes/No Toggle */}
                       <div className="flex items-center gap-6 py-1.5">
                         <label htmlFor="engravingCheckbox" className="cursor-pointer font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
@@ -968,9 +858,124 @@ export default function ProductDetailPage() {
                       )}
                     </div>
 
-                    {/* Shape Selector */}
+                                        </div>
+
+                    {/* RIGHT COLUMN */}
+                    <div className="contents sm:flex sm:flex-col sm:gap-y-6">
+                      {/* Diamond Weight Selector */}
+                    {product.diamond_price_matrix && selectedShape && product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).length > 0 && (
+                      <div className="self-start order-4 sm:order-none">
+                        <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                          Select Diamond Carat: {selectedDiamondWeight ? selectedDiamondWeight : ""}
+                        </span>
+                        <div className="flex flex-wrap gap-3">
+                          {product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).map((v) => (
+                            <button
+                              key={v.weight}
+                              onClick={() => setSelectedDiamondWeight(v.weight)}
+                              title={v.weight}
+                              className={`min-w-[40px] h-10 px-2 rounded-full flex items-center justify-center font-inter text-[12px] transition-all duration-300 ${
+                                selectedDiamondWeight === v.weight
+                                  ? "bg-[#2E3135] text-white"
+                                  : "bg-white border border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                              }`}
+                            >
+                              {v.weight}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                                          {/* Colour Selector */}
+                    {((product.colour_variants && product.colour_variants.length > 0) || (product.colour_options && product.colour_options.length > 0)) && (
+                      <div className="self-start order-1 sm:order-none">
+                        {product.colour_variants && product.colour_variants.length > 0 ? (
+                          <>
+                            <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                              Select Gold Color: {selectedColour}
+                            </span>
+                            <div className="flex flex-wrap gap-3">
+                              {product.colour_variants.map((variant) => (
+                                <button
+                                  key={variant.colour}
+                                  onClick={() => {
+                                    setSelectedColour(variant.colour)
+                                    if (variant.shapes && variant.shapes.length > 0) {
+                                      if (!variant.shapes.some(s => s.shape_id === selectedShape)) {
+                                        setSelectedShape(variant.shapes[0].shape_id);
+                                      }
+                                    } else {
+                                      setSelectedShape(null);
+                                    }
+                                    setActiveImageIndex(0)
+                                  }}
+                                  aria-label={`Select ${variant.colour}`}
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                    selectedColour === variant.colour
+                                      ? "ring-1 ring-offset-2 ring-[#2E3135]"
+                                      : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
+                                  }`}
+                                >
+                                  <span 
+                                    className="w-full h-full rounded-full border border-black/10" 
+                                    style={{ backgroundColor: variant.swatch_hex || '#e5e5e5' }}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
+                              Select Gold Color: {selectedColour}
+                            </span>
+                            <div className="flex flex-wrap items-center gap-3">
+                              {product.colour_options.map((col) => {
+                                const hex = product.colour_swatches?.[col];
+                                if (hex) {
+                                  return (
+                                    <button
+                                      key={col}
+                                      onClick={() => setSelectedColour(col)}
+                                      aria-label={`Select ${col}`}
+                                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                        selectedColour === col
+                                          ? "ring-1 ring-offset-2 ring-[#2E3135]"
+                                          : "ring-1 ring-offset-1 ring-transparent hover:ring-[#E5E5E5]"
+                                      }`}
+                                    >
+                                      <span 
+                                        className="w-full h-full rounded-full border border-black/10" 
+                                        style={{ backgroundColor: hex }}
+                                      />
+                                    </button>
+                                  );
+                                } else {
+                                  return (
+                                    <button
+                                      key={col}
+                                      onClick={() => setSelectedColour(col)}
+                                      className={`px-4 py-2.5 rounded-full font-inter font-medium text-[12px] border transition-all duration-300 ${
+                                        selectedColour === col
+                                          ? "bg-[#2E3135] border-[#2E3135] text-white"
+                                          : "bg-white border-[#E5E5E5] text-[#2E3135] hover:border-[#CDB38B]"
+                                      }`}
+                                    >
+                                      {col}
+                                    </button>
+                                  );
+                                }
+                              })}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                                          {/* Shape Selector */}
                     {activeVariant && activeVariant.shapes && activeVariant.shapes.length > 0 && (
-                      <div className="order-3 sm:order-6">
+                      <div className="self-start order-3 sm:order-none">
                         <span className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3 block">
                           Select Diamond Shape: {selectedShape ? selectedShape.charAt(0).toUpperCase() + selectedShape.slice(1) : ""}
                         </span>
@@ -1001,7 +1006,8 @@ export default function ProductDetailPage() {
                     )}
 
                   </div>
-                )}
+                                    </div>
+)}
 
                 {/* Quantity & Actions Stack */}
                 <div className="flex flex-wrap gap-3 sm:gap-4 mb-8">

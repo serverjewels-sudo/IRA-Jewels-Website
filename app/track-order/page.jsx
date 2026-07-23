@@ -14,10 +14,55 @@ export default function TrackOrderPage() {
   const [searched, setSearched] = useState(false);
   const [order, setOrder] = useState(null);
 
+  const [userOrders, setUserOrders] = useState([]);
+  const [selectedUserOrderId, setSelectedUserOrderId] = useState("");
+  const [authLoading, setAuthLoading] = useState(true);
+
   // Set document title on mount
   useEffect(() => {
     document.title = "Track Your Order | TATVAAN";
   }, []);
+
+  useEffect(() => {
+    async function checkAuthAndFetchOrders() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+          const { data, error } = await supabase
+            .from("orders")
+            .select("*")
+            .eq("customer_id", session.user.id)
+            .order("created_at", { ascending: false });
+
+          if (!error && data) {
+            // Filter out delivered and cancelled
+            const pendingOrders = data.filter(o => {
+              const s = (o.status || "").toLowerCase();
+              return s !== "delivered" && s !== "cancelled";
+            });
+            setUserOrders(pendingOrders);
+            if (pendingOrders.length > 0) {
+              setSelectedUserOrderId(pendingOrders[0].id);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user orders:", err);
+      } finally {
+        setAuthLoading(false);
+      }
+    }
+    checkAuthAndFetchOrders();
+  }, []);
+
+  const handleDropdownTrack = () => {
+    if (!selectedUserOrderId) return;
+    const selectedOrder = userOrders.find(o => o.id === selectedUserOrderId);
+    if (selectedOrder) {
+      setOrder(selectedOrder);
+      setSearched(true);
+    }
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -144,10 +189,46 @@ export default function TrackOrderPage() {
         {/* SECTION 1 — Search Form */}
         <section className="max-w-7xl mx-auto px-4 mt-12">
           <div className="max-w-[500px] mx-auto bg-white p-[40px] rounded-[8px] border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
+            
+            {!authLoading && userOrders.length > 0 && (
+              <div className="mb-10 pb-8 border-b border-gray-100">
+                <label className="block font-inter font-medium text-[13px] text-[#2E3135] tracking-[1.5px] uppercase mb-2">
+                  YOUR ACTIVE ORDERS
+                </label>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <select
+                      value={selectedUserOrderId}
+                      onChange={(e) => setSelectedUserOrderId(e.target.value)}
+                      className="w-full bg-white border border-[#2E3135] focus:border-[#CDB38B] outline-none font-inter text-[15px] px-[18px] py-[14px] transition-all rounded-[4px] appearance-none cursor-pointer"
+                    >
+                      {userOrders.map(o => (
+                        <option key={o.id} value={o.id}>
+                          {o.order_number} ({formatOrderDate(o.created_at)})
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-[18px] text-[#2E3135]">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDropdownTrack}
+                    className="w-full bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px]"
+                  >
+                    TRACK SELECTED ORDER
+                  </button>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSearch} className="space-y-6">
               <div>
                 <label className="block font-inter font-medium text-[13px] text-[#2E3135] tracking-[1.5px] uppercase mb-2">
-                  ORDER NUMBER
+                  {userOrders.length > 0 ? "OR SEARCH MANUALLY" : "ORDER NUMBER"}
                 </label>
                 <input
                   type="text"
@@ -161,15 +242,15 @@ export default function TrackOrderPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px] flex items-center justify-center gap-2"
+                className={`w-full ${userOrders.length > 0 ? "bg-white border border-[#2E3135] hover:bg-[#2E3135] hover:text-white text-[#2E3135]" : "bg-[#2E3135] hover:bg-[#CDB38B] text-white"} font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px] flex items-center justify-center gap-2`}
               >
                 {loading ? (
                   <>
-                    <div className="w-4 h-4 rounded-full border-2 border-t-transparent border-white animate-spin"></div>
+                    <div className="w-4 h-4 rounded-full border-2 border-t-transparent border-current animate-spin"></div>
                     <span>TRACKING...</span>
                   </>
                 ) : (
-                  <span>TRACK ORDER</span>
+                  <span>{userOrders.length > 0 ? "SEARCH" : "TRACK ORDER"}</span>
                 )}
               </button>
             </form>

@@ -53,6 +53,41 @@ export default function ProductDetailPage() {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [cartStatus, setCartStatus] = useState("ADD TO BAG")
   const [reviewsStats, setReviewsStats] = useState({ count: 0, average: 0 })
+
+  // Pincode Delivery Check
+  const [pincode, setPincode] = useState("")
+  const [deliveryInfo, setDeliveryInfo] = useState(null)
+  const [isCheckingDelivery, setIsCheckingDelivery] = useState(false)
+
+  const checkDelivery = async () => {
+    if (pincode.length !== 6 || !/^\d+$/.test(pincode)) {
+      setDeliveryInfo({ error: "Please enter a valid 6-digit pincode" })
+      return
+    }
+    setIsCheckingDelivery(true)
+    setDeliveryInfo(null)
+    try {
+      const res = await fetch(`/api/check-pincode?pincode=${pincode}`)
+      const data = await res.json()
+      if (data.deliverable) {
+        const estDate = new Date()
+        estDate.setDate(estDate.getDate() + 10)
+        const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' }
+        setDeliveryInfo({
+          success: true,
+          city: data.city,
+          state: data.state,
+          date: estDate.toLocaleDateString('en-GB', dateOptions)
+        })
+      } else {
+        setDeliveryInfo({ error: "Please enter a valid 6-digit pincode" })
+      }
+    } catch (err) {
+      setDeliveryInfo({ error: "Please enter a valid 6-digit pincode" })
+    } finally {
+      setIsCheckingDelivery(false)
+    }
+  }
   
   const sizeDropdownRef = useRef(null)
   const karatDropdownRef = useRef(null)
@@ -1081,6 +1116,39 @@ export default function ProductDetailPage() {
                       <span className="truncate">Buy Now</span>
                     </button>
                   </div>
+                </div>
+
+                {/* Delivery Check Section */}
+                <div className="mb-8 border border-[#E5E5E5] bg-[#FBFBFA] p-4">
+                  <h3 className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3">Check Delivery Options</h3>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      maxLength="6"
+                      placeholder="Enter 6-digit Pincode"
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                      className="flex-1 h-10 border border-[#E5E5E5] bg-white px-3 font-inter text-[13px] text-[#2E3135] focus:outline-none focus:border-[#CDB38B]"
+                    />
+                    <button
+                      onClick={checkDelivery}
+                      disabled={isCheckingDelivery || pincode.length !== 6}
+                      className="h-10 px-6 bg-[#2E3135] text-white font-inter font-medium text-[11px] tracking-[1px] uppercase hover:opacity-95 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                      {isCheckingDelivery ? "Checking..." : "Check"}
+                    </button>
+                  </div>
+                  {deliveryInfo && deliveryInfo.success && (
+                    <div className="text-[#166534] font-inter text-[12px] mt-2">
+                      <p>✓ Delivering to {deliveryInfo.city}, {deliveryInfo.state}</p>
+                      <p className="mt-1 text-[#2E3135]">Estimated delivery by {deliveryInfo.date}</p>
+                    </div>
+                  )}
+                  {deliveryInfo && deliveryInfo.error && (
+                    <div className="text-[#DC2626] font-inter text-[12px] mt-2">
+                      {deliveryInfo.error}
+                    </div>
+                  )}
                 </div>
 
                 {/* Trust Services Badges */}

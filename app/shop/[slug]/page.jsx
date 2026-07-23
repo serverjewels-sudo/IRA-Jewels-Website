@@ -593,11 +593,11 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product Details Section */}
-        <div className="max-w-[1280px] mx-auto px-6 py-6 lg:py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12">
+        <div className="max-w-[1800px] mx-auto px-6 lg:px-16 py-6 lg:py-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[540px_1fr] gap-6 lg:gap-16">
             
             {/* Left Column: Image Gallery */}
-            <div className="lg:col-span-6 flex flex-col">
+            <div className="flex flex-col">
               <div 
                 className="w-full lg:max-w-[540px] aspect-square bg-white border border-[#F3F1EC] overflow-hidden relative group"
                 onTouchStart={handleTouchStart}
@@ -683,7 +683,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Right Column: Product Info & Actions */}
-            <div className="lg:col-span-6 flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0">
               <div className="min-w-0">
                 {/* Category & Rating */}
                 <div className="flex justify-between items-center mb-4">
@@ -825,7 +825,7 @@ export default function ProductDetailPage() {
 
                 {/* Product Selectors */}
                 {((product.size_options?.length > 0) || product.karat || product.diamond_weight_variants?.length > 0 || product.colour_variants?.length > 0 || product.colour_options?.length > 0 || activeVariant?.shapes?.length > 0 || true) && (
-                  <div className="flex flex-col gap-y-6 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-0 mb-8">
+                  <div className="flex flex-col gap-y-6 sm:grid sm:grid-cols-[320px_1fr] sm:gap-x-10 sm:gap-y-0 mb-8">
                     {/* LEFT COLUMN */}
                     <div className="contents sm:flex sm:flex-col sm:gap-y-6">
                       {/* Size Selector Row - box and link as separate siblings */}
@@ -834,7 +834,7 @@ export default function ProductDetailPage() {
                         <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider self-start">
                           Size Guide
                         </Link>
-                        <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-full max-w-sm relative">
+                        <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-full max-w-xs relative">
                           <button
                             onClick={() => setIsSizeOpen(!isSizeOpen)}
                             className="flex items-center justify-between w-full text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"

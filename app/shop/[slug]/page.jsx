@@ -830,11 +830,14 @@ export default function ProductDetailPage() {
                     <div className="contents sm:flex sm:flex-col sm:gap-y-6">
                       {/* Size Selector Row - box and link as separate siblings */}
                     {product.size_options && product.size_options.length > 0 && (
-                      <div className="flex items-center gap-4 self-start order-5 sm:order-none">
-                        <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit relative">
+                      <div className="flex flex-col gap-2 order-5 sm:order-none">
+                        <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider self-start">
+                          Size Guide
+                        </Link>
+                        <div ref={sizeDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-full max-w-sm relative">
                           <button
                             onClick={() => setIsSizeOpen(!isSizeOpen)}
-                            className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                            className="flex items-center justify-between w-full text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
                           >
                             <span>SELECT SIZE: {selectedSize || "CHOOSE A SIZE"}</span>
                             <ChevronDown 
@@ -862,28 +865,23 @@ export default function ProductDetailPage() {
                             </div>
                           )}
                         </div>
-                        <Link href="/size-guide" className="font-inter text-[11px] text-[#CDB38B] hover:underline uppercase tracking-wider">
-                          Size Guide
-                        </Link>
                       </div>
                     )}
 
                                           {/* Karat Selector */}
                     {product.karat && (
-                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit self-start relative order-2 sm:order-none">
+                      <div ref={karatDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-full max-w-xs h-fit relative order-2 sm:order-none">
                         {product.available_karats && product.available_karats.length > 1 ? (
                           <>
-                            <div className="flex justify-between items-center">
-                              <button
-                                onClick={() => setIsKaratOpen(!isKaratOpen)}
-                                className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
-                              >
-                                <span>SELECT GOLD PURITY: {selectedKarat || product.karat || "CHOOSE GOLD PURITY"}</span>
-                                <ChevronDown 
-                                  className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isKaratOpen ? 'rotate-180' : ''}`} 
-                                />
-                              </button>
-                            </div>
+                            <button
+                              onClick={() => setIsKaratOpen(!isKaratOpen)}
+                              className="flex items-center justify-between w-full text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                            >
+                              <span>SELECT GOLD PURITY: {selectedKarat || product.karat || "CHOOSE GOLD PURITY"}</span>
+                              <ChevronDown 
+                                className={`w-3.5 h-3.5 text-[#CDB38B] transition-transform duration-200 ${isKaratOpen ? 'rotate-180' : ''}`} 
+                              />
+                            </button>
                             {isKaratOpen && (
                               <div className="absolute top-full left-0 mt-1 w-full min-w-full bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col py-1.5">
                                 {sortedKarats.map((krt) => (
@@ -914,9 +912,9 @@ export default function ProductDetailPage() {
                     )}
 
                                           {/* Engraving Section */}
-                    <div ref={engravingDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-fit h-fit self-start relative order-6 sm:order-none">
+                    <div ref={engravingDropdownRef} className="px-5 py-3 border border-[#E5E5E5] bg-[#FBFBFA] w-full max-w-xs h-fit relative order-6 sm:order-none">
                       {/* Yes/No Toggle */}
-                      <div className="flex items-center gap-6 py-1.5">
+                      <div className="flex items-center justify-between w-full py-1.5">
                         <label htmlFor="engravingCheckbox" className="cursor-pointer font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135]">
                           Engraving
                         </label>

@@ -12,8 +12,8 @@ export default function Footer() {
   const [isConnectFooterOpen, setIsConnectFooterOpen] = useState(false);
 
   return (
-    <footer className="w-full bg-[#FFFFFF] border-t border-[#F3F1EC] pt-16 pb-12 px-6">
-      <div className="max-w-7xl mx-auto">
+    <footer className="w-full bg-[#FFFFFF] border-t border-[#F3F1EC] pt-16 pb-12 px-6 lg:px-16">
+      <div className="max-w-[1800px] mx-auto">
         {/* Top: Columns Grid */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-10 mb-16">
           {/* Column 0: Logo & Bio */}

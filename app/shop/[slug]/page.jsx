@@ -30,6 +30,7 @@ export default function ProductDetailPage() {
   const [isSpecificationsOpen, setIsSpecificationsOpen] = useState(false)
   const [isShippingOpen, setIsShippingOpen] = useState(false)
   const [isReturnOpen, setIsReturnOpen] = useState(false)
+  const [activeDetailTab, setActiveDetailTab] = useState('specifications')
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
@@ -486,6 +487,95 @@ export default function ProductDetailPage() {
     selectedDiamondWeight: selectedDiamondWeight
   });
 
+  const renderSpecificationsContent = (
+    <div className="border border-[#E5E5E5] text-xs font-inter divide-y divide-[#E5E5E5]">
+      {product.category && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Category</span>
+          <span className="text-[#2E3135] font-medium capitalize">{product.category}</span>
+        </div>
+      )}
+
+      {(selectedColour || product.metalType || product.metal) && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Gold Color</span>
+          <span className="text-[#2E3135] font-medium">{selectedColour || product.metalType || product.metal}</span>
+        </div>
+      )}
+      {(selectedKarat || product.karat) && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Gold Purity</span>
+          <span className="text-[#2E3135] font-medium">{selectedKarat || product.karat}</span>
+        </div>
+      )}
+      {selectedSize && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Size</span>
+          <span className="text-[#2E3135] font-medium">{selectedSize}</span>
+        </div>
+      )}
+      {selectedShape && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Diamond Shape</span>
+          <span className="text-[#2E3135] font-medium capitalize">{selectedShape}</span>
+        </div>
+      )}
+      {selectedDiamondWeight && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Diamond Carat</span>
+          <span className="text-[#2E3135] font-medium">{selectedDiamondWeight}</span>
+        </div>
+      )}
+      {product.setting_style && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Setting Style</span>
+          <span className="text-[#2E3135] font-medium capitalize">{product.setting_style}</span>
+        </div>
+      )}
+      {overriddenNetGoldWeight && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Total Weight</span>
+          <span className="text-[#2E3135] font-medium">
+            {parseFloat((((selectedDiamondWeight ? parseFloat(selectedDiamondWeight) : 0) + (product.other_diamond_weight || 0)) * 0.2 + overriddenNetGoldWeight).toFixed(2))}g
+          </span>
+        </div>
+      )}
+      {product.stoneType && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Stone Details</span>
+          <span className="text-[#2E3135] font-medium">{product.stoneType}</span>
+        </div>
+      )}
+      {hasEngraving === "Yes" && engravingText && (
+        <div className="grid grid-cols-2 p-3">
+          <span className="text-[#888] uppercase tracking-wider">Engraving</span>
+          <span className="text-[#2E3135] font-medium">{engravingFont} &mdash; &apos;{engravingText}&apos;</span>
+        </div>
+      )}
+      <div className="grid grid-cols-2 p-3">
+        <span className="text-[#888] uppercase tracking-wider">Certificate</span>
+        <span className="text-[#2E3135] font-medium">IGI Certified</span>
+      </div>
+    </div>
+  );
+
+  const renderShippingContent = (
+    <div className="border border-[#E5E5E5] text-xs font-inter p-4 text-[#2E3135] leading-relaxed">
+      Free insured delivery across India. Delivery timelines depend on product availability, manufacturing, hallmarking, certification, and any customisation requested. Use the pincode checker above to see an estimated delivery date for your location.
+    </div>
+  );
+
+  const renderReturnContent = (
+    <div className="border border-[#E5E5E5] text-xs font-inter p-4 text-[#2E3135] leading-relaxed flex flex-col gap-3">
+      <p>
+        15-day return window from the date of delivery. Items must be unworn, unused, undamaged, and returned with original invoice, certificate, tags, and packaging. We arrange a complimentary insured return pickup. Customised, engraved, personalised, resized, or final-sale items are not eligible for change-of-mind returns.
+      </p>
+      <Link href="/return-refund-policy" className="text-[#CDB38B] hover:underline font-medium text-[11px] uppercase tracking-wider self-start mt-2">
+        Read full policy
+      </Link>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
       <Navbar />
@@ -545,12 +635,12 @@ export default function ProductDetailPage() {
 
               {/* Thumbnails */}
               {mediaItems.length > 1 && (
-                <div className="flex gap-4 mt-4 overflow-x-auto pb-2 scrollbar-thin">
+                <div className="flex gap-4 mt-4 overflow-x-auto pb-2 scrollbar-thin lg:max-w-[540px]">
                   {mediaItems.map((item, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`w-20 h-20 flex-shrink-0 relative overflow-hidden bg-white cursor-pointer transition-all duration-300 ${
+                      className={`w-[calc((100%-64px)/5)] aspect-square flex-shrink-0 relative overflow-hidden bg-white cursor-pointer transition-all duration-300 ${
                         activeImageIndex === idx
                           ? "border-2 border-[#CDB38B] opacity-100"
                           : "border border-[#F3F1EC] hover:border-[#CDB38B]/50 opacity-70 hover:opacity-100"
@@ -583,6 +673,13 @@ export default function ProductDetailPage() {
                   ))}
                 </div>
               )}
+
+              {/* Desktop/Tablet Tab Content Area */}
+              <div className="hidden lg:block mt-8 lg:max-w-[540px]">
+                {activeDetailTab === 'specifications' && renderSpecificationsContent}
+                {activeDetailTab === 'shipping' && renderShippingContent}
+                {activeDetailTab === 'return' && renderReturnContent}
+              </div>
             </div>
 
             {/* Right Column: Product Info & Actions */}
@@ -620,13 +717,20 @@ export default function ProductDetailPage() {
                 </h1>
 
                 {/* Price Display */}
-                <div className="flex items-baseline gap-4 mb-2">
-                  <span className="font-inter font-medium text-2xl lg:text-3xl text-[#2E3135]">
-                    {displayPrice}
-                  </span>
-                  {isOnSale && (
-                    <span className="font-inter text-md text-gray-400 line-through">
-                      {product.compare_price}
+                <div className="flex items-center justify-between gap-4 mb-2 w-full">
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-inter font-medium text-2xl lg:text-3xl text-[#2E3135]">
+                      {displayPrice}
+                    </span>
+                    {isOnSale && (
+                      <span className="font-inter text-md text-gray-400 line-through">
+                        {product.compare_price}
+                      </span>
+                    )}
+                  </div>
+                  {liveSku && (
+                    <span className="font-inter text-[11px] uppercase tracking-[1.5px] text-[#888]">
+                      SKU: {liveSku}
                     </span>
                   )}
                 </div>
@@ -636,7 +740,7 @@ export default function ProductDetailPage() {
                   <div className="mb-4">
                     <button
                       onClick={() => setIsBreakdownOpen(!isBreakdownOpen)}
-                      className="flex items-center gap-1.5 text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
+                      className="flex items-center justify-between w-full text-[11px] font-inter uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none"
                     >
                       <span>Price Breakdown</span>
                       <ChevronDown 
@@ -645,7 +749,7 @@ export default function ProductDetailPage() {
                     </button>
                     
                     {isBreakdownOpen && (
-                      <div className="mt-2 border border-[#E5E5E5] bg-[#FBFBFA] p-4 text-[12px] font-inter text-[#2E3135] space-y-2.5 max-w-md">
+                      <div className="mt-2 border border-[#E5E5E5] bg-[#FBFBFA] p-4 text-[12px] font-inter text-[#2E3135] space-y-2.5">
                         {/* Gold item */}
                         <div className="flex justify-between items-center">
                           <span className="text-[#888888]">
@@ -908,7 +1012,7 @@ export default function ProductDetailPage() {
 
                     {/* Delivery Check Section */}
                     <div className="border border-[#E5E5E5] bg-[#FBFBFA] p-4 h-fit self-start w-full max-w-xs order-7 sm:order-none relative">
-                      <h3 className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3">Check Delivery Options</h3>
+                      <h3 className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3">Check Availability</h3>
                       <div className="flex gap-2 mb-2">
                         <input
                           type="text"
@@ -1184,131 +1288,67 @@ export default function ProductDetailPage() {
               {/* Specifications Table */}
               <div className="mt-6">
                 <button
-                  onClick={() => setIsSpecificationsOpen(!isSpecificationsOpen)}
+                  onClick={() => {
+                    setIsSpecificationsOpen(!isSpecificationsOpen);
+                    setActiveDetailTab('specifications');
+                  }}
                   className="flex items-center justify-between text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
                 >
                   <span>Specifications</span>
                   <ChevronDown 
-                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 ${isSpecificationsOpen ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 hidden lg:block ${activeDetailTab === 'specifications' ? 'rotate-180' : ''}`} 
+                  />
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 lg:hidden block ${isSpecificationsOpen ? 'rotate-180' : ''}`} 
                   />
                 </button>
-                {isSpecificationsOpen && (
-                <div className="border border-[#E5E5E5] text-xs font-inter divide-y divide-[#E5E5E5]">
-                  {product.category && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Category</span>
-                      <span className="text-[#2E3135] font-medium capitalize">{product.category}</span>
-                    </div>
-                  )}
-                  {liveSku && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">SKU</span>
-                      <span className="text-[#2E3135] font-medium">{liveSku}</span>
-                    </div>
-                  )}
-                  {(selectedColour || product.metalType || product.metal) && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Gold Color</span>
-                      <span className="text-[#2E3135] font-medium">{selectedColour || product.metalType || product.metal}</span>
-                    </div>
-                  )}
-                  {(selectedKarat || product.karat) && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Gold Purity</span>
-                      <span className="text-[#2E3135] font-medium">{selectedKarat || product.karat}</span>
-                    </div>
-                  )}
-                  {selectedSize && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Size</span>
-                      <span className="text-[#2E3135] font-medium">{selectedSize}</span>
-                    </div>
-                  )}
-                  {selectedShape && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Diamond Shape</span>
-                      <span className="text-[#2E3135] font-medium capitalize">{selectedShape}</span>
-                    </div>
-                  )}
-                  {selectedDiamondWeight && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Diamond Carat</span>
-                      <span className="text-[#2E3135] font-medium">{selectedDiamondWeight}</span>
-                    </div>
-                  )}
-                  {product.setting_style && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Setting Style</span>
-                      <span className="text-[#2E3135] font-medium capitalize">{product.setting_style}</span>
-                    </div>
-                  )}
-                  {overriddenNetGoldWeight && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Total Weight</span>
-                      <span className="text-[#2E3135] font-medium">
-                        {parseFloat((((selectedDiamondWeight ? parseFloat(selectedDiamondWeight) : 0) + (product.other_diamond_weight || 0)) * 0.2 + overriddenNetGoldWeight).toFixed(2))}g
-                      </span>
-                    </div>
-                  )}
-                  {product.stoneType && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Stone Details</span>
-                      <span className="text-[#2E3135] font-medium">{product.stoneType}</span>
-                    </div>
-                  )}
-                  {hasEngraving === "Yes" && engravingText && (
-                    <div className="grid grid-cols-2 p-3">
-                      <span className="text-[#888] uppercase tracking-wider">Engraving</span>
-                      <span className="text-[#2E3135] font-medium">{engravingFont} &mdash; &apos;{engravingText}&apos;</span>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 p-3">
-                    <span className="text-[#888] uppercase tracking-wider">Certificate</span>
-                    <span className="text-[#2E3135] font-medium">IGI Certified</span>
-                  </div>
+                <div className="lg:hidden">
+                  {isSpecificationsOpen && renderSpecificationsContent}
                 </div>
-                )}
               </div>
 
               {/* Shipping & Delivery Section */}
               <div className="mt-6">
                 <button
-                  onClick={() => setIsShippingOpen(!isShippingOpen)}
+                  onClick={() => {
+                    setIsShippingOpen(!isShippingOpen);
+                    setActiveDetailTab('shipping');
+                  }}
                   className="flex items-center justify-between text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
                 >
                   <span>Shipping & Delivery</span>
                   <ChevronDown 
-                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 ${isShippingOpen ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 hidden lg:block ${activeDetailTab === 'shipping' ? 'rotate-180' : ''}`} 
+                  />
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 lg:hidden block ${isShippingOpen ? 'rotate-180' : ''}`} 
                   />
                 </button>
-                {isShippingOpen && (
-                <div className="border border-[#E5E5E5] text-xs font-inter p-4 text-[#2E3135] leading-relaxed">
-                  Free insured delivery across India. Delivery timelines depend on product availability, manufacturing, hallmarking, certification, and any customisation requested. Use the pincode checker above to see an estimated delivery date for your location.
+                <div className="lg:hidden">
+                  {isShippingOpen && renderShippingContent}
                 </div>
-                )}
               </div>
 
               {/* Return & Exchange Section */}
               <div className="mt-6">
                 <button
-                  onClick={() => setIsReturnOpen(!isReturnOpen)}
+                  onClick={() => {
+                    setIsReturnOpen(!isReturnOpen);
+                    setActiveDetailTab('return');
+                  }}
                   className="flex items-center justify-between text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
                 >
                   <span>Return & Exchange</span>
                   <ChevronDown 
-                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 ${isReturnOpen ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 hidden lg:block ${activeDetailTab === 'return' ? 'rotate-180' : ''}`} 
+                  />
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 lg:hidden block ${isReturnOpen ? 'rotate-180' : ''}`} 
                   />
                 </button>
-                {isReturnOpen && (
-                <div className="border border-[#E5E5E5] text-xs font-inter p-4 text-[#2E3135] leading-relaxed flex flex-col gap-3">
-                  <p>
-                    15-day return window from the date of delivery. Items must be unworn, unused, undamaged, and returned with original invoice, certificate, tags, and packaging. We arrange a complimentary insured return pickup. Customised, engraved, personalised, resized, or final-sale items are not eligible for change-of-mind returns.
-                  </p>
-                  <Link href="/return-refund-policy" className="text-[#CDB38B] hover:underline font-medium text-[11px] uppercase tracking-wider self-start mt-2">
-                    Read full policy
-                  </Link>
+                <div className="lg:hidden">
+                  {isReturnOpen && renderReturnContent}
                 </div>
-                )}
               </div>
 
             </div>

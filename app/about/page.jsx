@@ -27,7 +27,7 @@ export default function AboutPage() {
 
         {/* SECTION 2 — Brand Mission */}
         <section className="bg-white py-[80px] px-6 sm:px-8 lg:px-12" id="brand-mission">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left side: beautiful jewellery image */}
             <div className="w-full h-full relative aspect-square sm:aspect-[4/3] md:aspect-square overflow-hidden rounded-[8px]">
               <img
@@ -53,7 +53,7 @@ export default function AboutPage() {
 
         {/* SECTION 3 — Three Values */}
         <section className="bg-[#F3F1EC] py-[80px] px-6 sm:px-8 lg:px-12" id="our-values">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-[1600px] mx-auto">
             <h2 className="font-cormorant text-[36px] sm:text-[40px] text-[#2E3135] text-center mb-12 font-normal">
               Why TATVAAN?
             </h2>

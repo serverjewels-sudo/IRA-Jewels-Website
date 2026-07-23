@@ -42,7 +42,7 @@ export default function ContactPage() {
       <Navbar />
 
       {/* Main Container with 80px top and bottom padding */}
-      <main className="flex-grow bg-white py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <main className="flex-grow bg-white py-20 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full">
         
         {/* Section 1: Page Header */}
         <div className="flex flex-col items-center mb-16 text-center">

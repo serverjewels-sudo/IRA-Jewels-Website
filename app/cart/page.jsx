@@ -83,7 +83,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
         <Navbar />
-        <main className="flex-grow py-16 px-4 max-w-7xl mx-auto w-full flex flex-col items-center justify-center">
+        <main className="flex-grow py-16 px-4 max-w-[1600px] mx-auto w-full flex flex-col items-center justify-center">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-8 h-8 rounded-full border-2 border-t-[#CDB38B] border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
             <p className="text-[14px] font-inter font-light text-[#888888] tracking-wider uppercase">Loading Cart...</p>
@@ -98,7 +98,7 @@ export default function CartPage() {
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
       <Navbar />
 
-      <main className="flex-grow py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <main className="flex-grow py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full">
         {/* Title */}
         <h1 className="font-cormorant font-normal text-[36px] sm:text-[40px] text-[#2E3135] text-center mb-12 tracking-wide">
           Your Cart

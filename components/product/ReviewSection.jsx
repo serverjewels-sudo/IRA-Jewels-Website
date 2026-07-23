@@ -72,7 +72,7 @@ export default function ReviewSection({ productId }) {
     : 0
 
   return (
-    <div style={{maxWidth:'1200px', margin:'0 auto', padding:'60px 24px', fontFamily:'Inter'}}>
+    <div className="max-w-[1800px] mx-auto px-6 lg:px-16 py-[60px] font-inter">
       <h2 style={{fontFamily:'Cormorant Garamond', fontSize:'32px', color:'#2E3135', marginBottom:'24px'}}>Customer Reviews</h2>
 
       <div style={{display:'flex', alignItems:'center', gap:'16px', marginBottom:'40px', paddingBottom:'24px', borderBottom:'1px solid #e5e5e5'}}>
@@ -85,7 +85,7 @@ export default function ReviewSection({ productId }) {
         </div>
       </div>
 
-      <div style={{background:'#F3F1EC', padding:'32px', marginBottom:'40px'}}>
+      <div style={{background:'#F3F1EC', padding:'20px 32px', marginBottom:'40px'}}>
         {!user ? (
           <div style={{textAlign:'center'}}>
             <p style={{fontSize:'14px', color:'#2E3135', marginBottom:'12px'}}>Login to share your experience</p>

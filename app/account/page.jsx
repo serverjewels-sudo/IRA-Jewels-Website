@@ -111,7 +111,7 @@ export default function AccountPage() {
     <div className="min-h-screen flex flex-col bg-[#F3F1EC]">
       <Navbar />
       
-      <main className="flex-grow py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full">
+      <main className="flex-grow py-12 md:py-16 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full">
         {/* Welcome Header */}
         <div className="mb-10 text-center md:text-left">
           <h1 className="font-serif text-[32px] font-normal text-[#2E3135] mb-2">

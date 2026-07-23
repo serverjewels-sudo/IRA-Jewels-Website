@@ -89,7 +89,7 @@ export default function ConnectPage() {
 
         {/* Social Cards Section */}
         <section className="bg-white py-16 md:py-24 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-[1600px] mx-auto">
             <h2 className="font-cormorant text-[32px] text-ira-graphite text-center mb-12 font-normal">
               Find Us On
             </h2>
@@ -99,7 +99,7 @@ export default function ConnectPage() {
               {socialChannels.map((channel, index) => (
                 <div 
                   key={index} 
-                  className="group w-full max-w-sm bg-white border border-ira-mist rounded-[8px] p-8 md:p-10 flex flex-col items-center text-center transition-all duration-300 hover:border-ira-gold hover:shadow-lg hover:-translate-y-0.5"
+                  className="group w-full max-w-md bg-white border border-ira-mist rounded-[8px] p-8 md:p-10 flex flex-col items-center text-center transition-all duration-300 hover:border-ira-gold hover:shadow-lg hover:-translate-y-0.5"
                 >
                   {/* Platform Icon Wrapper */}
                   <div className="w-16 h-16 rounded-full border border-ira-mist flex items-center justify-center bg-white group-hover:border-ira-gold group-hover:bg-[#F9F8F6] transition-all duration-300 mb-6">

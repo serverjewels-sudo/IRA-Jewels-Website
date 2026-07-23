@@ -158,10 +158,11 @@ export default function WishlistPage() {
 
         {/* PAGE CONTENT */}
         <section className="bg-white py-[60px] px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[1200px] mx-auto w-full">
+          <div className="max-w-[1600px] mx-auto w-full">
             {isLoading ? (
               /* STATE 3 - Loading State */
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+              <div className="grid grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-x-6 gap-y-10">
+                <SkeletonCard />
                 <SkeletonCard />
                 <SkeletonCard />
                 <SkeletonCard />
@@ -173,7 +174,7 @@ export default function WishlistPage() {
                   {products.length} {products.length === 1 ? "piece" : "pieces"} saved
                 </span>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+                <div className="grid grid-cols-2 min-[901px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-x-6 gap-y-10">
                   {products.map((product) => (
                     <div key={product.id} className="flex flex-col">
                       <div className="flex-grow">

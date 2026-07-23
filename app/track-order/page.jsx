@@ -361,9 +361,9 @@ export default function TrackOrderPage() {
               )}
 
               {/* ESTIMATED DELIVERY NOTE */}
-              {!isCancelled && order.status?.toLowerCase() !== "delivered" && (
+              {!isCancelled && order.status?.toLowerCase() !== "delivered" && order.estimated_delivery_date && (
                 <div className="bg-[#FBF9F6] p-4 text-center font-inter text-[13px] text-[#2E3135]/80 border border-[#E8E6E1]/50 rounded-[4px]">
-                  Estimated delivery: 5–7 business days from order date
+                  Estimated delivery by <span className="font-medium text-[#166534]">{formatOrderDate(order.estimated_delivery_date)}</span>
                 </div>
               )}
             </div>

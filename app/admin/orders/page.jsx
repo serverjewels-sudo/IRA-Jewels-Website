@@ -315,7 +315,14 @@ We're preparing your order with care. Thank you for choosing TATVAAN!`;
                         <tr>
                           <td colSpan="7" className="p-0 border-b border-[#2E3135]/10 bg-[#FAFAFA]">
                             <div className="p-6">
-                              <h4 className="font-inter font-medium text-[11px] tracking-[1.5px] text-[#888] uppercase mb-4">Order Items</h4>
+                              <div className="flex justify-between items-center mb-4">
+                                <h4 className="font-inter font-medium text-[11px] tracking-[1.5px] text-[#888] uppercase">Order Items</h4>
+                                {order.estimated_delivery_date && (
+                                  <span className="font-inter font-medium text-[12px] text-[#166534]">
+                                    Estimated Delivery: {new Date(order.estimated_delivery_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                  </span>
+                                )}
+                              </div>
                               <div className="space-y-4">
                                 {items.length > 0 ? items.map((item, idx) => {
                                   const specs = [

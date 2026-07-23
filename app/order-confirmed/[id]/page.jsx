@@ -81,7 +81,12 @@ export default function OrderConfirmedPage() {
           
           <h1 style={{fontFamily:'Cormorant Garamond', fontSize:'44px', color:'#2E3135', marginBottom:'8px'}}>Order Confirmed</h1>
           <p style={{color:'#888', fontSize:'14px', marginBottom:'8px'}}>Thank you for your purchase</p>
-          <p style={{color:'#CDB38B', fontSize:'13px', letterSpacing:'1px', marginBottom:'48px'}}>ORDER #{order.order_number}</p>
+          <p style={{color:'#CDB38B', fontSize:'13px', letterSpacing:'1px', marginBottom: order.estimated_delivery_date ? '12px' : '48px'}}>ORDER #{order.order_number}</p>
+          {order.estimated_delivery_date && (
+            <p style={{color:'#166534', fontSize:'13px', fontWeight: 500, marginBottom:'48px'}}>
+              Estimated delivery by {new Date(order.estimated_delivery_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          )}
 
           <div style={{background:'#F3F1EC', padding:'32px', marginBottom:'24px', textAlign:'left'}}>
             <p style={{fontSize:'11px', letterSpacing:'2px', color:'#888', marginBottom:'16px', textTransform:'uppercase'}}>Items Ordered</p>

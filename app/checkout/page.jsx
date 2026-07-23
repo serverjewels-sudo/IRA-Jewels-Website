@@ -368,6 +368,19 @@ export default function CheckoutPage() {
         pincode: formData.pinCode,
       };
 
+      let estimated_delivery_date = null;
+      try {
+        const checkRes = await fetch(`/api/check-pincode?pincode=${formData.pinCode}`);
+        const checkData = await checkRes.json();
+        if (checkData.deliverable) {
+          const d = new Date();
+          d.setDate(d.getDate() + 10);
+          estimated_delivery_date = d.toISOString().split('T')[0];
+        }
+      } catch (err) {
+        console.warn("Delivery date check failed, proceeding without it.", err);
+      }
+
       if (paymentMethod === "cod") {
         const { data: newOrder, error } = await supabase
           .from("orders")
@@ -390,6 +403,7 @@ export default function CheckoutPage() {
               status: "placed",
               promo_code_used: appliedPromo?.code || null,
               total_discount_amount: totalDiscountAmount,
+              estimated_delivery_date: estimated_delivery_date,
             },
           ])
           .select();
@@ -463,6 +477,7 @@ export default function CheckoutPage() {
                     razorpay_payment_id: response.razorpay_payment_id,
                     promo_code_used: appliedPromo?.code || null,
                     total_discount_amount: totalDiscountAmount,
+                    estimated_delivery_date: estimated_delivery_date,
                   },
                 }),
               });
@@ -512,6 +527,13 @@ export default function CheckoutPage() {
       setSubmitError(err.message || "Something went wrong. Please try again.");
       setIsPlacingOrder(false);
     }
+  };
+
+  const handleCancelCheckout = () => {
+    if (buyNowItem) {
+      clearBuyNowItem();
+    }
+    router.push("/cart");
   };
 
   // Prevent hydration mismatch or premature display while redirecting empty cart or verifying auth
@@ -857,13 +879,23 @@ export default function CheckoutPage() {
                   {submitError}
                 </div>
               )}
-              <button
-                type="submit"
-                disabled={isPlacingOrder}
-                className="w-full h-14 bg-[#2E3135] text-white font-inter font-medium text-[12px] tracking-[2px] uppercase flex items-center justify-center hover:bg-[#CDB38B] disabled:bg-[#888888] transition-all duration-300 shadow-sm"
-              >
-                {isPlacingOrder ? "PLACING ORDER..." : "PLACE ORDER"}
-              </button>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleCancelCheckout}
+                  disabled={isPlacingOrder}
+                  className="w-1/2 h-14 bg-white border border-[#2E3135] text-[#2E3135] font-inter font-medium text-[12px] tracking-[2px] uppercase flex items-center justify-center hover:bg-[#F3F1EC] transition-all duration-300 shadow-sm"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPlacingOrder}
+                  className="w-1/2 h-14 bg-[#2E3135] text-white font-inter font-medium text-[12px] tracking-[2px] uppercase flex items-center justify-center hover:bg-[#CDB38B] disabled:bg-[#888888] transition-all duration-300 shadow-sm"
+                >
+                  {isPlacingOrder ? "PLACING..." : "PLACE ORDER"}
+                </button>
+              </div>
               <p className="text-center font-inter font-light text-[12px] text-[#888888]">
                 ✦ Free delivery across India on all orders
               </p>

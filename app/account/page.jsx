@@ -160,6 +160,15 @@ export default function AccountPage() {
                               year: "numeric",
                             })}
                           </div>
+                          {order.estimated_delivery_date && (
+                            <div className="text-[12px] text-[#166534] font-medium mt-0.5">
+                              Estimated Delivery: {new Date(order.estimated_delivery_date).toLocaleDateString("en-IN", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </div>
+                          )}
                           <div className="text-[12px] text-[#2E3135]/80 mb-2">
                             {itemCount} {itemCount === 1 ? "item" : "items"}
                           </div>

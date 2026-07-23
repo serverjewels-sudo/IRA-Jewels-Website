@@ -27,6 +27,8 @@ export default function ProductDetailPage() {
   const [isKaratOpen, setIsKaratOpen] = useState(false)
   const [isDiamondWeightOpen, setIsDiamondWeightOpen] = useState(false)
   const [isSpecificationsOpen, setIsSpecificationsOpen] = useState(false)
+  const [isShippingOpen, setIsShippingOpen] = useState(false)
+  const [isReturnOpen, setIsReturnOpen] = useState(false)
   
   // Selected options state
   const [selectedSize, setSelectedSize] = useState(null)
@@ -893,9 +895,42 @@ export default function ProductDetailPage() {
                       )}
                     </div>
 
-                                        </div>
+                    {/* Delivery Check Section */}
+                    <div className="border border-[#E5E5E5] bg-[#FBFBFA] p-4 h-fit self-start w-full max-w-xs order-7 sm:order-none relative">
+                      <h3 className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3">Check Delivery Options</h3>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          maxLength="6"
+                          placeholder="Enter 6-digit Pincode"
+                          value={pincode}
+                          onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                          className="flex-1 w-0 h-10 border border-[#E5E5E5] bg-white px-3 font-inter text-[13px] text-[#2E3135] focus:outline-none focus:border-[#CDB38B]"
+                        />
+                        <button
+                          onClick={checkDelivery}
+                          disabled={isCheckingDelivery || pincode.length !== 6}
+                          className="flex-shrink-0 h-10 px-4 bg-[#2E3135] text-white font-inter font-medium text-[11px] tracking-[1px] uppercase hover:opacity-95 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                        >
+                          {isCheckingDelivery ? "Checking..." : "Check"}
+                        </button>
+                      </div>
+                      {deliveryInfo && deliveryInfo.success && (
+                        <div className="text-[#166534] font-inter text-[12px] mt-2">
+                          <p>✓ Delivering to {deliveryInfo.city}, {deliveryInfo.state}</p>
+                          <p className="mt-1 text-[#2E3135]">Estimated delivery by {deliveryInfo.date}</p>
+                        </div>
+                      )}
+                      {deliveryInfo && deliveryInfo.error && (
+                        <div className="text-[#DC2626] font-inter text-[12px] mt-2">
+                          {deliveryInfo.error}
+                        </div>
+                      )}
+                    </div>
 
-                    {/* RIGHT COLUMN */}
+                  </div>
+
+                  {/* RIGHT COLUMN */}
                     <div className="contents sm:flex sm:flex-col sm:gap-y-6">
                       {/* Diamond Weight Selector */}
                     {product.diamond_price_matrix && selectedShape && product.diamond_price_matrix.filter(v => v.shape_id === selectedShape).length > 0 && (
@@ -1118,39 +1153,6 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* Delivery Check Section */}
-                <div className="mb-8 border border-[#E5E5E5] bg-[#FBFBFA] p-4">
-                  <h3 className="font-inter font-medium text-[11px] tracking-[1.5px] uppercase text-[#2E3135] mb-3">Check Delivery Options</h3>
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      maxLength="6"
-                      placeholder="Enter 6-digit Pincode"
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                      className="flex-1 h-10 border border-[#E5E5E5] bg-white px-3 font-inter text-[13px] text-[#2E3135] focus:outline-none focus:border-[#CDB38B]"
-                    />
-                    <button
-                      onClick={checkDelivery}
-                      disabled={isCheckingDelivery || pincode.length !== 6}
-                      className="h-10 px-6 bg-[#2E3135] text-white font-inter font-medium text-[11px] tracking-[1px] uppercase hover:opacity-95 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                    >
-                      {isCheckingDelivery ? "Checking..." : "Check"}
-                    </button>
-                  </div>
-                  {deliveryInfo && deliveryInfo.success && (
-                    <div className="text-[#166534] font-inter text-[12px] mt-2">
-                      <p>✓ Delivering to {deliveryInfo.city}, {deliveryInfo.state}</p>
-                      <p className="mt-1 text-[#2E3135]">Estimated delivery by {deliveryInfo.date}</p>
-                    </div>
-                  )}
-                  {deliveryInfo && deliveryInfo.error && (
-                    <div className="text-[#DC2626] font-inter text-[12px] mt-2">
-                      {deliveryInfo.error}
-                    </div>
-                  )}
-                </div>
-
                 {/* Trust Services Badges */}
                 <div className="grid grid-cols-3 gap-4 border-t border-b border-[#2E3135]/10 py-3 mb-2 text-center bg-[#FBFBFA]">
                   <div className="flex flex-col items-center p-2">
@@ -1247,6 +1249,47 @@ export default function ProductDetailPage() {
                     <span className="text-[#888] uppercase tracking-wider">Certificate</span>
                     <span className="text-[#2E3135] font-medium">IGI Certified</span>
                   </div>
+                </div>
+                )}
+              </div>
+
+              {/* Shipping & Delivery Section */}
+              <div className="mt-6">
+                <button
+                  onClick={() => setIsShippingOpen(!isShippingOpen)}
+                  className="flex items-center gap-1.5 text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
+                >
+                  <span>Shipping & Delivery</span>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 ${isShippingOpen ? 'rotate-180' : ''}`} 
+                  />
+                </button>
+                {isShippingOpen && (
+                <div className="border border-[#E5E5E5] text-xs font-inter p-4 text-[#2E3135] leading-relaxed">
+                  Free insured delivery across India. Delivery timelines depend on product availability, manufacturing, hallmarking, certification, and any customisation requested. Use the pincode checker above to see an estimated delivery date for your location.
+                </div>
+                )}
+              </div>
+
+              {/* Return & Exchange Section */}
+              <div className="mt-6">
+                <button
+                  onClick={() => setIsReturnOpen(!isReturnOpen)}
+                  className="flex items-center gap-1.5 text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
+                >
+                  <span>Return & Exchange</span>
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#CDB38B] transition-transform duration-200 ${isReturnOpen ? 'rotate-180' : ''}`} 
+                  />
+                </button>
+                {isReturnOpen && (
+                <div className="border border-[#E5E5E5] text-xs font-inter p-4 text-[#2E3135] leading-relaxed flex flex-col gap-3">
+                  <p>
+                    15-day return window from the date of delivery. Items must be unworn, unused, undamaged, and returned with original invoice, certificate, tags, and packaging. We arrange a complimentary insured return pickup. Customised, engraved, personalised, resized, or final-sale items are not eligible for change-of-mind returns.
+                  </p>
+                  <Link href="/return-refund-policy" className="text-[#CDB38B] hover:underline font-medium text-[11px] uppercase tracking-wider self-start mt-2">
+                    Read full policy
+                  </Link>
                 </div>
                 )}
               </div>

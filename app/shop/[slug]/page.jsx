@@ -1185,7 +1185,7 @@ export default function ProductDetailPage() {
               <div className="mt-6">
                 <button
                   onClick={() => setIsSpecificationsOpen(!isSpecificationsOpen)}
-                  className="flex items-center gap-1.5 text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
+                  className="flex items-center justify-between text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
                 >
                   <span>Specifications</span>
                   <ChevronDown 
@@ -1274,7 +1274,7 @@ export default function ProductDetailPage() {
               <div className="mt-6">
                 <button
                   onClick={() => setIsShippingOpen(!isShippingOpen)}
-                  className="flex items-center gap-1.5 text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
+                  className="flex items-center justify-between text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
                 >
                   <span>Shipping & Delivery</span>
                   <ChevronDown 
@@ -1292,7 +1292,7 @@ export default function ProductDetailPage() {
               <div className="mt-6">
                 <button
                   onClick={() => setIsReturnOpen(!isReturnOpen)}
-                  className="flex items-center gap-1.5 text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
+                  className="flex items-center justify-between text-[12px] font-inter font-medium uppercase tracking-[1.5px] text-[#2E3135] hover:text-[#CDB38B] transition-colors py-1.5 focus:outline-none w-full text-left mb-4"
                 >
                   <span>Return & Exchange</span>
                   <ChevronDown 

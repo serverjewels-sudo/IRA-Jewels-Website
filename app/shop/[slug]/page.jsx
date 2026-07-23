@@ -937,7 +937,7 @@ export default function ProductDetailPage() {
 
                       {/* Engraving Details */}
                       {hasEngraving === "Yes" && isEngravingOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-80 bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col p-4 space-y-4">
+                        <div className="absolute top-full left-0 mt-1 w-full bg-[#FBFBFA] border border-[#E5E5E5] shadow-lg z-20 flex flex-col p-4 space-y-4">
                           <div>
                             <label className="block font-inter font-medium text-[11px] tracking-wider uppercase text-[#2E3135] mb-2">
                               Select Font

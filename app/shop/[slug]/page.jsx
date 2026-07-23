@@ -11,6 +11,7 @@ import { supabase, mapSupabaseProduct } from '@/lib/supabase'
 import { sampleProducts } from '@/lib/products'
 import ReviewSection from '@/components/product/ReviewSection'
 import { calculateProductPrice } from '@/lib/priceUtils'
+import { computeManufacturingSku } from '@/lib/skuUtils'
 import { StoneShapeIcon } from '@/components/ui/StoneShapeIcons'
 
 export default function ProductDetailPage() {
@@ -474,6 +475,16 @@ export default function ProductDetailPage() {
       }
     }
   };
+
+  const liveSku = computeManufacturingSku({
+    style_number: product.style_number,
+    karat: selectedKarat,
+    selectedColour: selectedColour,
+    category: product.category,
+    selectedSize: selectedSize,
+    selectedShape: selectedShape,
+    selectedDiamondWeight: selectedDiamondWeight
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#2E3135]">
@@ -1187,6 +1198,12 @@ export default function ProductDetailPage() {
                     <div className="grid grid-cols-2 p-3">
                       <span className="text-[#888] uppercase tracking-wider">Category</span>
                       <span className="text-[#2E3135] font-medium capitalize">{product.category}</span>
+                    </div>
+                  )}
+                  {liveSku && (
+                    <div className="grid grid-cols-2 p-3">
+                      <span className="text-[#888] uppercase tracking-wider">SKU</span>
+                      <span className="text-[#2E3135] font-medium">{liveSku}</span>
                     </div>
                   )}
                   {(selectedColour || product.metalType || product.metal) && (

@@ -121,11 +121,9 @@ export default function Navbar() {
           
           {/* Left Side: Brand Logo */}
           <Link href="/" className="group flex flex-col items-center shrink-0">
-            <img
-              src="https://vlfxeyrhbsftlxczlgrs.supabase.co/storage/v1/object/public/site-assets/tatvaan-wordmark-only__1_-removebg-preview.png"
-              alt="TATVAAN"
-              className="h-[24px] w-auto"
-            />
+            <span className="font-serif text-[22px] sm:text-[26px] md:text-[17px] lg:text-[21px] xl:text-[26px] font-normal tracking-[0.25em] md:tracking-[0.12em] lg:tracking-[0.18em] xl:tracking-[0.25em] text-[#2E3135] uppercase transition-colors duration-300 group-hover:text-[#CDB38B]">
+              TATVAAN
+            </span>
           </Link>
 
           {/* Center: Navigation Links (Desktop) */}
@@ -374,11 +372,9 @@ export default function Navbar() {
         <div className="fixed top-0 left-0 w-[280px] h-dvh bg-white p-6 shadow-2xl flex flex-col justify-between z-50 md:hidden">
             <div>
               <div className="flex justify-between items-center mb-10">
-                <img
-                  src="https://vlfxeyrhbsftlxczlgrs.supabase.co/storage/v1/object/public/site-assets/tatvaan-wordmark-only__1_-removebg-preview.png"
-                  alt="TATVAAN"
-                  className="h-[24px] w-auto"
-                />
+                <span className="font-serif text-[18px] font-normal tracking-[0.2em] text-[#2E3135] uppercase">
+                  TATVAAN
+                </span>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="p-1 text-[#2E3135]"

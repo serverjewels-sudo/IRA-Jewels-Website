@@ -109,7 +109,7 @@ export default function Navbar() {
   const navBackground = isSignatureOpen
     ? "bg-white border-b border-[#F3F1EC]"
     : isTransparent 
-      ? "bg-transparent border-transparent" 
+      ? "bg-transparent border-b border-transparent" 
       : "bg-white/90 backdrop-blur-md border-b border-[#F3F1EC]";
   const iconColor = isTransparent ? "text-white" : "text-[#2E3135]";
 

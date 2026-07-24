@@ -186,115 +186,120 @@ export default function TrackOrderPage() {
           </div>
         </section>
 
-        {/* SECTION 1 — Search Form */}
-        <section className="max-w-7xl mx-auto px-4 mt-12">
-          <div className="max-w-[500px] mx-auto bg-white p-[40px] rounded-[8px] border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
+        {/* MAIN CONTENT AREA: 2-Column Desktop, Stacked Mobile */}
+        <section className="max-w-7xl mx-auto px-4 mt-12 mb-12">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
             
-            {!authLoading && userOrders.length > 0 && (
-              <div className="mb-10 pb-8 border-b border-gray-100">
-                <label className="block font-inter font-medium text-[13px] text-[#2E3135] tracking-[1.5px] uppercase mb-2">
-                  YOUR ACTIVE ORDERS
-                </label>
-                <div className="space-y-4">
-                  <div className="relative">
-                    <select
-                      value={selectedUserOrderId}
-                      onChange={(e) => setSelectedUserOrderId(e.target.value)}
-                      className="w-full bg-white border border-[#2E3135] focus:border-[#CDB38B] outline-none font-inter text-[15px] px-[18px] py-[14px] transition-all rounded-[4px] appearance-none cursor-pointer"
-                    >
-                      {userOrders.map(o => (
-                        <option key={o.id} value={o.id}>
-                          {o.order_number} ({formatOrderDate(o.created_at)})
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-[18px] text-[#2E3135]">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                      </svg>
+            {/* LEFT COLUMN: Search Controls */}
+            <div className="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0">
+              <div className="bg-white p-[40px] rounded-[8px] border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
+                
+                {!authLoading && userOrders.length > 0 && (
+                  <div className="mb-10 pb-8 border-b border-gray-100">
+                    <label className="block font-inter font-medium text-[13px] text-[#2E3135] tracking-[1.5px] uppercase mb-2">
+                      YOUR ACTIVE ORDERS
+                    </label>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <select
+                          value={selectedUserOrderId}
+                          onChange={(e) => setSelectedUserOrderId(e.target.value)}
+                          className="w-full bg-white border border-[#2E3135] focus:border-[#CDB38B] outline-none font-inter text-[15px] px-[18px] py-[14px] transition-all rounded-[4px] appearance-none cursor-pointer"
+                        >
+                          {userOrders.map(o => (
+                            <option key={o.id} value={o.id}>
+                              {o.order_number} ({formatOrderDate(o.created_at)})
+                            </option>
+                          ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-[18px] text-[#2E3135]">
+                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDropdownTrack}
+                        className="w-full bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px]"
+                      >
+                        TRACK SELECTED ORDER
+                      </button>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleDropdownTrack}
-                    className="w-full bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px]"
-                  >
-                    TRACK SELECTED ORDER
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <form onSubmit={handleSearch} className="space-y-6">
-              <div>
-                <label className="block font-inter font-medium text-[13px] text-[#2E3135] tracking-[1.5px] uppercase mb-2">
-                  {userOrders.length > 0 ? "OR SEARCH MANUALLY" : "ORDER NUMBER"}
-                </label>
-                <input
-                  type="text"
-                  value={orderNumber}
-                  onChange={(e) => setOrderNumber(e.target.value)}
-                  placeholder="e.g. TATVAAN-2026-441262"
-                  className="w-full bg-white border border-[#2E3135] focus:border-[#CDB38B] outline-none font-inter text-[15px] px-[18px] py-[14px] transition-all rounded-[4px]"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full ${userOrders.length > 0 ? "bg-white border border-[#2E3135] hover:bg-[#2E3135] hover:text-white text-[#2E3135]" : "bg-[#2E3135] hover:bg-[#CDB38B] text-white"} font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px] flex items-center justify-center gap-2`}
-              >
-                {loading ? (
-                  <>
-                    <div className="w-4 h-4 rounded-full border-2 border-t-transparent border-current animate-spin"></div>
-                    <span>TRACKING...</span>
-                  </>
-                ) : (
-                  <span>{userOrders.length > 0 ? "SEARCH" : "TRACK ORDER"}</span>
                 )}
-              </button>
-            </form>
-          </div>
-        </section>
-
-        {/* RESULTS AREA */}
-        <section className="max-w-2xl mx-auto px-4 mt-8">
-          {/* STATE 3 — Empty (no search yet) */}
-          {!searched && !loading && (
-            <div className="text-center py-12 flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[#FBF9F6] flex items-center justify-center text-[#CDB38B]">
-                <Package className="w-8 h-8 stroke-[1.25]" />
-              </div>
-              <p className="font-inter text-[15px] text-[#888888] font-light max-w-sm">
-                Enter your order number above to track your delivery.
-              </p>
-            </div>
-          )}
-
-          {/* STATE 2 — Order Not Found */}
-          {searched && !order && !loading && (
-            <div className="bg-white p-[40px] rounded-[8px] border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-center space-y-6">
-              <h2 className="font-cormorant text-[24px] text-[#2E3135] font-normal">
-                Order not found
-              </h2>
-              <p className="font-inter text-[15px] text-[#555555] font-light leading-relaxed max-w-md mx-auto">
-                We couldn&apos;t find an order with that number. Please check and try again.
-              </p>
-              <div className="pt-2">
-                <a
-                  href="https://wa.me/919023454014"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 border border-[#2E3135] hover:bg-[#2E3135] hover:text-white text-[#2E3135] font-inter font-medium text-[12px] tracking-[1.5px] uppercase px-8 py-[14px] transition-all duration-300 rounded-[4px]"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>Contact us on WhatsApp</span>
-                </a>
+    
+                <form onSubmit={handleSearch} className="space-y-6">
+                  <div>
+                    <label className="block font-inter font-medium text-[13px] text-[#2E3135] tracking-[1.5px] uppercase mb-2">
+                      {userOrders.length > 0 ? "OR SEARCH MANUALLY" : "ORDER NUMBER"}
+                    </label>
+                    <input
+                      type="text"
+                      value={orderNumber}
+                      onChange={(e) => setOrderNumber(e.target.value)}
+                      placeholder="e.g. TATVAAN-2026-441262"
+                      className="w-full bg-white border border-[#2E3135] focus:border-[#CDB38B] outline-none font-inter text-[15px] px-[18px] py-[14px] transition-all rounded-[4px]"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full ${userOrders.length > 0 ? "bg-white border border-[#2E3135] hover:bg-[#2E3135] hover:text-white text-[#2E3135]" : "bg-[#2E3135] hover:bg-[#CDB38B] text-white"} font-inter font-medium text-[13px] tracking-[1.5px] uppercase py-[14px] px-[18px] transition-all duration-300 rounded-[4px] flex items-center justify-center gap-2`}
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-4 h-4 rounded-full border-2 border-t-transparent border-current animate-spin"></div>
+                        <span>TRACKING...</span>
+                      </>
+                    ) : (
+                      <span>{userOrders.length > 0 ? "SEARCH" : "TRACK ORDER"}</span>
+                    )}
+                  </button>
+                </form>
               </div>
             </div>
-          )}
 
-          {/* STATE 1 — Order Found */}
+            {/* RIGHT COLUMN: Results Area */}
+            <div className="w-full flex-1">
+              
+              {/* STATE 3 — Empty (no search yet) */}
+              {!searched && !loading && (
+                <div className="bg-white p-[40px] rounded-[8px] border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.02)] h-full min-h-[300px] flex flex-col items-center justify-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-[#FBF9F6] flex items-center justify-center text-[#CDB38B]">
+                    <Package className="w-8 h-8 stroke-[1.25]" />
+                  </div>
+                  <p className="font-inter text-[15px] text-[#888888] font-light max-w-sm text-center">
+                    Select an order or enter your order number to see tracking details.
+                  </p>
+                </div>
+              )}
+    
+              {/* STATE 2 — Order Not Found */}
+              {searched && !order && !loading && (
+                <div className="bg-white p-[40px] rounded-[8px] border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-center space-y-6 h-full min-h-[300px] flex flex-col items-center justify-center">
+                  <h2 className="font-cormorant text-[24px] text-[#2E3135] font-normal">
+                    Order not found
+                  </h2>
+                  <p className="font-inter text-[15px] text-[#555555] font-light leading-relaxed max-w-md mx-auto">
+                    We couldn&apos;t find an order with that number. Please check and try again.
+                  </p>
+                  <div className="pt-2">
+                    <a
+                      href="https://wa.me/919023454014"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 border border-[#2E3135] hover:bg-[#2E3135] hover:text-white text-[#2E3135] font-inter font-medium text-[12px] tracking-[1.5px] uppercase px-8 py-[14px] transition-all duration-300 rounded-[4px]"
+                    >
+                      <Phone className="w-4 h-4" />
+                      <span>Contact us on WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* STATE 1 — Order Found */}
           {searched && order && !loading && (
             <div className="bg-white p-6 sm:p-8 rounded-[8px] border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.06)] space-y-8">
               {/* Gold checkmark & Order basic info */}
@@ -449,6 +454,8 @@ export default function TrackOrderPage() {
               )}
             </div>
           )}
+            </div>
+          </div>
         </section>
       </main>
 

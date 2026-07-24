@@ -17,13 +17,12 @@ export default function Footer() {
         {/* Top: Columns Grid */}
         <div className="flex flex-col md:flex-row md:justify-between gap-10 md:gap-6 mb-16">
           {/* Column 0: Logo & Bio */}
-          <div className="flex flex-col space-y-4">
-            <div className="font-serif text-[20px] tracking-[0.2em] text-[#2E3135] uppercase">
-              TATVAAN
-            </div>
-            <p className="text-[12px] font-light font-inter text-[#2E3135]/70 leading-relaxed max-w-xs">
-              Handcrafted everyday luxury made with ethical, stunning lab-grown diamonds.
-            </p>
+          <div className="flex flex-col items-center md:items-start space-y-4">
+            <img
+              src="https://vlfxeyrhbsftlxczlgrs.supabase.co/storage/v1/object/public/site-assets/tatvaan-logo-trimmed.jpg"
+              alt="TATVAAN"
+              className="h-[220px] w-auto"
+            />
           </div>
 
           {/* Column 1: Shop */}

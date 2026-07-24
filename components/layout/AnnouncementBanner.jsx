@@ -72,7 +72,7 @@ export default function AnnouncementBanner() {
   };
 
   return (
-    <div className="bg-[#2E3135] text-white py-2 px-4 relative flex items-center justify-center border-b border-white/5 transition-all duration-300">
+    <div className="bg-[#2E3135] text-white py-1 md:py-2 px-4 relative flex items-center justify-center border-b border-white/5 transition-all duration-300">
       <p className="text-[10px] font-inter uppercase tracking-[2px] text-center pr-6">
         Use code <span className="text-[#CDB38B] font-semibold">{currentPromo.code}</span> for {currentPromo.discount_percentage}% off {collectionText}
       </p>

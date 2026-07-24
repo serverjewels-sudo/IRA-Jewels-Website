@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function ShopCarousel({ title, subtitle, items, filterKey }) {
+export default function ShopCarousel({ title, subtitle, items, filterKey, directLink = false }) {
   const [visibleItems, setVisibleItems] = useState(4);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -174,7 +174,7 @@ export default function ShopCarousel({ title, subtitle, items, filterKey }) {
                   className="shrink-0 px-4"
                   style={{ width: `${itemWidthPercent}%` }}
                 >
-                  <Link href={`/shop?${filterKey}=${item.slug}`} className="group block h-full">
+                  <Link href={directLink ? `/shop/${item.slug}` : `/shop?${filterKey}=${item.slug}`} className="group block h-full">
                     <div className="aspect-square w-full overflow-hidden bg-[#F9F8F6] mb-5">
                       <img 
                         src={item.image} 

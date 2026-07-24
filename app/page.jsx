@@ -15,8 +15,20 @@ export default async function HomePage() {
   // Fetch setting_style and colour_variants from all active products to ensure we only show styles with real inventory
   const { data: activeProducts } = await supabaseAdmin
     .from('products')
-    .select('setting_style, colour_variants')
+    .select('name, slug, images, is_featured, setting_style, colour_variants')
     .eq('is_active', true);
+    
+  // Map featured products for the Best Seller carousel
+  const featuredProducts = (activeProducts || [])
+    .filter(p => p.is_featured)
+    .map(p => {
+      const imagesArray = Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []);
+      return {
+        name: p.name,
+        slug: p.slug,
+        image: imagesArray[0] || ""
+      };
+    });
     
   const activeStyleNames = new Set(
     activeProducts?.map(p => p.setting_style).filter(Boolean) || []
@@ -54,6 +66,15 @@ export default async function HomePage() {
       <main className="flex-grow">
         <Hero />
         <Banner />
+        
+        {featuredProducts.length > 0 && (
+          <ShopCarousel 
+            title="Best Seller"
+            subtitle="The Curated Collection"
+            items={featuredProducts}
+            directLink={true}
+          />
+        )}
         
         <ShopCarousel 
           title="Shop by Category"

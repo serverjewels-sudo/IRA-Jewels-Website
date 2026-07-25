@@ -25,6 +25,7 @@ export default function Navbar() {
   const [collections, setCollections] = useState([]);
   const [previewData, setPreviewData] = useState({ imageUrl: '', label: '' });
   const closeTimeoutRef = useRef(null);
+  const hasPreloadedRef = useRef(false);
 
   const handleMouseEnter = () => {
     if (closeTimeoutRef.current) {
@@ -60,6 +61,20 @@ export default function Navbar() {
   useEffect(() => {
     if (!isSignatureOpen && collections.length > 0) {
       setPreviewData({ imageUrl: collections[0].cover_image_url || '', label: collections[0].name });
+    }
+  }, [isSignatureOpen, collections]);
+
+  useEffect(() => {
+    if (isSignatureOpen && !hasPreloadedRef.current) {
+      hasPreloadedRef.current = true;
+      const urls = [
+        ...collections.map(c => c.cover_image_url).filter(Boolean),
+        ...CATEGORIES.map(c => c.image).filter(Boolean)
+      ];
+      urls.forEach((url) => {
+        const img = new window.Image();
+        img.src = url;
+      });
     }
   }, [isSignatureOpen, collections]);
 

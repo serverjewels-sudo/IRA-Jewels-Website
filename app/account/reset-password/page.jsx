@@ -12,11 +12,28 @@ function ResetPasswordForm() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [isRecoveryFlow, setIsRecoveryFlow] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
 
-  // Supabase automatically handles the hash in the URL and establishes a session 
-  // for the password reset if it's a valid link. We don't need to manually parse it.
-  
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsRecoveryFlow(true);
+        setCheckingAuth(false);
+      }
+    });
+
+    // Timeout to stop checking if no recovery event fires (e.g. normal visit)
+    const timer = setTimeout(() => {
+      setCheckingAuth(false);
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
+  }, []);
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -59,67 +76,85 @@ function ResetPasswordForm() {
         </p>
       </div>
 
-      <form className="space-y-6" onSubmit={handleUpdatePassword}>
-        <div>
-          <label 
-            htmlFor="password" 
-            className="block font-inter text-[12px] uppercase tracking-wider text-[#2E3135] mb-2 font-medium"
-          >
-            New Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-[#FFFFFF] border border-[#2E3135] font-inter text-[15px] p-3 focus:outline-none focus:border-[#CDB38B] transition-colors duration-300 rounded-none text-[#2E3135]"
-            placeholder="••••••••"
-          />
+      {checkingAuth ? (
+        <div className="text-center text-[#2E3135]/60 font-inter text-sm mt-8 mb-8 animate-pulse">
+          Verifying recovery link...
         </div>
+      ) : isRecoveryFlow ? (
+        <form className="space-y-6" onSubmit={handleUpdatePassword}>
+          <div>
+            <label 
+              htmlFor="password" 
+              className="block font-inter text-[12px] uppercase tracking-wider text-[#2E3135] mb-2 font-medium"
+            >
+              New Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-[#FFFFFF] border border-[#2E3135] font-inter text-[15px] p-3 focus:outline-none focus:border-[#CDB38B] transition-colors duration-300 rounded-none text-[#2E3135]"
+              placeholder="••••••••"
+            />
+          </div>
 
-        <div>
-          <label 
-            htmlFor="confirmPassword" 
-            className="block font-inter text-[12px] uppercase tracking-wider text-[#2E3135] mb-2 font-medium"
-          >
-            Confirm New Password
-          </label>
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full bg-[#FFFFFF] border border-[#2E3135] font-inter text-[15px] p-3 focus:outline-none focus:border-[#CDB38B] transition-colors duration-300 rounded-none text-[#2E3135]"
-            placeholder="••••••••"
-          />
-        </div>
+          <div>
+            <label 
+              htmlFor="confirmPassword" 
+              className="block font-inter text-[12px] uppercase tracking-wider text-[#2E3135] mb-2 font-medium"
+            >
+              Confirm New Password
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full bg-[#FFFFFF] border border-[#2E3135] font-inter text-[15px] p-3 focus:outline-none focus:border-[#CDB38B] transition-colors duration-300 rounded-none text-[#2E3135]"
+              placeholder="••••••••"
+            />
+          </div>
 
-        <div>
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#2E3135] text-[#FFFFFF] font-inter font-medium text-[13px] tracking-[2px] uppercase py-3.5 hover:bg-[#CDB38B] transition-colors duration-300 disabled:opacity-50"
+            >
+              {loading ? "UPDATING..." : "UPDATE PASSWORD"}
+            </button>
+          </div>
+          
+          {errorMsg && (
+            <p className="text-red-600 text-sm mt-2 text-center font-inter font-medium">
+              {errorMsg}
+            </p>
+          )}
+          
+          {successMsg && (
+            <p className="text-green-600 text-sm mt-2 text-center font-inter font-medium">
+              {successMsg}
+            </p>
+          )}
+        </form>
+      ) : (
+        <div className="text-center mt-8 mb-4">
+          <p className="text-red-600 font-inter text-sm mb-6">
+            This password reset link is invalid or has expired.
+          </p>
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#2E3135] text-[#FFFFFF] font-inter font-medium text-[13px] tracking-[2px] uppercase py-3.5 hover:bg-[#CDB38B] transition-colors duration-300 disabled:opacity-50"
+            onClick={() => router.push("/account/login")}
+            className="w-full bg-[#2E3135] text-[#FFFFFF] font-inter font-medium text-[13px] tracking-[2px] uppercase py-3.5 hover:bg-[#CDB38B] transition-colors duration-300"
           >
-            {loading ? "UPDATING..." : "UPDATE PASSWORD"}
+            Return to Login
           </button>
         </div>
-        
-        {errorMsg && (
-          <p className="text-red-600 text-sm mt-2 text-center font-inter font-medium">
-            {errorMsg}
-          </p>
-        )}
-        
-        {successMsg && (
-          <p className="text-green-600 text-sm mt-2 text-center font-inter font-medium">
-            {successMsg}
-          </p>
-        )}
-      </form>
+      )}
     </div>
   );
 }

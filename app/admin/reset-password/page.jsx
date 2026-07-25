@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 
@@ -11,6 +11,27 @@ export default function AdminResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [isRecoveryFlow, setIsRecoveryFlow] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsRecoveryFlow(true);
+        setCheckingAuth(false);
+      }
+    });
+
+    // Timeout to stop checking if no recovery event fires (e.g. normal visit)
+    const timer = setTimeout(() => {
+      setCheckingAuth(false);
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
@@ -54,70 +75,87 @@ export default function AdminResetPasswordPage() {
           Reset Password
         </p>
 
-        {/* Reset Form */}
-        <form onSubmit={handleUpdatePassword} className="w-full space-y-5">
-          {errorMsg && (
-            <div className="text-red-600 text-[13px] font-inter text-center py-2 px-3 bg-red-50 rounded border border-red-100">
-              {errorMsg}
-            </div>
-          )}
-          {successMsg && (
-            <div className="text-green-600 text-[13px] font-inter text-center py-2 px-3 bg-green-50 rounded border border-green-100">
-              {successMsg}
-            </div>
-          )}
-
-          {/* New Password input */}
-          <div className="flex flex-col space-y-1.5">
-            <label
-              htmlFor="password"
-              className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase"
-            >
-              New Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 bg-[#F3F1EC]/40 border border-[#E5E5E5] text-[#2E3135] rounded-md font-inter text-[13px] tracking-wide focus:outline-none focus:border-[#CDB38B] focus:bg-white transition-all placeholder:text-[#2E3135]/30"
-            />
+        {checkingAuth ? (
+          <div className="text-center text-[#2E3135]/60 font-inter text-sm mt-8 mb-8 animate-pulse">
+            Verifying recovery link...
           </div>
-
-          {/* Confirm Password input */}
-          <div className="flex flex-col space-y-1.5">
-            <label
-              htmlFor="confirmPassword"
-              className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase"
-            >
-              Confirm New Password
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 bg-[#F3F1EC]/40 border border-[#E5E5E5] text-[#2E3135] rounded-md font-inter text-[13px] tracking-wide focus:outline-none focus:border-[#CDB38B] focus:bg-white transition-all placeholder:text-[#2E3135]/30"
-            />
-          </div>
-
-          {/* UPDATE Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3.5 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[12px] font-semibold tracking-[2px] uppercase rounded-md shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              "UPDATE PASSWORD"
+        ) : isRecoveryFlow ? (
+          <form onSubmit={handleUpdatePassword} className="w-full space-y-5">
+            {errorMsg && (
+              <div className="text-red-600 text-[13px] font-inter text-center py-2 px-3 bg-red-50 rounded border border-red-100">
+                {errorMsg}
+              </div>
             )}
-          </button>
-        </form>
+            {successMsg && (
+              <div className="text-green-600 text-[13px] font-inter text-center py-2 px-3 bg-green-50 rounded border border-green-100">
+                {successMsg}
+              </div>
+            )}
+
+            {/* New Password input */}
+            <div className="flex flex-col space-y-1.5">
+              <label
+                htmlFor="password"
+                className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase"
+              >
+                New Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-[#F3F1EC]/40 border border-[#E5E5E5] text-[#2E3135] rounded-md font-inter text-[13px] tracking-wide focus:outline-none focus:border-[#CDB38B] focus:bg-white transition-all placeholder:text-[#2E3135]/30"
+              />
+            </div>
+
+            {/* Confirm Password input */}
+            <div className="flex flex-col space-y-1.5">
+              <label
+                htmlFor="confirmPassword"
+                className="font-inter text-[11px] font-semibold tracking-wider text-[#2E3135]/60 uppercase"
+              >
+                Confirm New Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-[#F3F1EC]/40 border border-[#E5E5E5] text-[#2E3135] rounded-md font-inter text-[13px] tracking-wide focus:outline-none focus:border-[#CDB38B] focus:bg-white transition-all placeholder:text-[#2E3135]/30"
+              />
+            </div>
+
+            {/* UPDATE Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[12px] font-semibold tracking-[2px] uppercase rounded-md shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                "UPDATE PASSWORD"
+              )}
+            </button>
+          </form>
+        ) : (
+          <div className="text-center mt-8 mb-4">
+            <p className="text-red-600 font-inter text-sm mb-6">
+              This password reset link is invalid or has expired.
+            </p>
+            <button
+              onClick={() => router.push("/admin/login")}
+              className="w-full py-3.5 bg-[#2E3135] hover:bg-[#CDB38B] text-white font-inter text-[12px] font-semibold tracking-[2px] uppercase rounded-md shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              Return to Login
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

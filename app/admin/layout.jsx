@@ -18,8 +18,8 @@ export default function AdminLayout({ children }) {
   }, [pathname]);
 
   useEffect(() => {
-    // If it's the login page, bypass authentication check in layout
-    if (pathname === "/admin/login") {
+    // If it's the login or reset password page, bypass authentication check in layout
+    if (pathname === "/admin/login" || pathname === "/admin/reset-password") {
       setLoading(false);
       return;
     }
@@ -68,8 +68,8 @@ export default function AdminLayout({ children }) {
     };
   }, [pathname, router]);
 
-  // If rendering login page, return layout-free children
-  if (pathname === "/admin/login") {
+  // If rendering login or reset password page, return layout-free children
+  if (pathname === "/admin/login" || pathname === "/admin/reset-password") {
     return <div className="min-h-screen bg-[#F3F1EC] text-[#2E3135]">{children}</div>;
   }
 

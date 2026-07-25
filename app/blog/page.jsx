@@ -2,6 +2,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 
+// .
+
 export const metadata = {
   title: "Stories & Insights | TATVAAN",
   description: "Jewellery care, diamond education, and style inspiration. Learn how to care for your pieces, understand the 4Cs, and get style inspiration.",
